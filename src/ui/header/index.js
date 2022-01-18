@@ -5,7 +5,7 @@ export class Header extends React.Component {
     render() {
         return (
           <>
-            <div className="header">Transfer</div>
+            <div className="header"><input type="text" placeholder="Search File, Folder"></input> </div>
           </>
         )
     }

@@ -3,6 +3,7 @@ import {Logo} from './icons/Logo'
 import {Leftmenu} from './ui/left-menubar/index.js'
 import {Header} from './ui/header/index.js'
 import { menus } from './vars';
+import { Content } from './ui/content/index.js'
 
 
 export class Crypithm extends React.Component {
@@ -27,6 +28,7 @@ export class Crypithm extends React.Component {
       <>
       <Leftmenu currentPage={this.state.currentPage} updateFunc={()=>this.pushedToState()}/>
       <Header />
+      <Content currentPage={this.state.currentPage} />
       </>
     )
   }   

@@ -41,9 +41,6 @@
     align-items: center;
     justify-content: left;
     font-size: 10pt;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
     cursor: pointer;
     margin-top: 10px;
     -webkit-tap-highlight-color: transparent;

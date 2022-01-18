@@ -5,4 +5,5 @@
     margin-left: 360px;
     padding-top: 131px;
     background-color: inherit;
+    flex-direction: column;
 }

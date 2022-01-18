@@ -1,9 +1,6 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import {Crypithm} from './Crypithm';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import { Crypithm } from "./Crypithm";
 
-ReactDOM.render(
-    <Crypithm />,
-  document.getElementById('root')
-);
+ReactDOM.render(<Crypithm />, document.getElementById("root"));

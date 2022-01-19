@@ -1,3 +1,4 @@
+import { RiDeleteBin7Fill, RiPencilFill } from "react-icons/ri";
 import React from "react";
 import "./index.css";
 
@@ -10,7 +11,7 @@ export class Files extends React.Component {
   render() {
     var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };
     return (
-      <div ref={this.clickDetectionArea}>
+      <div>
         <div
           className="dragSquare"
           style={{
@@ -33,19 +34,42 @@ export class Files extends React.Component {
                 : (this.state.currentPos[1] - this.state.startPos[1]) * -1,
           }}
         ></div>
-        <div className="fileControlOptions"></div>
-        <div style={{ height: "100vh" }}>
+        <div
+          className={
+            this.state.selectedIndex.length === 0
+              ? "fileControlOptions hidden"
+              : "fileControlOptions"
+          }
+        >
+          <b>selected {this.state.selectedIndex.length} file(s)</b>
+          <div className="FileOptButtons">
+            <div className="FileOptIcons">
+              <RiDeleteBin7Fill />
+            </div>
+            <div className="FileOptIcons">
+              <RiPencilFill />
+            </div>
+          </div>
+        </div>
+        <div style={{ height: "100vh" }} ref={this.clickDetectionArea}>
           {[
-            "89shHGfdasg",
-            "8HBF579hfcX",
-            "8Gvxzjaskdu",
-            "lW6PdOYPNCW",
-            "1lNa9ADW58H",
-            "7UdbAm8LGtm",
-            "JTn0psPPtDs",
-            "slCVk11xUV2",
-            "rg2avRUQgpr",
-          ].map((id, index) => {
+            {
+              id: "89shHGfdasg",
+              name: "TusisCool.mpeg",
+              size: 1209121,
+              date: "2022 1 19",
+              thumb:
+                "https://pbs.twimg.com/profile_images/1342768807891378178/8le-DzgC_400x400.jpg",
+            },
+            {
+              id: "8HBF579hfcX",
+              name: "crypithm.jpeg",
+              size: 2048,
+              date: "2022 1 19",
+              thumb:
+                "https://i1.sndcdn.com/avatars-zUGIpyyW010rJFrc-rdl0PQ-t240x240.jpg",
+            },
+          ].map((elem, index) => {
             return (
               <div
                 className="fileContainer"
@@ -54,11 +78,15 @@ export class Files extends React.Component {
                     ? selectedStyle
                     : {}
                 }
-                objectid={id}
-                key={id}
+                objectid={elem.id}
+                key={elem.id}
                 data-index={index + 1}
               >
-                a
+                <div className="fileThumbnail">
+                  <img src={elem.thumb} width={20}/>
+                </div>
+
+                {elem.name}
               </div>
             );
           })}
@@ -99,7 +127,7 @@ export class Files extends React.Component {
       if (targetIndex == null) {
         //dragsquare
         this.setState({ startPos: [e.clientX, e.clientY] });
-        this.mouseMove(e)
+        this.mouseMove(e);
         window.addEventListener("mousemove", this.mouseMove);
         window.addEventListener("mouseup", () => {
           window.removeEventListener("mousemove", this.mouseMove);

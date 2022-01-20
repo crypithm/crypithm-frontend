@@ -25,7 +25,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.1s ease-in-out;
+    transition: opacity 0.1s ease-in-out;
     cursor: pointer;
 }
 .FileOptIcons:hover {
@@ -36,7 +36,7 @@
     align-items: center;
     font-size: 12pt;
     margin: 0 30px 0 auto;
-    width: 50px;
+    width: 80px;
     justify-content: space-between;
 }
 

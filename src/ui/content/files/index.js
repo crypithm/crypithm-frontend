@@ -11,6 +11,7 @@ export class Files extends React.Component {
     super(props);
     this.clickDetectionArea = React.createRef();
     this.dragDetectionArea = React.createRef();
+    this.fileItemsRef = [];
     this.state = {
       selectedIndex: [],
       startPos: [0, 0],
@@ -52,7 +53,6 @@ export class Files extends React.Component {
     );
   };
 
-
   render = () => {
     var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };
 
@@ -70,14 +70,8 @@ export class Files extends React.Component {
               this.state.currentPos[0] - this.state.startPos[0] > 0
                 ? this.state.startPos[0]
                 : this.state.currentPos[0],
-            width:
-              this.state.currentPos[0] - this.state.startPos[0] >= 0
-                ? this.state.currentPos[0] - this.state.startPos[0]
-                : (this.state.currentPos[0] - this.state.startPos[0]) * -1,
-            height:
-              this.state.currentPos[1] - this.state.startPos[1] >= 0
-                ? this.state.currentPos[1] - this.state.startPos[1]
-                : (this.state.currentPos[1] - this.state.startPos[1]) * -1,
+            width: Math.abs(this.state.currentPos[0] - this.state.startPos[0]),
+            height: Math.abs(this.state.currentPos[1] - this.state.startPos[1]),
           }}
         ></div>
         <div
@@ -119,6 +113,7 @@ export class Files extends React.Component {
                 objectid={elem.id}
                 key={elem.id}
                 data-index={index + 1}
+                ref={(ref) => { this.fileItemsRef[index] = ref; return true; }}
               >
                 <div className="fileThumbnail">
                   <img src={elem.thumb} width={20} />
@@ -139,7 +134,6 @@ export class Files extends React.Component {
       .getAttribute("objectid");
   };
 
-
   mouseDown = (e) => {
     this.setState({ startPos: [0, 0], currentPos: [0, 0] });
     var targetIndex = e.target.getAttribute("data-index");
@@ -147,10 +141,16 @@ export class Files extends React.Component {
       //dragsquare
       this.setState({ startPos: [e.clientX, e.clientY] });
       this.mouseMove(e);
-      this.dragDetectionArea.current.addEventListener("mousemove", this.mouseMove);
+      this.dragDetectionArea.current.addEventListener(
+        "mousemove",
+        this.mouseMove
+      );
       window.addEventListener("mouseup", () => {
         if (this.dragDetectionArea.current) {
-          this.dragDetectionArea.current.removeEventListener("mousemove", this.mouseMove);
+          this.dragDetectionArea.current.removeEventListener(
+            "mousemove",
+            this.mouseMove
+          );
           this.setState({ startPos: [0, 0], currentPos: [0, 0] });
         }
       });
@@ -207,11 +207,11 @@ export class Files extends React.Component {
     }
   };
 
-  
   mouseMove = (mouseMoveEvent) => {
     this.setState({
       currentPos: [mouseMoveEvent.clientX, mouseMoveEvent.clientY],
     });
+
     if (mouseMoveEvent.target.getAttribute("data-index")) {
       if (
         this.state.selectedIndex.indexOf(

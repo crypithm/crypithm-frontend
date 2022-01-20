@@ -6,3 +6,16 @@ body, html {
   -webkit-user-select: none;
   -moz-user-select: none;
 }
+body::-webkit-scrollbar {
+  width: 8px;
+}
+body::-webkit-scrollbar-thumb {
+  background-color: #ffffff4d;
+  border-radius: 4px;
+}
+body::-webkit-scrollbar-thumb:hover {
+  background-color: #ffffff80;
+}
+body::-webkit-scrollbar-track {
+  background-color: #191919;
+}

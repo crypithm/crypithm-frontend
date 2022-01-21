@@ -45,16 +45,28 @@
 
 }
 
+.unselectButton {
+    color: #575757;
+    margin-left: 10px;
+    font-size: 8.5pt;
+    cursor: pointer;
+}
 .fileControlOptions {
+    z-index: 1;
+    background-color: #191919;
     width: 100%;
     height: 70px;
-    display: flex;
-    align-items: center;
     font-family: 'Source Code Pro', monospace;
     color: rgba(255,255,255,0.6);
     font-size: 10pt;
+    position: sticky;
+    top: 131px;
+}
+.FCObtn {
+    display: flex;
+    align-items: center;
+    height: 100%;
     transition: opacity 0.1s ease-in-out;
-
 }
 .dragSquare {
     background-color: rgba(255,255,255,0.05);

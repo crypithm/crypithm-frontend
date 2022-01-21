@@ -74,29 +74,35 @@ export class Files extends React.Component {
             height: Math.abs(this.state.currentPos[1] - this.state.startPos[1]),
           }}
         ></div>
-        <div
-          className={
-            this.state.selectedIndex.length === 0
-              ? "fileControlOptions hidden"
-              : "fileControlOptions"
-          }
-        >
-          <b>selected {this.state.selectedIndex.length} file(s)</b>
-          <div className="FileOptButtons">
-            <div
-              className={
-                this.state.selectedIndex.length !== 1
-                  ? "FileOptIcons hidden"
-                  : "FileOptIcons"
-              }
+        <div className={"fileControlOptions"}>
+          <div
+            className={this.state.selectedIndex.length === 0 ? "FCObtn hidden" : "FCObtn"}
+          >
+            <b>selected {this.state.selectedIndex.length} file(s)</b>{" "}
+            <b
+              className="unselectButton"
+              onClick={() => {
+                this.setState({ selectedIndex: [] });
+              }}
             >
-              <RiInformationFill />
-            </div>
-            <div className="FileOptIcons">
-              <RiDeleteBin7Fill />
-            </div>
-            <div className="FileOptIcons">
-              <RiPencilFill />
+              unselect
+            </b>
+            <div className="FileOptButtons">
+              <div
+                className={
+                  this.state.selectedIndex.length !== 1
+                    ? "FileOptIcons hidden"
+                    : "FileOptIcons"
+                }
+              >
+                <RiInformationFill />
+              </div>
+              <div className="FileOptIcons">
+                <RiDeleteBin7Fill />
+              </div>
+              <div className="FileOptIcons">
+                <RiPencilFill />
+              </div>
             </div>
           </div>
         </div>
@@ -113,7 +119,10 @@ export class Files extends React.Component {
                 objectid={elem.id}
                 key={elem.id}
                 data-index={index + 1}
-                ref={(ref) => { this.fileItemsRef[index] = ref; return true; }}
+                ref={(ref) => {
+                  this.fileItemsRef[index] = ref;
+                  return true;
+                }}
               >
                 <div className="fileThumbnail">
                   <img src={elem.thumb} width={20} />
@@ -139,7 +148,8 @@ export class Files extends React.Component {
     var targetIndex = e.target.getAttribute("data-index");
     if (targetIndex == null) {
       //dragsquare
-      this.setState({ startPos: [e.clientX, e.clientY] });
+      console.log(e);
+      this.setState({ startPos: [e.pageX, e.pageY] });
       this.mouseMove(e);
       this.dragDetectionArea.current.addEventListener(
         "mousemove",
@@ -209,7 +219,7 @@ export class Files extends React.Component {
 
   mouseMove = (mouseMoveEvent) => {
     this.setState({
-      currentPos: [mouseMoveEvent.clientX, mouseMoveEvent.clientY],
+      currentPos: [mouseMoveEvent.pageX, mouseMoveEvent.pageY],
     });
 
     if (mouseMoveEvent.target.getAttribute("data-index")) {

@@ -40,11 +40,33 @@
     justify-content: space-between;
 }
 
+
 .fileContainer:hover {
     background-color: rgba(255,255,255,0.05)
 
 }
 
+.Newbtn {
+    margin-right: 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    background-color: #242424;
+    padding: 7px 13px 7px 13px;
+    border-radius: 5px;
+    color: #636363;
+    transition: color 0.1s ease-in-out;
+}
+.Newbtn:hover {
+    color: #9c9c9c;
+}
+.Newbtn-icon {
+    font-size: 15pt;
+    display: flex;
+    align-items: center;
+    margin-right: 5px;
+}
 .unselectButton {
     color: #575757;
     margin-left: 10px;
@@ -61,11 +83,14 @@
     font-size: 10pt;
     position: sticky;
     top: 131px;
+    display: flex;
+    align-items: center;
 }
 .FCObtn {
     display: flex;
     align-items: center;
     height: 100%;
+    width: 100%;
     transition: opacity 0.1s ease-in-out;
 }
 .dragSquare {

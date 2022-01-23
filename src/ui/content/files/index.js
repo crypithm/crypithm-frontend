@@ -3,6 +3,8 @@ import {
   RiPencilFill,
   RiInformationFill,
 } from "react-icons/ri";
+
+import {BsCloudPlusFill} from "react-icons/bs"
 import React from "react";
 import "./index.css";
 
@@ -74,7 +76,8 @@ export class Files extends React.Component {
             height: Math.abs(this.state.currentPos[1] - this.state.startPos[1]),
           }}
         ></div>
-        <div className={"fileControlOptions"}>
+        <div className="fileControlOptions">
+          <b className="Newbtn"><div className="Newbtn-icon"><BsCloudPlusFill /></div> New</b>
           <div
             className={this.state.selectedIndex.length === 0 ? "FCObtn hidden" : "FCObtn"}
           >

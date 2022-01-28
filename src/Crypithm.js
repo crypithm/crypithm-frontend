@@ -9,10 +9,10 @@ export class Crypithm extends React.Component {
     super(props);
     this.state = { currentPage: window.location.pathname.split("/")[1] };
   }
-  pushedToState() {
+  pushedToState = () => {
     this.setState({ currentPage: window.location.pathname.split("/")[1] });
-  }
-  componentDidMount() {
+  };
+  componentDidMount = () => {
     window.onpopstate = () => {
       var currentPage = window.location.pathname.split("/")[1];
       this.setState({ currentPage: currentPage });
@@ -20,8 +20,8 @@ export class Crypithm extends React.Component {
     if (menus.indexOf(this.state.currentPage) == -1) {
       window.history.pushState({}, "", "files");
     }
-  }
-  render() {
+  };
+  render = () => {
     return (
       <>
         <Leftmenu
@@ -32,5 +32,5 @@ export class Crypithm extends React.Component {
         <Content currentPage={this.state.currentPage} />
       </>
     );
-  }
+  };
 }

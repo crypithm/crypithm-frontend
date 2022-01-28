@@ -4,7 +4,7 @@ import {
   RiInformationFill,
 } from "react-icons/ri";
 
-import {BsCloudPlusFill} from "react-icons/bs"
+import { BsCloudPlusFill } from "react-icons/bs";
 import React from "react";
 import "./index.css";
 
@@ -14,6 +14,7 @@ export class Files extends React.Component {
     this.clickDetectionArea = React.createRef();
     this.dragDetectionArea = React.createRef();
     this.fileItemsRef = [];
+    this.dragBoxRef = React.createRef();
     this.state = {
       selectedIndex: [],
       startPos: [0, 0],
@@ -75,11 +76,19 @@ export class Files extends React.Component {
             width: Math.abs(this.state.currentPos[0] - this.state.startPos[0]),
             height: Math.abs(this.state.currentPos[1] - this.state.startPos[1]),
           }}
+          ref={this.dragBoxRef}
         ></div>
         <div className="fileControlOptions">
-          <b className="Newbtn"><div className="Newbtn-icon"><BsCloudPlusFill /></div> New</b>
+          <b className="Newbtn" onClick={() => this.newBtnClicked()}>
+            <div className="Newbtn-icon">
+              <BsCloudPlusFill />
+            </div>{" "}
+            New
+          </b>
           <div
-            className={this.state.selectedIndex.length === 0 ? "FCObtn hidden" : "FCObtn"}
+            className={
+              this.state.selectedIndex.length === 0 ? "FCObtn hidden" : "FCObtn"
+            }
           >
             <b>selected {this.state.selectedIndex.length} file(s)</b>{" "}
             <b
@@ -109,7 +118,11 @@ export class Files extends React.Component {
             </div>
           </div>
         </div>
-        <div style={{ height: "100vh" }} ref={this.clickDetectionArea}>
+        <div
+          style={{ height: "100vh" }}
+          ref={this.clickDetectionArea}
+          className="filecont-cont"
+        >
           {this.data.map((elem, index) => {
             return (
               <div
@@ -140,6 +153,7 @@ export class Files extends React.Component {
     );
   };
 
+  newBtnClicked = () => {};
   getIdFromIndex = (index) => {
     return document
       .querySelector(`[data-index="${index}"]`)
@@ -151,7 +165,6 @@ export class Files extends React.Component {
     var targetIndex = e.target.getAttribute("data-index");
     if (targetIndex == null) {
       //dragsquare
-      console.log(e);
       this.setState({ startPos: [e.pageX, e.pageY] });
       this.mouseMove(e);
       this.dragDetectionArea.current.addEventListener(
@@ -221,22 +234,30 @@ export class Files extends React.Component {
   };
 
   mouseMove = (mouseMoveEvent) => {
+    this.fileItemsRef.map((elem, _) => {
+      if (
+        this.dragBoxRef.current.getBoundingClientRect().y <=
+          elem.getBoundingClientRect().bottom &&
+        this.state.currentPos[1] != 0 &&
+        this.state.currentPos[0] != 0 &&
+        this.dragBoxRef.current.getBoundingClientRect().x >=
+          elem.getBoundingClientRect().x
+      ) {
+        if (
+          this.state.selectedIndex.indexOf(
+            parseInt(elem.getAttribute('data-index'))
+          ) == -1
+        ) {
+          this.setState({
+            selectedIndex: this.state.selectedIndex.concat([
+              parseInt(elem.getAttribute('data-index')),
+            ]),
+          });
+        }
+      }
+    });
     this.setState({
       currentPos: [mouseMoveEvent.pageX, mouseMoveEvent.pageY],
     });
-
-    if (mouseMoveEvent.target.getAttribute("data-index")) {
-      if (
-        this.state.selectedIndex.indexOf(
-          parseInt(mouseMoveEvent.target.getAttribute("data-index"))
-        ) == -1
-      ) {
-        this.setState({
-          selectedIndex: this.state.selectedIndex.concat([
-            parseInt(mouseMoveEvent.target.getAttribute("data-index")),
-          ]),
-        });
-      }
-    }
   };
 }

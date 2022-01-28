@@ -10,32 +10,32 @@ export class Leftmenu extends React.Component {
     this.state = { ActiveMenuIndex: 0 };
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.refreshIndex();
-  }
-  componentDidUpdate(prevProps) {
+  };
+  componentDidUpdate = (prevProps) => {
     if (this.props.currentPage !== prevProps.currentPage) {
       this.refreshIndex();
     }
-  }
+  };
 
-  LeftMenuButtonClicked(n) {
+  LeftMenuButtonClicked = (n) => {
     this.setState({ ActiveMenuIndex: n });
     if (this.props.currentPage != menus[n]) {
       window.history.pushState({}, "", `/${menus[n]}`);
     }
     this.props.updateFunc();
-  }
+  };
 
-  refreshIndex() {
+  refreshIndex = () => {
     this.setState({
       ActiveMenuIndex:
         menus.indexOf(this.props.currentPage) !== -1
           ? menus.indexOf(this.props.currentPage)
           : 0,
     });
-  }
-  render() {
+  };
+  render = () => {
     var ActivatedMenuStyle = {
       fontWeight: "bold",
       color: "rgba(255,255,255,0.7)",
@@ -89,5 +89,5 @@ export class Leftmenu extends React.Component {
         </div>
       </>
     );
-  }
+  };
 }

@@ -7,3 +7,11 @@
     background-color: inherit;
     flex-direction: column;
 }
+
+@media (max-width: 800px) {
+    .mainContentArea {
+        width: 100%;
+        margin-left: 0;
+        padding-top: 101px;
+    }    
+  }

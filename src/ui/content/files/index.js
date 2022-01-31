@@ -2,6 +2,9 @@ import {
   RiDeleteBin7Fill,
   RiPencilFill,
   RiInformationFill,
+  RiFolderAddFill,
+  RiFolderUploadFill,
+  RiFileUploadFill
 } from "react-icons/ri";
 
 import { BsCloudPlusFill } from "react-icons/bs";
@@ -19,11 +22,11 @@ export class Files extends React.Component {
       selectedIndex: [],
       startPos: [0, 0],
       currentPos: [0, 0],
-      idList: [],
+      newDropdown: true
     };
     this.data = [
       {
-        id: "89shHGfdasg",
+        id: "49shHGfdasg",
         name: "TusisCool.mpeg",
         size: 1209121,
         date: "2022 1 19",
@@ -31,7 +34,7 @@ export class Files extends React.Component {
           "https://pbs.twimg.com/profile_images/1342768807891378178/8le-DzgC_400x400.jpg",
       },
       {
-        id: "8HBF579hfcX",
+        id: "GxBF579hfcX",
         name: "crypithm.jpeg",
         size: 2048,
         date: "2022 1 19",
@@ -82,9 +85,14 @@ export class Files extends React.Component {
           <b className="Newbtn" onClick={() => this.newBtnClicked()}>
             <div className="Newbtn-icon">
               <BsCloudPlusFill />
-            </div>{" "}
+            </div>
             New
           </b>
+          <div className={this.state.newDropdown?'newDropdown':'newDropdown dropDownShow'}>
+            <p><div className="dropdown-buttonIcon"><RiFolderAddFill /> </div></p>
+            <p><div className="dropdown-buttonIcon"><RiFolderUploadFill /> </div></p>
+            <p><div className="dropdown-buttonIcon"><RiFileUploadFill /> </div></p>
+          </div>
           <div
             className={
               this.state.selectedIndex.length === 0 ? "FCObtn hidden" : "FCObtn"
@@ -153,7 +161,9 @@ export class Files extends React.Component {
     );
   };
 
-  newBtnClicked = () => {};
+  newBtnClicked = () => {
+    this.setState({newDropdown: this.state.newDropdown?false:true})
+  };
   getIdFromIndex = (index) => {
     return document
       .querySelector(`[data-index="${index}"]`)
@@ -185,6 +195,7 @@ export class Files extends React.Component {
       targetIndex = parseInt(targetIndex);
       //click,shift,ctrl
       if (e.shiftKey) {
+
         if (this.state.selectedIndex.length == 0) {
           this.setState({
             selectedIndex: this.state.selectedIndex.concat([targetIndex]),

@@ -46,6 +46,46 @@
 
 }
 
+.newDropdown {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 185px;
+    background-color: #242424;
+    padding: 20px;
+    opacity: 0;
+    transition: all 0.2s ease-in-out;
+    visibility: hidden;
+    left: 370px;
+}
+
+.dropdown-buttonIcon {
+    display: flex;
+    align-items: center;
+    font-size: 15pt;
+    justify-content: center;
+}
+.dropdown-buttonIcon:hover {
+    color: rgba(255,255,255,0.3)
+}
+
+.newDropdown p {
+    padding: 0;
+    margin: 0;
+    padding: 5px 0 5px 0;
+    cursor: pointer;
+    font-size: 10pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dropDownShow {
+    top: 210px;
+    opacity: 1;
+    visibility: visible;
+}
+
 .Newbtn {
     margin-right: 20px;
     margin-left: 10px;

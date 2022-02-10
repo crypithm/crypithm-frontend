@@ -10,6 +10,7 @@ import {
 import { BsCloudPlusFill } from "react-icons/bs";
 import React from "react";
 import "./index.css";
+import {FileInfo} from "./fileInfo/index.js"
 
 export class Files extends React.Component {
   constructor(props) {
@@ -64,6 +65,7 @@ export class Files extends React.Component {
 
     return (
       <div ref={this.dragDetectionArea}>
+        <FileInfo />
         <div
           className="dragSquare"
           style={{

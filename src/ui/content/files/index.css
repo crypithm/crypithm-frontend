@@ -64,12 +64,6 @@
     align-items: center;
     font-size: 15pt;
     justify-content: center;
-}
-.dropdown-buttonIcon:hover {
-    color: rgba(255,255,255,0.3)
-}
-
-.newDropdown p {
     padding: 0;
     margin: 0;
     padding: 5px 0 5px 0;
@@ -79,6 +73,11 @@
     align-items: center;
     justify-content: center;
 }
+.dropdown-buttonIcon:hover {
+    color: rgba(255,255,255,0.3)
+}
+
+
 
 .dropDownShow {
     top: 210px;

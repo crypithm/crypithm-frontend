@@ -23,7 +23,8 @@ export class Files extends React.Component {
       selectedIndex: [],
       startPos: [0, 0],
       currentPos: [0, 0],
-      newDropdown: true
+      newDropdown: true,
+      showFileInfo: false
     };
     this.data = [
       {
@@ -60,12 +61,16 @@ export class Files extends React.Component {
     );
   };
 
+  FileInfo = () => {
+    this.setState({showFileInfo: true})
+  }
+
   render = () => {
     var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };
 
     return (
       <div ref={this.dragDetectionArea}>
-        <FileInfo />
+        <FileInfo b={this.state.showFileInfo} />
         <div
           className="dragSquare"
           style={{
@@ -91,9 +96,9 @@ export class Files extends React.Component {
             New
           </b>
           <div className={this.state.newDropdown?'newDropdown':'newDropdown dropDownShow'}>
-            <p><div className="dropdown-buttonIcon"><RiFolderAddFill /> </div></p>
-            <p><div className="dropdown-buttonIcon"><RiFolderUploadFill /> </div></p>
-            <p><div className="dropdown-buttonIcon"><RiFileUploadFill /> </div></p>
+            <div className="dropdown-buttonIcon"><RiFolderAddFill /> </div>
+            <div className="dropdown-buttonIcon"><RiFolderUploadFill /> </div>
+            <div className="dropdown-buttonIcon"><RiFileUploadFill /> </div>
           </div>
           <div
             className={
@@ -116,6 +121,7 @@ export class Files extends React.Component {
                     ? "FileOptIcons hidden"
                     : "FileOptIcons"
                 }
+                onClick={() => this.FileInfo()}
               >
                 <RiInformationFill />
               </div>

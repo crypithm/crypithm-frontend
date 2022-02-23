@@ -4,13 +4,14 @@ import {
   RiInformationFill,
   RiFolderAddFill,
   RiFolderUploadFill,
-  RiFileUploadFill
+  RiFileUploadFill,
 } from "react-icons/ri";
 
 import { BsCloudPlusFill } from "react-icons/bs";
 import React from "react";
+import ReactDOM from 'react-dom'
 import "./index.css";
-import {FileInfo} from "./fileInfo/index.js"
+import { FileInfo } from "./fileInfo/index.js";
 
 export class Files extends React.Component {
   constructor(props) {
@@ -24,7 +25,7 @@ export class Files extends React.Component {
       startPos: [0, 0],
       currentPos: [0, 0],
       newDropdown: true,
-      showFileInfo: false
+
     };
     this.data = [
       {
@@ -62,15 +63,19 @@ export class Files extends React.Component {
   };
 
   FileInfo = () => {
-    this.setState({showFileInfo: true})
-  }
+    ReactDOM.render(
+      <FileInfo />,
+      document.querySelector("#fileInfoWillCome")
+      )
+  };
 
   render = () => {
     var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };
 
     return (
       <div ref={this.dragDetectionArea}>
-        <FileInfo b={this.state.showFileInfo} />
+        <div id="fileInfoWillCome">
+        </div>
         <div
           className="dragSquare"
           style={{
@@ -95,10 +100,22 @@ export class Files extends React.Component {
             </div>
             New
           </b>
-          <div className={this.state.newDropdown?'newDropdown':'newDropdown dropDownShow'}>
-            <div className="dropdown-buttonIcon"><RiFolderAddFill /> </div>
-            <div className="dropdown-buttonIcon"><RiFolderUploadFill /> </div>
-            <div className="dropdown-buttonIcon"><RiFileUploadFill /> </div>
+          <div
+            className={
+              this.state.newDropdown
+                ? "newDropdown"
+                : "newDropdown dropDownShow"
+            }
+          >
+            <div className="dropdown-buttonIcon">
+              <RiFolderAddFill />{" "}
+            </div>
+            <div className="dropdown-buttonIcon">
+              <RiFolderUploadFill />{" "}
+            </div>
+            <div className="dropdown-buttonIcon">
+              <RiFileUploadFill />{" "}
+            </div>
           </div>
           <div
             className={
@@ -170,7 +187,7 @@ export class Files extends React.Component {
   };
 
   newBtnClicked = () => {
-    this.setState({newDropdown: this.state.newDropdown?false:true})
+    this.setState({ newDropdown: this.state.newDropdown ? false : true });
   };
   getIdFromIndex = (index) => {
     return document
@@ -203,7 +220,6 @@ export class Files extends React.Component {
       targetIndex = parseInt(targetIndex);
       //click,shift,ctrl
       if (e.shiftKey) {
-
         if (this.state.selectedIndex.length == 0) {
           this.setState({
             selectedIndex: this.state.selectedIndex.concat([targetIndex]),
@@ -264,12 +280,12 @@ export class Files extends React.Component {
       ) {
         if (
           this.state.selectedIndex.indexOf(
-            parseInt(elem.getAttribute('data-index'))
+            parseInt(elem.getAttribute("data-index"))
           ) == -1
         ) {
           this.setState({
             selectedIndex: this.state.selectedIndex.concat([
-              parseInt(elem.getAttribute('data-index')),
+              parseInt(elem.getAttribute("data-index")),
             ]),
           });
         }

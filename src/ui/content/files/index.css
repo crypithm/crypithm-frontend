@@ -141,6 +141,16 @@
 }
 
 @media (max-width: 800px) {
+    .newDropdown {
+        left: 25px;
+        top: 150px;
+    }
+    .dropDownShow {
+        top: 180px;
+        opacity: 1;
+        visibility: visible;
+    }
+    
     .fileControlOptions {
         top: 101px;
     }

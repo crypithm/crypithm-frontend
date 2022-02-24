@@ -12,6 +12,7 @@ import React from "react";
 import ReactDOM from 'react-dom'
 import "./index.css";
 import { FileInfo } from "./fileInfo/index.js";
+import { ContextMenu } from "./contextMenu/index.js"
 
 export class Files extends React.Component {
   constructor(props) {
@@ -69,11 +70,22 @@ export class Files extends React.Component {
       )
   };
 
+  ctxMenuCalled = (ctxMenuEvent) => {
+    ctxMenuEvent.preventDefault();
+    console.log(ctxMenuEvent)
+
+    ReactDOM.render(
+      <ContextMenu x={ctxMenuEvent.clientX} y={ctxMenuEvent.clientY}/>,
+      document.querySelector("#ctxMenuWillCome")
+    )
+  }
   render = () => {
     var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };
 
     return (
-      <div ref={this.dragDetectionArea}>
+      <div ref={this.dragDetectionArea} onContextMenu={(e)=>this.ctxMenuCalled(e)}>
+        <div id="ctxMenuWillCome">
+        </div>
         <div id="fileInfoWillCome">
         </div>
         <div
@@ -122,7 +134,7 @@ export class Files extends React.Component {
               this.state.selectedIndex.length === 0 ? "FCObtn hidden" : "FCObtn"
             }
           >
-            <b>selected {this.state.selectedIndex.length} file(s)</b>{" "}
+            <b className="howManySelected">selected {this.state.selectedIndex.length} file(s)</b>{" "}
             <b
               className="unselectButton"
               onClick={() => {

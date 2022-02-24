@@ -1,0 +1,12 @@
+.contextMenu {
+    width: 150px;
+    height: 200px;
+    position: fixed;
+    z-index: 1;
+    background-color: #242424;
+    display: flex;
+    flex-direction: column;
+}
+.contentBtn {
+    
+}

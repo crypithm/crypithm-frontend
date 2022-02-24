@@ -111,6 +111,7 @@
     margin-left: 10px;
     font-size: 8.5pt;
     cursor: pointer;
+    display: flex;
 }
 .fileControlOptions {
     z-index: 1;
@@ -140,6 +141,10 @@
     height: 0;
 }
 
+.howManySelected {
+    display: flex;
+}
+
 @media (max-width: 800px) {
     .newDropdown {
         left: 25px;
@@ -164,5 +169,11 @@
     }
     .Newbtn {
         margin-left: 25px;
+    }
+    .howManySelected {
+        display: none;
+    }
+    .unselectButton {
+        display: none;
     }
   }

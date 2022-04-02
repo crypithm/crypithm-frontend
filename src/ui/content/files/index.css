@@ -14,7 +14,7 @@
  height: 20px;
  overflow: hidden;
  margin :0 13px 0 10px;
- filter: grayscale(90%);
+ filter: grayscale(70%);
  border-radius: 2px;
 }
 
@@ -157,7 +157,7 @@
     }
     
     .fileControlOptions {
-        top: 101px;
+        top: 71px;
     }
     .fileContainer {
         width: 90%;

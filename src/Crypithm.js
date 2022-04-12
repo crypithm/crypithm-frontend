@@ -7,7 +7,7 @@ import { Content } from "./ui/content/index.js";
 export class Crypithm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { currentPage: window.location.pathname.split("/")[1] };
+    this.state = { currentPage: window.location.pathname.split("/")[1], mobileMenuOpen: false };
   }
   pushedToState = () => {
     this.setState({ currentPage: window.location.pathname.split("/")[1] });
@@ -21,14 +21,18 @@ export class Crypithm extends React.Component {
       window.history.pushState({}, "", "files");
     }
   };
+  toggleMobileMenu=()=>{
+    this.setState({mobileMenuOpen:this.state.mobileMenuOpen?false:true})
+  }
   render = () => {
     return (
       <>
         <Leftmenu
           currentPage={this.state.currentPage}
           updateFunc={() => this.pushedToState()}
+          ismobileMenuOpen={this.state.mobileMenuOpen}
         />
-        <Header />
+        <Header mobileMenu={()=>this.toggleMobileMenu()}/>
         <Content currentPage={this.state.currentPage} />
       </>
     );

@@ -26,7 +26,6 @@ export class Leftmenu extends React.Component {
     }
     this.props.updateFunc();
   };
-
   refreshIndex = () => {
     this.setState({
       ActiveMenuIndex:
@@ -40,9 +39,10 @@ export class Leftmenu extends React.Component {
       fontWeight: "bold",
       color: "rgba(255,255,255,0.7)",
     };
+    
     return (
       <>
-        <div className="leftmenu">
+        <div className={`leftmenu ${this.props.ismobileMenuOpen?"open":""}`}>
           <div className="logo">
             <Logo width={30} opacity={0.3} color={"#fff"} />
             <b>Crypithm Cloud</b>
@@ -80,7 +80,7 @@ export class Leftmenu extends React.Component {
             </div>
           </div>
           <div className="userInfoArea">
-            <b>Welcome Home, Developer</b>
+            <b>User: Developer</b>
             <div className="progressArea">
               <progress max="90" value="80"></progress>
               <b>8GB out of 10GB used</b>

@@ -3,14 +3,12 @@ import "./index.css";
 import {AiOutlineMenu} from 'react-icons/ai'
 
 export class Header extends React.Component {
-  menuClick = () =>{
-    console.log("a")
-  }
+
   render() {
     return (
       <>
         <div className="header">
-          <div className="menuBtn" onClick={()=>this.menuClick()}>
+          <div className="menuBtn" onClick={()=>this.props.mobileMenu()}>
           <AiOutlineMenu />
           </div>
           <input type="text" placeholder="Search File, Folder"></input>{" "}

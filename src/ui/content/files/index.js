@@ -78,6 +78,10 @@ export class Files extends React.Component {
       <ContextMenu x={ctxMenuEvent.clientX} y={ctxMenuEvent.clientY}/>,
       document.querySelector("#ctxMenuWillCome")
     )
+
+    window.addEventListener("click", ()=>{
+      ReactDOM.unmountComponentAtNode(document.querySelector("#ctxMenuWillCome"))
+    })
   }
   render = () => {
     var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };

@@ -102,8 +102,21 @@
 }
 
 @media (max-width: 800px) {
+  .logo{
+    display: none;
+  }
   .leftmenu {
+    width: 200px;
     left: -370px;
     height: calc(100vh - 120px);
+    transition: left 0.3s ease-in-out;
+    bottom: 0;
+    background-color: #191919;
+    z-index: 2;
+    padding: 30px;
+    border-right: solid 1px rgba(255,255,255,0.3);
 }
+  .open{
+    left: 0px;
+  }
 }

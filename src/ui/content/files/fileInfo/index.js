@@ -4,7 +4,6 @@ import "./index.css";
 
 export class FileInfo extends React.Component {
   unMount = () => {
-    console.log("a");
     ReactDOM.unmountComponentAtNode(
       document.querySelector("#fileInfoWillCome")
     );

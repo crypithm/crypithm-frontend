@@ -5,14 +5,16 @@ import {
   RiFolderAddFill,
   RiFolderUploadFill,
   RiFileUploadFill,
+  RiLayoutGridFill,
+  RiLayoutBottomFill,
 } from "react-icons/ri";
 
 import { BsCloudPlusFill } from "react-icons/bs";
 import React from "react";
-import ReactDOM from 'react-dom'
+import ReactDOM from "react-dom";
 import "./index.css";
 import { FileInfo } from "./fileInfo/index.js";
-import { ContextMenu } from "./contextMenu/index.js"
+import { ContextMenu } from "./contextMenu/index.js";
 
 export class Files extends React.Component {
   constructor(props) {
@@ -26,7 +28,7 @@ export class Files extends React.Component {
       startPos: [0, 0],
       currentPos: [0, 0],
       newDropdown: true,
-
+      Aligngrid: false,
     };
     this.data = [
       {
@@ -53,6 +55,79 @@ export class Files extends React.Component {
         thumb:
           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
       },
+      {
+        id: "8Hd7s6d5xFs",
+        name: "uarenoov.png",
+        size: 5048,
+        date: "2022 1 19",
+        thumb:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
+      },
+      {
+        id: "8Hd7s6d5xFs",
+        name: "uarenoov.png",
+        size: 5048,
+        date: "2022 1 19",
+        thumb:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
+      },
+      {
+        id: "8Hd7s6d5xFs",
+        name: "uarenoov.png",
+        size: 5048,
+        date: "2022 1 19",
+        thumb:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
+      },
+      {
+        id: "8Hd7s6d5xFs",
+        name: "uarenoov.png",
+        size: 5048,
+        date: "2022 1 19",
+        thumb:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
+      },
+      {
+        id: "8Hd7s6d5xFs",
+        name: "uarenoov.png",
+        size: 5048,
+        date: "2022 1 19",
+        thumb:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
+      },
+      {
+        id: "8Hd7s6d5xFs",
+        name: "uarenoov.png",
+        size: 5048,
+        date: "2022 1 19",
+        thumb:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
+      },
+      {
+        id: "8Hd7s6d5xFs",
+        name: "uarenoov.png",
+        size: 5048,
+        date: "2022 1 19",
+        thumb:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
+      },
+      {
+        id: "8Hd7s6d5xFs",
+        name: "uarenoov.png",
+        size: 5048,
+        date: "2022 1 19",
+        thumb:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
+      },
+      {
+        id: "8Hd7s6d5xFs",
+        name: "uarenoov.png",
+        size: 5048,
+        date: "2022 1 19",
+        thumb:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
+      },
+
     ];
   }
 
@@ -64,34 +139,37 @@ export class Files extends React.Component {
   };
 
   FileInfo = () => {
-    ReactDOM.render(
-      <FileInfo />,
-      document.querySelector("#fileInfoWillCome")
-      )
+    ReactDOM.render(<FileInfo />, document.querySelector("#fileInfoWillCome"));
   };
 
   ctxMenuCalled = (ctxMenuEvent) => {
     ctxMenuEvent.preventDefault();
-    console.log(ctxMenuEvent)
 
     ReactDOM.render(
-      <ContextMenu x={ctxMenuEvent.clientX} y={ctxMenuEvent.clientY}/>,
+      <ContextMenu x={ctxMenuEvent.clientX} y={ctxMenuEvent.clientY} />,
       document.querySelector("#ctxMenuWillCome")
-    )
+    );
 
-    window.addEventListener("click", ()=>{
-      ReactDOM.unmountComponentAtNode(document.querySelector("#ctxMenuWillCome"))
-    })
-  }
+    window.addEventListener("click", () => {
+      ReactDOM.unmountComponentAtNode(
+        document.querySelector("#ctxMenuWillCome")
+      );
+    });
+  };
+
+  changedAlign = () => {
+    this.setState({ Aligngrid: this.state.Aligngrid == true ? false : true });
+  };
   render = () => {
     var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };
 
     return (
-      <div ref={this.dragDetectionArea} onContextMenu={(e)=>this.ctxMenuCalled(e)}>
-        <div id="ctxMenuWillCome">
-        </div>
-        <div id="fileInfoWillCome">
-        </div>
+      <div
+        ref={this.dragDetectionArea}
+        onContextMenu={(e) => this.ctxMenuCalled(e)}
+      >
+        <div id="ctxMenuWillCome"></div>
+        <div id="fileInfoWillCome"></div>
         <div
           className="dragSquare"
           style={{
@@ -116,6 +194,13 @@ export class Files extends React.Component {
             </div>
             New
           </b>
+          <b className="viewStyle" onClick={() => this.changedAlign()}>
+            {this.state.Aligngrid ? (
+              <RiLayoutGridFill />
+            ) : (
+              <RiLayoutBottomFill />
+            )}
+          </b>
           <div
             className={
               this.state.newDropdown
@@ -138,7 +223,9 @@ export class Files extends React.Component {
               this.state.selectedIndex.length === 0 ? "FCObtn hidden" : "FCObtn"
             }
           >
-            <b className="howManySelected">selected {this.state.selectedIndex.length} file(s)</b>{" "}
+            <b className="howManySelected">
+              selected {this.state.selectedIndex.length} file(s)
+            </b>{" "}
             <b
               className="unselectButton"
               onClick={() => {
@@ -170,12 +257,16 @@ export class Files extends React.Component {
         <div
           style={{ height: "100vh" }}
           ref={this.clickDetectionArea}
-          className="filecont-cont"
+          className={
+            this.state.Aligngrid ? "filecont-cont displayGrid" : "filecont-cont"
+          }
         >
           {this.data.map((elem, index) => {
             return (
               <div
-                className="fileContainer"
+                className={
+                  this.state.Aligngrid ? "fileContainer grid" : "fileContainer"
+                }
                 style={
                   this.state.selectedIndex.indexOf(index + 1) != -1
                     ? selectedStyle
@@ -291,8 +382,10 @@ export class Files extends React.Component {
           elem.getBoundingClientRect().bottom &&
         this.state.currentPos[1] != 0 &&
         this.state.currentPos[0] != 0 &&
-        this.dragBoxRef.current.getBoundingClientRect().x >=
-          elem.getBoundingClientRect().x
+        this.dragBoxRef.current.getBoundingClientRect().right >=
+          elem.getBoundingClientRect().x 
+
+        
       ) {
         if (
           this.state.selectedIndex.indexOf(

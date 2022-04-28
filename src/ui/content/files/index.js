@@ -54,80 +54,7 @@ export class Files extends React.Component {
         date: "2022 1 19",
         thumb:
           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
-      },
-      {
-        id: "8Hd7s6d5xFs",
-        name: "uarenoov.png",
-        size: 5048,
-        date: "2022 1 19",
-        thumb:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
-      },
-      {
-        id: "8Hd7s6d5xFs",
-        name: "uarenoov.png",
-        size: 5048,
-        date: "2022 1 19",
-        thumb:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
-      },
-      {
-        id: "8Hd7s6d5xFs",
-        name: "uarenoov.png",
-        size: 5048,
-        date: "2022 1 19",
-        thumb:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
-      },
-      {
-        id: "8Hd7s6d5xFs",
-        name: "uarenoov.png",
-        size: 5048,
-        date: "2022 1 19",
-        thumb:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
-      },
-      {
-        id: "8Hd7s6d5xFs",
-        name: "uarenoov.png",
-        size: 5048,
-        date: "2022 1 19",
-        thumb:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
-      },
-      {
-        id: "8Hd7s6d5xFs",
-        name: "uarenoov.png",
-        size: 5048,
-        date: "2022 1 19",
-        thumb:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
-      },
-      {
-        id: "8Hd7s6d5xFs",
-        name: "uarenoov.png",
-        size: 5048,
-        date: "2022 1 19",
-        thumb:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
-      },
-      {
-        id: "8Hd7s6d5xFs",
-        name: "uarenoov.png",
-        size: 5048,
-        date: "2022 1 19",
-        thumb:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
-      },
-      {
-        id: "8Hd7s6d5xFs",
-        name: "uarenoov.png",
-        size: 5048,
-        date: "2022 1 19",
-        thumb:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
-      },
-
+      }
     ];
   }
 
@@ -353,7 +280,7 @@ export class Files extends React.Component {
           this.setState({ selectedIndex: intlist });
         }
       }
-      if (e.ctrlKey) {
+      if (e.ctrlKey || e.metaKey) {
         if (this.state.selectedIndex.indexOf(targetIndex) == -1) {
           this.setState({
             selectedIndex: this.state.selectedIndex.concat([targetIndex]),
@@ -366,7 +293,7 @@ export class Files extends React.Component {
           }
         }
       }
-      if (!e.shiftKey && !e.ctrlKey) {
+      if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
         this.setState({ selectedIndex: [] });
         this.setState({
           selectedIndex: this.state.selectedIndex.concat([targetIndex]),
@@ -376,16 +303,16 @@ export class Files extends React.Component {
   };
 
   mouseMove = (mouseMoveEvent) => {
+    var a = this.dragBoxRef.current.getBoundingClientRect();
     this.fileItemsRef.map((elem, _) => {
+      var b = elem.getBoundingClientRect();
       if (
-        this.dragBoxRef.current.getBoundingClientRect().y <=
-          elem.getBoundingClientRect().bottom &&
+        a.left < b.right &&
+        a.right > b.left &&
+        a.top < b.bottom &&
+        a.bottom > b.top &&
         this.state.currentPos[1] != 0 &&
-        this.state.currentPos[0] != 0 &&
-        this.dragBoxRef.current.getBoundingClientRect().right >=
-          elem.getBoundingClientRect().x 
-
-        
+        this.state.currentPos[0] != 0
       ) {
         if (
           this.state.selectedIndex.indexOf(

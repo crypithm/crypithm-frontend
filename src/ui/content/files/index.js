@@ -7,6 +7,7 @@ import {
   RiFileUploadFill,
   RiLayoutGridFill,
   RiLayoutBottomFill,
+  RiArrowDownSFill,
 } from "react-icons/ri";
 
 import { BsCloudPlusFill } from "react-icons/bs";
@@ -28,34 +29,35 @@ export class Files extends React.Component {
       startPos: [0, 0],
       currentPos: [0, 0],
       newDropdown: true,
+      ascending: false,
       Aligngrid: false,
+      data: [
+        {
+          id: "49shHGfdasg",
+          name: "TusisCool.mpeg",
+          size: 1209121,
+          date: "2022 1 19",
+          thumb:
+            "https://pbs.twimg.com/profile_images/1342768807891378178/8le-DzgC_400x400.jpg",
+        },
+        {
+          id: "GxBF579hfcX",
+          name: "crypithm.jpeg",
+          size: 2048,
+          date: "2022 1 19",
+          thumb:
+            "https://i1.sndcdn.com/avatars-zUGIpyyW010rJFrc-rdl0PQ-t240x240.jpg",
+        },
+        {
+          id: "8Hd7s6d5xFs",
+          name: "uarenoov.png",
+          size: 5048,
+          date: "2022 1 19",
+          thumb:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
+        },
+      ],
     };
-    this.data = [
-      {
-        id: "49shHGfdasg",
-        name: "TusisCool.mpeg",
-        size: 1209121,
-        date: "2022 1 19",
-        thumb:
-          "https://pbs.twimg.com/profile_images/1342768807891378178/8le-DzgC_400x400.jpg",
-      },
-      {
-        id: "GxBF579hfcX",
-        name: "crypithm.jpeg",
-        size: 2048,
-        date: "2022 1 19",
-        thumb:
-          "https://i1.sndcdn.com/avatars-zUGIpyyW010rJFrc-rdl0PQ-t240x240.jpg",
-      },
-      {
-        id: "8Hd7s6d5xFs",
-        name: "uarenoov.png",
-        size: 5048,
-        date: "2022 1 19",
-        thumb:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
-      }
-    ];
   }
 
   componentDidMount = () => {
@@ -83,7 +85,16 @@ export class Files extends React.Component {
       );
     });
   };
-
+  alignBySomething = (byindex) => {
+    if (byindex==1) {
+      if(this.state.ascending){
+        this.setState({data: this.state.data.sort((a,b)=>{return a.name.localeCompare(b.name);})})
+      }else{
+        this.setState({data: this.state.data.sort((a,b)=>{return b.name.localeCompare(a.name);})})
+      }
+      this.setState({ascending:this.state.ascending?false:true})
+    }
+  };
   changedAlign = () => {
     this.setState({ Aligngrid: this.state.Aligngrid == true ? false : true });
   };
@@ -182,13 +193,22 @@ export class Files extends React.Component {
           </div>
         </div>
         <div
+            className="arrangeBar"
+            style={{ display: this.state.Aligngrid ? "none" : "" }}
+          >
+            <b onClick={()=>this.alignBySomething(1)}>
+              Name
+              <RiArrowDownSFill style={{transform:this.state.ascending?"rotate(0deg)":"rotate(180deg)", transition: "all 0.1s linear"}}/>
+            </b>
+          </div>
+        <div
           style={{ height: "100vh" }}
           ref={this.clickDetectionArea}
           className={
             this.state.Aligngrid ? "filecont-cont displayGrid" : "filecont-cont"
           }
         >
-          {this.data.map((elem, index) => {
+          {this.state.data.map((elem, index) => {
             return (
               <div
                 className={

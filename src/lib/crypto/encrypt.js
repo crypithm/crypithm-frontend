@@ -1,4 +1,4 @@
-import react from "react";
+
 
 const megabyte = 1048576;
 
@@ -19,6 +19,7 @@ export async function encryptBlob(binary, key, randomiv, iv) {
   return cryptdata;
 }
 
+
 //data:binary
 export async function hashBinary(algo, data) {
   
@@ -28,7 +29,8 @@ export async function hashBinary(algo, data) {
     .join("");
 }
 
-export async function encryptAndUploadFile(file, clientKey) {
+export async function encryptAndUploadFile(file, clientKey, updateValue) {
+  updateValue(10,1,"9HbGdtS5dckj")
   var keysalt = crypto.getRandomValues(new Uint8Array(16));
   var enc = new TextEncoder();
   var importedClientKey = await crypto.subtle.importKey(

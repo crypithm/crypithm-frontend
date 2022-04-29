@@ -8,6 +8,7 @@ import {
   RiLayoutGridFill,
   RiLayoutBottomFill,
   RiArrowDownSFill,
+  RiArrowUpLine
 } from "react-icons/ri";
 
 import { BsCloudPlusFill } from "react-icons/bs";
@@ -25,6 +26,7 @@ export class Files extends React.Component {
     this.fileItemsRef = [];
     this.dragBoxRef = React.createRef();
     this.fileInputBox = React.createRef();
+    this.changedUploadProgress = this.changedUploadProgress.bind(this)
     this.state = {
       selectedIndex: [],
       startPos: [0, 0],
@@ -38,6 +40,7 @@ export class Files extends React.Component {
           name: "TusisCool.mpeg",
           size: 1209121,
           date: "2022 1 19",
+          completed: true,
           thumb:
             "https://pbs.twimg.com/profile_images/1342768807891378178/8le-DzgC_400x400.jpg",
         },
@@ -46,6 +49,7 @@ export class Files extends React.Component {
           name: "crypithm.jpeg",
           size: 2048,
           date: "2022 1 19",
+          completed: true,
           thumb:
             "https://i1.sndcdn.com/avatars-zUGIpyyW010rJFrc-rdl0PQ-t240x240.jpg",
         },
@@ -54,14 +58,25 @@ export class Files extends React.Component {
           name: "uarenoov.png",
           size: 5048,
           date: "2022 1 19",
+          completed: true,
           thumb:
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
         },
+        {
+          id: "9HbGdtS5dckj",
+          name: "uareverypro.png",
+          completed: false,
+        },
       ],
-      uploadsInProgress: [],
+      uploadsInProgress: { "9HbGdtS5dckj": [80,1] }
     };
   }
 
+
+  changedUploadProgress = (progress, speed, id)=>{
+    this.state.uploadsInProgress[id]=[progress, speed]
+    this.setState({uploadsInProgress: this.state.uploadsInProgress})
+  }
   componentDidMount = () => {
     this.clickDetectionArea.current.addEventListener(
       "mousedown",
@@ -113,17 +128,17 @@ export class Files extends React.Component {
     var clientKey = "a";
     var files = this.fileInputBox.current.files;
     var current = 0;
-    loopFiles(files.length);
-    async function loopFiles(leftover) {
-      var v=leftover > 4 ? 4 : leftover
-      for (var i = 0; i <v; i++) {
-        await encryptAndUploadFile(files[current], clientKey);
+    var loopFiles = async(leftover) => {
+      var v = leftover > 4 ? 4 : leftover;
+      for (var i = 0; i < v; i++) {
+        await encryptAndUploadFile(files[current], clientKey, this.changedUploadProgress.bind(this));
         current += 1;
       }
       if (current < files.length) {
         loopFiles(files.length - current);
       }
     }
+    loopFiles(files.length);
     current = 0;
   };
   render = () => {
@@ -270,11 +285,27 @@ export class Files extends React.Component {
                   return true;
                 }}
               >
-                <div className="fileThumbnail">
-                  <img src={elem.thumb} width={20} />
-                </div>
-
-                {elem.name}
+                {elem.completed ? (
+                  <>
+                    <div className="fileThumbnail">
+                      <img src={elem.thumb} width={20} />
+                    </div>
+                    {elem.name}
+                  </>
+                ) : (
+                  <>
+                    <progress
+                      className="uploadingProgress"
+                      max="100"
+                      value={this.state.uploadsInProgress[elem.id][0]}
+                    ></progress>
+                    <p className="fileName">
+                    {`${elem.name}`}                      
+                    </p>
+                    {`${this.state.uploadsInProgress[elem.id][1]}MB/s`}
+                    <RiArrowUpLine />
+                  </>
+                )}
               </div>
             );
           })}

@@ -16,7 +16,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import { FileInfo } from "./fileInfo/index.js";
 import { ContextMenu } from "./contextMenu/index.js";
-
+import { encryptAndUploadFile } from "../../../lib/crypto/encrypt.js";
 export class Files extends React.Component {
   constructor(props) {
     super(props);
@@ -24,6 +24,7 @@ export class Files extends React.Component {
     this.dragDetectionArea = React.createRef();
     this.fileItemsRef = [];
     this.dragBoxRef = React.createRef();
+    this.fileInputBox = React.createRef();
     this.state = {
       selectedIndex: [],
       startPos: [0, 0],
@@ -57,6 +58,7 @@ export class Files extends React.Component {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
         },
       ],
+      uploadsInProgress: [],
     };
   }
 
@@ -86,17 +88,43 @@ export class Files extends React.Component {
     });
   };
   alignBySomething = (byindex) => {
-    if (byindex==1) {
-      if(this.state.ascending){
-        this.setState({data: this.state.data.sort((a,b)=>{return a.name.localeCompare(b.name);})})
-      }else{
-        this.setState({data: this.state.data.sort((a,b)=>{return b.name.localeCompare(a.name);})})
+    if (byindex == 1) {
+      if (this.state.ascending) {
+        this.setState({
+          data: this.state.data.sort((a, b) => {
+            return a.name.localeCompare(b.name);
+          }),
+        });
+      } else {
+        this.setState({
+          data: this.state.data.sort((a, b) => {
+            return b.name.localeCompare(a.name);
+          }),
+        });
       }
-      this.setState({ascending:this.state.ascending?false:true})
+      this.setState({ ascending: this.state.ascending ? false : true });
     }
   };
   changedAlign = () => {
     this.setState({ Aligngrid: this.state.Aligngrid == true ? false : true });
+  };
+
+  startUpload = async () => {
+    var clientKey = "a";
+    var files = this.fileInputBox.current.files;
+    var current = 0;
+    loopFiles(files.length);
+    async function loopFiles(leftover) {
+      var v=leftover > 4 ? 4 : leftover
+      for (var i = 0; i <v; i++) {
+        await encryptAndUploadFile(files[current], clientKey);
+        current += 1;
+      }
+      if (current < files.length) {
+        loopFiles(files.length - current);
+      }
+    }
+    current = 0;
   };
   render = () => {
     var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };
@@ -152,9 +180,17 @@ export class Files extends React.Component {
             <div className="dropdown-buttonIcon">
               <RiFolderUploadFill />{" "}
             </div>
-            <div className="dropdown-buttonIcon">
+            <input
+              type="file"
+              ref={this.fileInputBox}
+              style={{ display: "none" }}
+              id="fileInput"
+              onChange={() => this.startUpload()}
+              multiple
+            ></input>
+            <label className="dropdown-buttonIcon" htmlFor="fileInput">
               <RiFileUploadFill />{" "}
-            </div>
+            </label>
           </div>
           <div
             className={
@@ -193,14 +229,21 @@ export class Files extends React.Component {
           </div>
         </div>
         <div
-            className="arrangeBar"
-            style={{ display: this.state.Aligngrid ? "none" : "" }}
-          >
-            <b onClick={()=>this.alignBySomething(1)}>
-              Name
-              <RiArrowDownSFill style={{transform:this.state.ascending?"rotate(0deg)":"rotate(180deg)", transition: "all 0.1s linear"}}/>
-            </b>
-          </div>
+          className="arrangeBar"
+          style={{ display: this.state.Aligngrid ? "none" : "" }}
+        >
+          <b onClick={() => this.alignBySomething(1)}>
+            Name
+            <RiArrowDownSFill
+              style={{
+                transform: this.state.ascending
+                  ? "rotate(0deg)"
+                  : "rotate(180deg)",
+                transition: "all 0.1s linear",
+              }}
+            />
+          </b>
+        </div>
         <div
           style={{ height: "100vh" }}
           ref={this.clickDetectionArea}

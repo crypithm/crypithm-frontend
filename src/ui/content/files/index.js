@@ -26,7 +26,6 @@ export class Files extends React.Component {
     this.fileItemsRef = [];
     this.dragBoxRef = React.createRef();
     this.fileInputBox = React.createRef();
-    this.changedUploadProgress = this.changedUploadProgress.bind(this)
     this.state = {
       selectedIndex: [],
       startPos: [0, 0],
@@ -131,7 +130,7 @@ export class Files extends React.Component {
     var loopFiles = async(leftover) => {
       var v = leftover > 4 ? 4 : leftover;
       for (var i = 0; i < v; i++) {
-        await encryptAndUploadFile(files[current], clientKey, this.changedUploadProgress.bind(this));
+        await encryptAndUploadFile(files[current], clientKey, this.changedUploadProgress);
         current += 1;
       }
       if (current < files.length) {

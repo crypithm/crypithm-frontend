@@ -1,5 +1,4 @@
 
-
 const megabyte = 1048576;
 
 //(c)2022 Oh Eunchong
@@ -19,18 +18,21 @@ export async function encryptBlob(binary, key, randomiv, iv) {
   return cryptdata;
 }
 
-
 //data:binary
 export async function hashBinary(algo, data) {
-  
   var digest = await window.crypto.subtle.digest(algo, data);
   return Array.from(new Uint8Array(digest))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
 
-export async function encryptAndUploadFile(file, clientKey, updateValue) {
-  updateValue(10,1,"9HbGdtS5dckj")
+export async function encryptAndUploadFile(
+  file,
+  clientKey,
+  updateStatus,
+  ongoingFileId
+) {
+  await updateStatus(100, 0, ongoingFileId);
   var keysalt = crypto.getRandomValues(new Uint8Array(16));
   var enc = new TextEncoder();
   var importedClientKey = await crypto.subtle.importKey(
@@ -69,7 +71,6 @@ export async function encryptAndUploadFile(file, clientKey, updateValue) {
   form.append("fileSize", file.size + 32);
   form.append("fileName", file.name);
   form.append("chunkKey", encryptedFileKey);
-  console.log(encryptedFileKey);
 
   if (file.size < megabyte * 5) {
     await loopEncryptChunk([0, file.size]);
@@ -91,7 +92,6 @@ export async function encryptAndUploadFile(file, clientKey, updateValue) {
       );
       finishedBytes.set(iv, 0);
       finishedBytes.set(encryptedBlobSlice, 16);
-      console.log(encryptedBlobSlice);
       if (offset[1] < file.size) {
         loopEncryptChunk([offset[1], offset[1] + megabyte * 5]);
       }

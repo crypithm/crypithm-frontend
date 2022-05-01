@@ -8,7 +8,7 @@ import {
   RiLayoutGridFill,
   RiLayoutBottomFill,
   RiArrowDownSFill,
-  RiArrowUpLine
+  RiArrowUpLine,
 } from "react-icons/ri";
 
 import { BsCloudPlusFill } from "react-icons/bs";
@@ -18,6 +18,7 @@ import "./index.css";
 import { FileInfo } from "./fileInfo/index.js";
 import { ContextMenu } from "./contextMenu/index.js";
 import { encryptAndUploadFile } from "../../../lib/crypto/encrypt.js";
+import { randString } from "../../../lib/crypto/random";
 export class Files extends React.Component {
   constructor(props) {
     super(props);
@@ -61,21 +62,20 @@ export class Files extends React.Component {
           thumb:
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
         },
-        {
-          id: "9HbGdtS5dckj",
-          name: "uareverypro.png",
-          completed: false,
-        },
       ],
-      uploadsInProgress: { "9HbGdtS5dckj": [80,1] }
+      uploadsInProgress: { "9HbGdtS5dckj": [80, 1] },
     };
   }
 
-
-  changedUploadProgress = (progress, speed, id)=>{
-    this.state.uploadsInProgress[id]=[progress, speed]
-    this.setState({uploadsInProgress: this.state.uploadsInProgress})
-  }
+  pushToQueue = async (id, name) => {
+    this.setState({ data: this.state.data.concat({ id: id, name: name }) });
+    this.state.uploadsInProgress[id] = [0, 0];
+    this.setState({ uploadsInProgress: this.state.uploadsInProgress });
+  };
+  changedUploadProgress = async (progress, speed, id) => {
+    this.state.uploadsInProgress[id] = [progress, speed];
+    this.setState({ uploadsInProgress: this.state.uploadsInProgress });
+  };
   componentDidMount = () => {
     this.clickDetectionArea.current.addEventListener(
       "mousedown",
@@ -127,19 +127,32 @@ export class Files extends React.Component {
     var clientKey = "a";
     var files = this.fileInputBox.current.files;
     var current = 0;
-    var loopFiles = async(leftover) => {
+    var idList=[]
+    for(var b=0;b<files.length;b++){
+      var currentId=randString(11)
+      this.changedUploadProgress(0,0,currentId)
+      await this.pushToQueue(currentId,files[b].name)
+      idList[b]=currentId
+    }
+    var loopFiles = async (leftover) => {
       var v = leftover > 4 ? 4 : leftover;
       for (var i = 0; i < v; i++) {
-        await encryptAndUploadFile(files[current], clientKey, this.changedUploadProgress);
+        await encryptAndUploadFile(
+          files[current],
+          clientKey,
+          this.changedUploadProgress,
+          idList[current]
+        );
         current += 1;
       }
       if (current < files.length) {
         loopFiles(files.length - current);
       }
-    }
+    };
     loopFiles(files.length);
     current = 0;
   };
+
   render = () => {
     var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };
 
@@ -298,9 +311,7 @@ export class Files extends React.Component {
                       max="100"
                       value={this.state.uploadsInProgress[elem.id][0]}
                     ></progress>
-                    <p className="fileName">
-                    {`${elem.name}`}                      
-                    </p>
+                    <p className="fileName">{`${elem.name}`}</p>
                     {`${this.state.uploadsInProgress[elem.id][1]}MB/s`}
                     <RiArrowUpLine />
                   </>

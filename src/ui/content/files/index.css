@@ -241,12 +241,27 @@
   }
 
   .fileName{
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: block;
       margin-right: 10px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      width: 300px;
   }
+  .fileContainer.grid>.fileName {
+    width: 140px;
+    margin-right:0;
+}
+
 @media (max-width: 800px) {
+    .fileName{
+        display: block;
+        margin-right: 10px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        width: 200px;
+    }
 
     .arrangeBar{
         display: none;
@@ -315,5 +330,13 @@
         border-radius: 0.3em;
         margin-top: 20px;
         margin-left: 6.5%;
+    }
+    .fileName{
+        display: block;
+        margin-right: 10px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        width: 120px;
     }
   }

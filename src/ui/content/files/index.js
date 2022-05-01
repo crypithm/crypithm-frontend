@@ -63,7 +63,7 @@ export class Files extends React.Component {
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
         },
       ],
-      uploadsInProgress: { "9HbGdtS5dckj": [80, 1] },
+      uploadsInProgress: {},
     };
   }
 

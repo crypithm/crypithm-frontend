@@ -74,6 +74,7 @@ export async function encryptAndUploadFile(
   form.append("fileSize", file.size + 32);
   form.append("fileName", file.name);
   form.append("chunkKey", encode(encryptedFileKey));
+
  
   if (file.size < megabyte * 5) {
     await loopEncryptChunk([0, file.size]);
@@ -82,7 +83,6 @@ export async function encryptAndUploadFile(
   }
 
   async function loopEncryptChunk(offset) {
-    var finishedBytes = new Uint8Array(offset[1] - offset[0] + 16);
     var sliced = file.slice(offset[0], offset[1]);
     var reader = new FileReader();
     var iv = crypto.getRandomValues(new Uint8Array(16));
@@ -93,8 +93,9 @@ export async function encryptAndUploadFile(
         false,
         iv
       );
+      var finishedBytes = new Uint8Array(encryptedBlobSlice.byteLength + 16);
       finishedBytes.set(iv, 0);
-      finishedBytes.set(encryptedBlobSlice, 16);
+      finishedBytes.set(new Uint8Array(encryptedBlobSlice), 16);
       if (offset[1] < file.size) {
         loopEncryptChunk([offset[1], offset[1] + megabyte * 5]);
       }

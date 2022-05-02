@@ -1,5 +1,8 @@
+import { encode } from "base64-arraybuffer";
 
 const megabyte = 1048576;
+const baseEndpointURL = "https://crypithm.com/api"
+
 
 //(c)2022 Oh Eunchong
 // (AES-256-GCM) binary: blob, key: cryptokey(256bits), iv: iv
@@ -32,7 +35,7 @@ export async function encryptAndUploadFile(
   updateStatus,
   ongoingFileId
 ) {
-  await updateStatus(100, 0, ongoingFileId);
+  //update Status==> await updateStatus(100, 0, ongoingFileId);
   var keysalt = crypto.getRandomValues(new Uint8Array(16));
   var enc = new TextEncoder();
   var importedClientKey = await crypto.subtle.importKey(
@@ -70,8 +73,8 @@ export async function encryptAndUploadFile(
   var form = new FormData();
   form.append("fileSize", file.size + 32);
   form.append("fileName", file.name);
-  form.append("chunkKey", encryptedFileKey);
-
+  form.append("chunkKey", encode(encryptedFileKey));
+ 
   if (file.size < megabyte * 5) {
     await loopEncryptChunk([0, file.size]);
   } else {

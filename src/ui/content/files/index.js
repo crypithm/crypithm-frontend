@@ -272,7 +272,6 @@ export class Files extends React.Component {
           </b>
         </div>
         <div
-          style={{ height: "100vh" }}
           ref={this.clickDetectionArea}
           className={
             this.state.Aligngrid ? "filecont-cont displayGrid" : "filecont-cont"

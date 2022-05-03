@@ -70,11 +70,39 @@ export async function encryptAndUploadFile(
     false,
     keyIV
   );
-  var form = new FormData();
-  form.append("fileSize", file.size + 32);
-  form.append("fileName", file.name);
-  form.append("chunkKey", encode(encryptedFileKey));
 
+  var encryptedFileKeyArr = new Uint8Array(encryptedFileKey.byteLength + 32)
+  encryptedFileKeyArr.set(keyIV,0)
+  encryptedFileKeyArr.set(keysalt,16)
+  encryptedFileKeyArr.set(new Uint8Array(encryptedFileKey),32)
+
+  var fnIV = crypto.getRandomValues(new Uint8Array(16))
+  var enc = new TextEncoder()
+
+  var encryptedFileName = await encryptBlob(
+    enc.encode(file.name),
+    usedClientKey,
+    false,
+    fnIV
+  )
+
+  var encryptedFileNameArr = new Uint8Array(encryptedFileName.byteLength + 16)
+  encryptedFileNameArr.set(fnIV,0)
+  encryptedFileNameArr.set(new Uint8Array(encryptedFileName),16)
+  var form = new FormData();
+
+  form.append("fileSize", file.size + 32);
+  form.append("fileName", encode(encryptedFileName));
+  form.append("chunkKey", encode(encryptedFileKeyArr));
+  form.append("id",ongoingFileId)
+
+  await fetch(`${baseEndpointURL}/pre`,{
+    headers : {
+      'Authorization': localStorage.getItem("tk")
+    },
+    method: "POST",
+    body: form
+  })
  
   if (file.size < megabyte * 5) {
     await loopEncryptChunk([0, file.size]);

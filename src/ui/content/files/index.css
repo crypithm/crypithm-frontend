@@ -238,7 +238,7 @@
     height: 1px;
     background: transparent;
     border: none;
-    transition: all 0.1s ease-in-out;
+    transition: all 0.2s ease-in-out;
     -webkit-appearance: none;
 }
 

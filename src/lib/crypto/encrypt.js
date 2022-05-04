@@ -96,20 +96,21 @@ export async function encryptAndUploadFile(
   form.append("chunkKey", encode(encryptedFileKeyArr));
   form.append("id",ongoingFileId)
 
-  await fetch(`${baseEndpointURL}/pre`,{
+  var resp = await fetch(`${baseEndpointURL}/pre`,{
     headers : {
       'Authorization': localStorage.getItem("tk")
     },
     method: "POST",
     body: form
   })
- 
+  var jsn = await resp.json()
   if (file.size < megabyte * 5) {
     await loopEncryptChunk([0, file.size]);
   } else {
+    
     await loopEncryptChunk([0, megabyte * 5]);
   }
-
+  var varForConcurrent = 0
   async function loopEncryptChunk(offset) {
     var sliced = file.slice(offset[0], offset[1]);
     var reader = new FileReader();
@@ -124,6 +125,29 @@ export async function encryptAndUploadFile(
       var finishedBytes = new Uint8Array(encryptedBlobSlice.byteLength + 16);
       finishedBytes.set(iv, 0);
       finishedBytes.set(new Uint8Array(encryptedBlobSlice), 16);
+
+      var Form = new FormData()
+      Form.append("token",jsn.StatusMessage)
+      Form.append("partialFileDta", new Blob([finishedBytes]))
+      var xhr = new XMLHttpRequest()
+      xhr.open("POST", `${baseEndpointURL}/upload`)
+      xhr.setRequestHeader("StartRange",offset[0])
+      xhr.setRequestHeader("EndRange",offset[1])
+      
+      xhr.onloadend=()=>{
+        //chunk upload ended!
+      }
+      var prevVal=0
+      var prevloaded=0, nowloaded=0
+      xhr.upload.onprogress=function(e){
+        setTimeout(()=>{prevloaded = e.loaded},1000)
+        nowloaded = e.loaded
+        varForConcurrent += e.loaded - prevVal
+        updateStatus((varForConcurrent/file.size)*100, Math.round(((nowloaded - prevloaded)/megabyte)*10)/10, ongoingFileId)
+        prevVal=e.loaded
+      }
+      xhr.send(Form)
+
       if (offset[1] < file.size) {
         loopEncryptChunk([offset[1], offset[1] + megabyte * 5]);
       }

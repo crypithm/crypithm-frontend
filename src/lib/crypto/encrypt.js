@@ -50,7 +50,7 @@ export async function encryptAndUploadFile(
     importedClientKey,
     { name: "AES-GCM", length: 256 },
     false,
-    ["encrypt", "decrypt"]
+    ["encrypt"]
   );
 
   var Filekey = await crypto.subtle.generateKey(
@@ -86,13 +86,15 @@ export async function encryptAndUploadFile(
     fnIV
   )
 
-  var encryptedFileNameArr = new Uint8Array(encryptedFileName.byteLength + 16)
+  var encryptedFileNameArr = new Uint8Array(encryptedFileName.byteLength + 32)
   encryptedFileNameArr.set(fnIV,0)
-  encryptedFileNameArr.set(new Uint8Array(encryptedFileName),16)
+  encryptedFileNameArr.set(keysalt,16)
+  encryptedFileNameArr.set(new Uint8Array(encryptedFileName),32)
+  console.log(encryptedFileName)
   var form = new FormData();
 
   form.append("fileSize", file.size + 32);
-  form.append("fileName", encode(encryptedFileName));
+  form.append("fileName", encode(encryptedFileNameArr));
   form.append("chunkKey", encode(encryptedFileKeyArr));
   form.append("id",ongoingFileId)
 
@@ -105,13 +107,13 @@ export async function encryptAndUploadFile(
   })
   var jsn = await resp.json()
   if (file.size < megabyte * 5) {
-    await loopEncryptChunk([0, file.size]);
+    await loopEncryptChunk([0, file.size],0);
   } else {
     
-    await loopEncryptChunk([0, megabyte * 5]);
+    await loopEncryptChunk([0, megabyte * 5],0);
   }
   var varForConcurrent = 0
-  async function loopEncryptChunk(offset) {
+  async function loopEncryptChunk(offset, previous) {
     var sliced = file.slice(offset[0], offset[1]);
     var reader = new FileReader();
     var iv = crypto.getRandomValues(new Uint8Array(16));
@@ -131,12 +133,8 @@ export async function encryptAndUploadFile(
       Form.append("partialFileDta", new Blob([finishedBytes]))
       var xhr = new XMLHttpRequest()
       xhr.open("POST", `${baseEndpointURL}/upload`)
-      xhr.setRequestHeader("StartRange",offset[0])
-      xhr.setRequestHeader("EndRange",offset[1])
+      xhr.setRequestHeader("StartRange",previous)
       
-      xhr.onloadend=()=>{
-        //chunk upload ended!
-      }
       var prevVal=0
       var prevloaded=0, nowloaded=0
       xhr.upload.onprogress=function(e){
@@ -149,7 +147,7 @@ export async function encryptAndUploadFile(
       xhr.send(Form)
 
       if (offset[1] < file.size) {
-        loopEncryptChunk([offset[1], offset[1] + megabyte * 5]);
+        loopEncryptChunk([offset[1], offset[1] + megabyte * 5], previous+finishedBytes.byteLength);
       }
     };
     reader.readAsArrayBuffer(sliced);

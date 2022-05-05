@@ -19,22 +19,9 @@ import { FileInfo } from "./fileInfo/index.js";
 import { ContextMenu } from "./contextMenu/index.js";
 import { encryptAndUploadFile } from "../../../lib/crypto/encrypt.js";
 import { randString } from "../../../lib/crypto/random";
-export class Files extends React.Component {
-  constructor(props) {
-    super(props);
-    this.clickDetectionArea = React.createRef();
-    this.dragDetectionArea = React.createRef();
-    this.fileItemsRef = [];
-    this.dragBoxRef = React.createRef();
-    this.fileInputBox = React.createRef();
-    this.state = {
-      selectedIndex: [],
-      startPos: [0, 0],
-      currentPos: [0, 0],
-      newDropdown: true,
-      ascending: false,
-      Aligngrid: false,
-      data: [
+import { getAllFiledata } from "../../../lib/crypto/decrypt";
+
+/*
         {
           id: "49shHGfdasg",
           name: "TusisCool.mpeg",
@@ -62,7 +49,23 @@ export class Files extends React.Component {
           thumb:
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
         },
-      ],
+*/
+export class Files extends React.Component {
+  constructor(props) {
+    super(props);
+    this.clickDetectionArea = React.createRef();
+    this.dragDetectionArea = React.createRef();
+    this.fileItemsRef = [];
+    this.dragBoxRef = React.createRef();
+    this.fileInputBox = React.createRef();
+    this.state = {
+      selectedIndex: [],
+      startPos: [0, 0],
+      currentPos: [0, 0],
+      newDropdown: true,
+      ascending: false,
+      Aligngrid: false,
+      data: [],
       uploadsInProgress: {},
     };
   }
@@ -76,11 +79,13 @@ export class Files extends React.Component {
     this.state.uploadsInProgress[id] = [progress, speed];
     this.setState({ uploadsInProgress: this.state.uploadsInProgress });
   };
-  componentDidMount = () => {
+  componentDidMount = async() => {
     this.clickDetectionArea.current.addEventListener(
       "mousedown",
       this.mouseDown
     );
+    var decryptedJsonarray = await getAllFiledata(localStorage.getItem("key"))
+    this.setState({data:decryptedJsonarray})
   };
 
   FileInfo = () => {
@@ -124,7 +129,7 @@ export class Files extends React.Component {
   };
 
   startUpload = async () => {
-    var clientKey = "a";
+    var clientKey = localStorage.getItem("key");
     var files = this.fileInputBox.current.files;
     var current = 0;
     var idList=[]

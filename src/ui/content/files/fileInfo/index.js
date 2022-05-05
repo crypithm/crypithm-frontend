@@ -1,13 +1,13 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import "./index.css";
 
 export class FileInfo extends React.Component {
   unMount = () => {
-    ReactDOM.unmountComponentAtNode(
-      document.querySelector("#fileInfoWillCome")
-    );
+    this.props.root.unmount();
+
   };
+  
   render = () => {
     return (
       <>

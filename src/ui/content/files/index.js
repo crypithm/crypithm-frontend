@@ -13,7 +13,7 @@ import {
 
 import { BsCloudPlusFill } from "react-icons/bs";
 import React from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import "./index.css";
 import { FileInfo } from "./fileInfo/index.js";
 import { ContextMenu } from "./contextMenu/index.js";
@@ -79,32 +79,28 @@ export class Files extends React.Component {
     this.state.uploadsInProgress[id] = [progress, speed];
     this.setState({ uploadsInProgress: this.state.uploadsInProgress });
   };
-  componentDidMount = async() => {
+  componentDidMount = async () => {
     this.clickDetectionArea.current.addEventListener(
       "mousedown",
       this.mouseDown
     );
-    var decryptedJsonarray = await getAllFiledata(localStorage.getItem("key"))
-    this.setState({data:decryptedJsonarray})
+    var decryptedJsonarray = await getAllFiledata(localStorage.getItem("key"));
+    this.setState({ data: decryptedJsonarray });
   };
 
   FileInfo = () => {
-    ReactDOM.render(<FileInfo />, document.querySelector("#fileInfoWillCome"));
+    const root = ReactDOM.createRoot(document.querySelector("#fileInfoWillCome"))
+    root.render(
+      <FileInfo root={root} />
+    );
   };
-
   ctxMenuCalled = (ctxMenuEvent) => {
     ctxMenuEvent.preventDefault();
-
-    ReactDOM.render(
-      <ContextMenu x={ctxMenuEvent.clientX} y={ctxMenuEvent.clientY} />,
-      document.querySelector("#ctxMenuWillCome")
+    const root = ReactDOM.createRoot(document.querySelector("#ctxMenuWillCome"))
+    root.render(
+      <ContextMenu x={ctxMenuEvent.clientX} y={ctxMenuEvent.clientY} />
     );
 
-    window.addEventListener("click", () => {
-      ReactDOM.unmountComponentAtNode(
-        document.querySelector("#ctxMenuWillCome")
-      );
-    });
   };
   alignBySomething = (byindex) => {
     if (byindex == 1) {
@@ -132,12 +128,12 @@ export class Files extends React.Component {
     var clientKey = localStorage.getItem("key");
     var files = this.fileInputBox.current.files;
     var current = 0;
-    var idList=[]
-    for(var b=0;b<files.length;b++){
-      var currentId=randString(11)
-      this.changedUploadProgress(0,0,currentId)
-      await this.pushToQueue(currentId,files[b].name)
-      idList[b]=currentId
+    var idList = [];
+    for (var b = 0; b < files.length; b++) {
+      var currentId = randString(11);
+      this.changedUploadProgress(0, 0, currentId);
+      await this.pushToQueue(currentId, files[b].name);
+      idList[b] = currentId;
     }
     var loopFiles = async (leftover) => {
       var v = leftover > 4 ? 4 : leftover;

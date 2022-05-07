@@ -124,6 +124,7 @@ export class Files extends React.Component {
     this.setState({ Aligngrid: this.state.Aligngrid == true ? false : true });
   };
 
+
   startUpload = async () => {
     var clientKey = localStorage.getItem("key");
     var files = this.fileInputBox.current.files;

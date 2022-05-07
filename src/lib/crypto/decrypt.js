@@ -35,8 +35,8 @@ export async function getAllFiledata(key) {
     if (jsn.Files.length > 0) {
       var FinrtnArray = [];
       var decoder = new TextDecoder();
-      jsn.Files.map(async (elem, _) => {
-        var keysalt = decode(elem.Name).slice(16, 32);
+      var loop = async(v)=>{
+        var keysalt = decode(jsn.Files[v].Name).slice(16, 32);
         var usedClientKey = await crypto.subtle.deriveKey(
           {
             name: "PBKDF2",
@@ -49,7 +49,7 @@ export async function getAllFiledata(key) {
           false,
           ["decrypt"]
         );
-        var Fullname = decode(elem.Name);
+        var Fullname = decode(jsn.Files[v].Name);
         var decryptedData = await decryptBlob(
           usedClientKey,
           Fullname.slice(0, 16),
@@ -57,14 +57,18 @@ export async function getAllFiledata(key) {
         );
         FinrtnArray.push({
           name: decoder.decode(decryptedData),
-          size: parseInt(elem.Size),
+          size: parseInt(jsn.Files[v].Size),
           date: "2022 1 19",
-          id: elem.Id,
+          id: jsn.Files[v].Id,
           thumb:
             "https://i1.sndcdn.com/avatars-zUGIpyyW010rJFrc-rdl0PQ-t240x240.jpg",
           completed: true,
-        });
-      });
+        }); 
+        if(jsn.Files.length-1>v){
+          await loop(v+1)
+        }
+      }
+      await loop(0)
       return FinrtnArray;
     }
   }

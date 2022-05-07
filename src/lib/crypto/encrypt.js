@@ -144,6 +144,12 @@ export async function encryptAndUploadFile(
         updateStatus((varForConcurrent/file.size)*100, Math.round(((nowloaded - prevloaded)/megabyte)*10)/10, ongoingFileId)
         prevVal=e.loaded
       }
+
+      xhr.onloadend=function(){
+        if(offset[1]>=file.size){
+          console.log("ended")
+        }
+      }
       xhr.send(Form)
 
       if (offset[1] < file.size) {

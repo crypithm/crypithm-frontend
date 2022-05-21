@@ -384,7 +384,7 @@ export class Files extends React.Component {
           }
           this.setState({ selectedIndex: intlist });
         }
-      }
+      }else
       if (e.ctrlKey || e.metaKey) {
         if (this.state.selectedIndex.indexOf(targetIndex) == -1) {
           this.setState({
@@ -397,11 +397,11 @@ export class Files extends React.Component {
             this.setState({ selectedIndex: this.state.selectedIndex });
           }
         }
-      }
+      }else
       if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
         this.setState({ selectedIndex: [] });
         this.setState({
-          selectedIndex: this.state.selectedIndex.concat([targetIndex]),
+          selectedIndex: [targetIndex],
         });
       }
     }

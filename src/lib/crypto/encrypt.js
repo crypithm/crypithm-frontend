@@ -113,6 +113,7 @@ export async function encryptAndUploadFile(
     await loopEncryptChunk([0, megabyte * 5],0);
   }
   var varForConcurrent = 0
+  var fullUploadedBytes=0
   async function loopEncryptChunk(offset, previous) {
     var sliced = file.slice(offset[0], offset[1]);
     var reader = new FileReader();
@@ -146,7 +147,8 @@ export async function encryptAndUploadFile(
       }
 
       xhr.onloadend=function(){
-        if(offset[1]>=file.size){
+        fullUploadedBytes+=offset[1]-offset[0]
+        if(fullUploadedBytes>=file.size){
           console.log("ended")
         }
       }

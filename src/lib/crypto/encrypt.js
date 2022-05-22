@@ -33,7 +33,8 @@ export async function encryptAndUploadFile(
   file,
   clientKey,
   updateStatus,
-  ongoingFileId
+  ongoingFileId,
+  finishedUpload
 ) {
   //update Status==> await updateStatus(100, 0, ongoingFileId);
   var keysalt = crypto.getRandomValues(new Uint8Array(16));
@@ -149,7 +150,7 @@ export async function encryptAndUploadFile(
       xhr.onloadend=function(){
         fullUploadedBytes+=offset[1]-offset[0]
         if(fullUploadedBytes>=file.size){
-          console.log("ended")
+          finishedUpload(ongoingFileId)
         }
       }
       xhr.send(Form)

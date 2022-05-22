@@ -124,6 +124,22 @@ export class Files extends React.Component {
     this.setState({ Aligngrid: this.state.Aligngrid == true ? false : true });
   };
 
+  findElemIndex = (id)=>{
+    for(var i=0;i<this.state.data.length;i++){
+      if(this.state.data[i].id==id){
+        return i
+      }
+    }
+    return -1
+  }
+
+  uploadDone = async(id)=>{
+    let index = this.findElemIndex(id)
+    var elem = this.state.data[index]
+    elem.completed=true
+    this.state.data.splice(index,1)
+    this.setState({data:this.state.data.concat(elem)})
+  }
 
   startUpload = async () => {
     var clientKey = localStorage.getItem("key");
@@ -143,7 +159,8 @@ export class Files extends React.Component {
           files[current],
           clientKey,
           this.changedUploadProgress,
-          idList[current]
+          idList[current],
+          this.uploadDone
         );
         current += 1;
       }

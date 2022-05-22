@@ -21,35 +21,6 @@ import { encryptAndUploadFile } from "../../../lib/crypto/encrypt.js";
 import { randString } from "../../../lib/crypto/random";
 import { getAllFiledata } from "../../../lib/crypto/decrypt";
 
-/*
-        {
-          id: "49shHGfdasg",
-          name: "TusisCool.mpeg",
-          size: 1209121,
-          date: "2022 1 19",
-          completed: true,
-          thumb:
-            "https://pbs.twimg.com/profile_images/1342768807891378178/8le-DzgC_400x400.jpg",
-        },
-        {
-          id: "GxBF579hfcX",
-          name: "crypithm.jpeg",
-          size: 2048,
-          date: "2022 1 19",
-          completed: true,
-          thumb:
-            "https://i1.sndcdn.com/avatars-zUGIpyyW010rJFrc-rdl0PQ-t240x240.jpg",
-        },
-        {
-          id: "8Hd7s6d5xFs",
-          name: "uarenoov.png",
-          size: 5048,
-          date: "2022 1 19",
-          completed: true,
-          thumb:
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROtpHcuUX6rkfh8MpUbLNxJch5a_sXlLoOU6rlsVLzla0NpyEPD7PChbhElWNJz2O8djY&usqp=CAU",
-        },
-*/
 export class Files extends React.Component {
   constructor(props) {
     super(props);
@@ -98,7 +69,7 @@ export class Files extends React.Component {
     ctxMenuEvent.preventDefault();
     const root = ReactDOM.createRoot(document.querySelector("#ctxMenuWillCome"))
     root.render(
-      <ContextMenu x={ctxMenuEvent.clientX} y={ctxMenuEvent.clientY} />
+      <ContextMenu x={ctxMenuEvent.clientX} y={ctxMenuEvent.clientY} root={root}/>
     );
 
   };

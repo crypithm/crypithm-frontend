@@ -3,11 +3,12 @@ import { Leftmenu } from "./ui/left-menubar/index.js";
 import { Header } from "./ui/header/index.js";
 import { menus } from "./vars";
 import { Content } from "./ui/content/index.js";
+import { Viewer } from "./ui/viewer";
 
 export class Crypithm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { currentPage: window.location.pathname.split("/")[1], mobileMenuOpen: false };
+    this.state = { currentPage: window.location.pathname.split("/")[1], mobileMenuOpen: false, viewingFileId:null };
   }
   pushedToState = () => {
     this.setState({ currentPage: window.location.pathname.split("/")[1] });
@@ -27,6 +28,7 @@ export class Crypithm extends React.Component {
   render = () => {
     return (
       <>
+      <Viewer></Viewer>
         <Leftmenu
           currentPage={this.state.currentPage}
           updateFunc={() => this.pushedToState()}

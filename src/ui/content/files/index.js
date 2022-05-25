@@ -9,6 +9,7 @@ import {
   RiLayoutBottomFill,
   RiArrowDownSFill,
   RiArrowUpLine,
+  RiArrowDropRightLine
 } from "react-icons/ri";
 
 import { BsCloudPlusFill } from "react-icons/bs";
@@ -291,7 +292,9 @@ export class Files extends React.Component {
                     <div className="fileThumbnail">
                       <img src={elem.thumb} width={20} />
                     </div>
+                    <p className="elemName">
                     {elem.name}
+                    </p>
                   </>
                 ) : (
                   <>
@@ -309,6 +312,15 @@ export class Files extends React.Component {
             );
           })}
         </div>
+        <div className="directory">
+          <b className="directoryBtn">
+          Crypithm
+          </b>
+          <RiArrowDropRightLine/>
+          <b className="directoryBtn">
+          File
+          </b>
+          </div>
       </div>
     );
   };

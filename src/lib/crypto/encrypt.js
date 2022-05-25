@@ -1,4 +1,5 @@
 import { encode } from "base64-arraybuffer";
+import { FileThumbnail } from "../utils/thumbnail"; 
 
 const megabyte = 1048576;
 const baseEndpointURL = "https://crypithm.com/api"
@@ -110,7 +111,6 @@ export async function encryptAndUploadFile(
   if (file.size < megabyte * 5) {
     await loopEncryptChunk([0, file.size],0);
   } else {
-    
     await loopEncryptChunk([0, megabyte * 5],0);
   }
   var varForConcurrent = 0

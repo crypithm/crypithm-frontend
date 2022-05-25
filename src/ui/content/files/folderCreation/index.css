@@ -1,0 +1,92 @@
+.folderCreationArea{
+    top: calc(100vh/2 - 100px);
+    left: calc(100vw/2 - 200px);
+    position: fixed;
+    z-index: 5;
+    width: 400px;
+    height: 200px;
+    background-color: #191919;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Source Code Pro', monospace;
+    color: rgba(255,255,255,0.4);
+}
+
+.folderCreationArea .title {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border-bottom: solid 1px rgba(255,255,255,0.3);
+    font-size: 9pt;
+}
+
+.folderCreationArea .title p {
+margin: 0;
+padding: 0;
+margin-left: 20px;
+}
+
+.folderCreationArea .body {
+    height: fit-content;
+    width: 100%;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+}
+
+.folderCreationArea .nameInput {
+    display: flex;
+    flex-direction: column;
+    width: 85%;
+    align-items: flex-start;
+    font-size:7pt;
+    height: 95px;
+    justify-content: center;
+}
+
+.creationBtn{
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    background-color: #242424;
+    padding: 7px;
+    color: #636363;
+    transition: color 0.1s ease-in-out;
+    font-size: 8pt;
+    margin-left: 10px;
+}
+.buttons {
+    display: flex;
+    flex-direction: row;
+    width: 85%;
+    justify-content: flex-end;
+}
+
+.nameInput input[type="text"]{
+    width: calc(100% - 20px);
+    border: none;
+    background-color: transparent;
+    border-bottom: solid 1px rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.6);
+    padding: 10px;
+    font-family: 'Source Code Pro', monospace;
+}
+.nameInput input[type="text"]:focus{
+    outline: none;
+}
+
+@media (max-width: 450px) {
+    .folderCreationArea{
+        top: calc(100vh/2 - 100px);
+        left: calc(100vw/2 - 150px);
+        position: fixed;
+        z-index: 5;
+        width: 300px;
+        height: 200px;
+    }
+}

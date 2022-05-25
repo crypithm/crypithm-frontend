@@ -80,11 +80,13 @@ export class Leftmenu extends React.Component {
             </div>
           </div>
           <div className="userInfoArea">
-            <b>User: Developer</b>
             <div className="progressArea">
+            <b>8GB out of 10GB used</b>
               <progress max="90" value="80"></progress>
-              <b>8GB out of 10GB used</b>
             </div>
+          </div>
+          <div className="btmLeftOver">
+            Privacy Policy | Terms Of Service
           </div>
         </div>
       </>

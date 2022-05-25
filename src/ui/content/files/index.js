@@ -21,6 +21,7 @@ import { ContextMenu } from "./contextMenu/index.js";
 import { encryptAndUploadFile } from "../../../lib/crypto/encrypt.js";
 import { randString } from "../../../lib/crypto/random";
 import { getAllFiledata } from "../../../lib/crypto/decrypt";
+import {Foldercreation} from "./folderCreation"
 
 export class Files extends React.Component {
   constructor(props) {
@@ -38,7 +39,7 @@ export class Files extends React.Component {
       ascending: false,
       Aligngrid: false,
       data: [],
-      uploadsInProgress: {},
+      uploadsInProgress: {}
     };
   }
 
@@ -144,6 +145,13 @@ export class Files extends React.Component {
     current = 0;
   };
 
+  showFileCreation = ()=>{
+    const root = ReactDOM.createRoot(document.querySelector("#folderCreationWillCome"))
+    root.render(
+      <Foldercreation root={root} />
+    );
+  }
+
   render = () => {
     var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };
 
@@ -154,6 +162,7 @@ export class Files extends React.Component {
       >
         <div id="ctxMenuWillCome"></div>
         <div id="fileInfoWillCome"></div>
+        <div id="folderCreationWillCome"></div>
         <div
           className="dragSquare"
           style={{
@@ -192,7 +201,7 @@ export class Files extends React.Component {
                 : "newDropdown dropDownShow"
             }
           >
-            <div className="dropdown-buttonIcon">
+            <div className="dropdown-buttonIcon" onClick={()=>this.showFileCreation()}>
               <RiFolderAddFill />{" "}
             </div>
             <div className="dropdown-buttonIcon">
@@ -316,7 +325,7 @@ export class Files extends React.Component {
           <b className="directoryBtn">
           Crypithm
           </b>
-          <RiArrowDropRightLine/>
+          <RiArrowDropRightLine />
           <b className="directoryBtn">
           File
           </b>
@@ -324,7 +333,8 @@ export class Files extends React.Component {
       </div>
     );
   };
-
+/*
+*/
   newBtnClicked = () => {
     this.setState({ newDropdown: this.state.newDropdown ? false : true });
   };

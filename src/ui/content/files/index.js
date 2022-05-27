@@ -12,6 +12,7 @@ import {
   RiArrowDropRightLine
 } from "react-icons/ri";
 
+import {FcFolder} from 'react-icons/fc'
 import { BsCloudPlusFill } from "react-icons/bs";
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -111,9 +112,11 @@ export class Files extends React.Component {
     var elem = this.state.data[index]
     elem.completed=true
     this.state.data.splice(index,1)
+    this.appendToView(elem)
+  }
+  appendToView = (elem)=>{
     this.setState({data:this.state.data.concat(elem)})
   }
-
   startUpload = async () => {
     var clientKey = localStorage.getItem("key");
     var files = this.fileInputBox.current.files;
@@ -148,7 +151,7 @@ export class Files extends React.Component {
   showFileCreation = ()=>{
     const root = ReactDOM.createRoot(document.querySelector("#folderCreationWillCome"))
     root.render(
-      <Foldercreation root={root} />
+      <Foldercreation root={root} appendToView={(elem)=>this.appendToView(elem)}/>
     );
   }
 
@@ -278,8 +281,10 @@ export class Files extends React.Component {
           }
         >
           {this.state.data.map((elem, index) => {
-            return (
-              <div
+
+            if(elem.type=="folder"){
+              return(
+                <div
                 className={
                   this.state.Aligngrid ? "fileContainer grid" : "fileContainer"
                 }
@@ -296,29 +301,57 @@ export class Files extends React.Component {
                   return true;
                 }}
               >
-                {elem.completed ? (
-                  <>
-                    <div className="fileThumbnail">
-                      <img src={elem.thumb} width={20} />
-                    </div>
-                    <p className="elemName">
-                    {elem.name}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <progress
-                      className="uploadingProgress"
-                      max="100"
-                      value={this.state.uploadsInProgress[elem.id][0]}
-                    ></progress>
-                    <p className="fileName">{`${elem.name}`}</p>
-                    {`${this.state.uploadsInProgress[elem.id][1]}MB/s`}
-                    <RiArrowUpLine />
-                  </>
-                )}
+                  <div className="fileThumbnail" style={{fontSize: this.state.Aligngrid?"40pt":"20pt"}}>
+                        <FcFolder />
+                      </div>
+                      <p className="elemName">
+                      {elem.name}
+                      </p>
               </div>
-            );
+              )
+            }else{
+              return (
+                <div
+                  className={
+                    this.state.Aligngrid ? "fileContainer grid" : "fileContainer"
+                  }
+                  style={
+                    this.state.selectedIndex.indexOf(index + 1) != -1
+                      ? selectedStyle
+                      : {}
+                  }
+                  objectid={elem.id}
+                  key={elem.id}
+                  data-index={index + 1}
+                  ref={(ref) => {
+                    this.fileItemsRef[index] = ref;
+                    return true;
+                  }}
+                >
+                  {elem.completed ? (
+                    <>
+                      <div className="fileThumbnail">
+                        <img src={elem.thumb} width={20} />
+                      </div>
+                      <p className="elemName">
+                      {elem.name}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <progress
+                        className="uploadingProgress"
+                        max="100"
+                        value={this.state.uploadsInProgress[elem.id][0]}
+                      ></progress>
+                      <p className="fileName">{`${elem.name}`}</p>
+                      {`${this.state.uploadsInProgress[elem.id][1]}MB/s`}
+                      <RiArrowUpLine />
+                    </>
+                  )}
+                </div>
+              ); 
+            }
           })}
         </div>
         <div className="directory">

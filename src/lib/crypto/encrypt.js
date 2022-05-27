@@ -22,6 +22,27 @@ export async function encryptBlob(binary, key, randomiv, iv) {
   return cryptdata;
 }
 
+//rawKeyBytes:string, keysalt: ArrayBuffer => AES-256-GCM CryptoKey Obj (PBKDF2)
+export async function importAndDeriveKeyFromRaw(rawKeyBytes, keysalt){
+  var enc = new TextEncoder();
+  var importedClientKey = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(rawKeyBytes),
+    "PBKDF2",
+    false,
+    ["deriveKey", "deriveBits"]
+  );
+  var usedClientKey = await crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: keysalt, iterations: 100000, hash: "SHA-256" },
+    importedClientKey,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt"]
+  );
+
+return usedClientKey;
+}
+
 //data:binary
 export async function hashBinary(algo, data) {
   var digest = await window.crypto.subtle.digest(algo, data);
@@ -37,33 +58,16 @@ export async function encryptAndUploadFile(
   ongoingFileId,
   finishedUpload
 ) {
-  //update Status==> await updateStatus(100, 0, ongoingFileId);
   var keysalt = crypto.getRandomValues(new Uint8Array(16));
-  var enc = new TextEncoder();
-  var importedClientKey = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(clientKey),
-    "PBKDF2",
-    false,
-    ["deriveKey", "deriveBits"]
-  );
-  var usedClientKey = await crypto.subtle.deriveKey(
-    { name: "PBKDF2", salt: keysalt, iterations: 100000, hash: "SHA-256" },
-    importedClientKey,
-    { name: "AES-GCM", length: 256 },
-    false,
-    ["encrypt"]
-  );
-
-  var Filekey = await crypto.subtle.generateKey(
-    {
-      name: "AES-GCM",
-      length: 256,
-    },
-    true,
-    ["encrypt", "decrypt"]
-  );
-
+var usedClientKey = await importAndDeriveKeyFromRaw(clientKey,keysalt)
+var Filekey = await crypto.subtle.generateKey(
+  {
+    name: "AES-GCM",
+    length: 256,
+  },
+  true,
+  ["encrypt", "decrypt"]
+);
   var FileKeyRaw = await crypto.subtle.exportKey("raw", Filekey);
   var keyIV = crypto.getRandomValues(new Uint8Array(16));
   var encryptedFileKey = await encryptBlob(

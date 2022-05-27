@@ -16,7 +16,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Raleway', sans-serif;
     font-size: 10pt;
 }
 .contentBtn:hover {

@@ -32,10 +32,41 @@ export async function getAllFiledata(key) {
   if (jsn.Message != "Success") {
     console.error("fetcherror");
   } else {
-    if (jsn.Files.length > 0) {
-      var FinrtnArray = [];
+    var foldersArr=[];
+    if (jsn.Folders) {
       var decoder = new TextDecoder();
-      var loop = async(v)=>{
+      for(var v=0;v<jsn.Folders.length;v++){
+        var keysalt = decode(jsn.Folders[v].Name).slice(0, 16);
+        var usedClientKey = await crypto.subtle.deriveKey(
+          {
+            name: "PBKDF2",
+            salt: keysalt,
+            iterations: 100000,
+            hash: "SHA-256",
+          },
+          importedClientKey,
+          { name: "AES-GCM", length: 256 },
+          false,
+          ["decrypt"]
+        );
+        var Fullname = decode(jsn.Folders[v].Name);
+        var decryptedData = await decryptBlob(
+          usedClientKey,
+          Fullname.slice(16, 32),
+          Fullname.slice(32)
+        );
+        foldersArr.push({
+          name: decoder.decode(decryptedData),
+          date: jsn.Folders[v].Date,
+          id: jsn.Folders[v].Id,
+          type: "folder"
+        }); 
+      }
+    }
+    var filesArr=[];
+    if (jsn.Files) {
+      var decoder = new TextDecoder();
+      for(var v=0;v<jsn.Files.length;v++){
         var keysalt = decode(jsn.Files[v].Name).slice(16, 32);
         var usedClientKey = await crypto.subtle.deriveKey(
           {
@@ -55,7 +86,7 @@ export async function getAllFiledata(key) {
           Fullname.slice(0, 16),
           Fullname.slice(32)
         );
-        FinrtnArray.push({
+        filesArr.push({
           name: decoder.decode(decryptedData),
           size: parseInt(jsn.Files[v].Size),
           date: "2022 1 19",
@@ -64,12 +95,8 @@ export async function getAllFiledata(key) {
             "https://i1.sndcdn.com/avatars-zUGIpyyW010rJFrc-rdl0PQ-t240x240.jpg",
           completed: true,
         }); 
-        if(jsn.Files.length-1>v){
-          await loop(v+1)
-        }
       }
-      await loop(0)
-      return FinrtnArray;
     }
+    return[...foldersArr, ...filesArr]
   }
 }

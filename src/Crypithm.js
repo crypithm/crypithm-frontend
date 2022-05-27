@@ -14,6 +14,7 @@ export class Crypithm extends React.Component {
     this.setState({ currentPage: window.location.pathname.split("/")[1] });
   };
   componentDidMount = () => {
+    localStorage.setItem("dir", "/ 0")
     window.onpopstate = () => {
       var currentPage = window.location.pathname.split("/")[1];
       this.setState({ currentPage: currentPage });

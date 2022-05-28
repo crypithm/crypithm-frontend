@@ -33,7 +33,10 @@ export class Files extends React.Component {
     this.dragBoxRef = React.createRef();
     this.fileInputBox = React.createRef();
     this.state = {
+      selectedIds : [],
       selectedIndex: [],
+      moveFileBoxPos: [0, 0],
+      onFolder: "",
       startPos: [0, 0],
       currentPos: [0, 0],
       newDropdown: true,
@@ -176,22 +179,23 @@ export class Files extends React.Component {
   };
 
   moveToDir = (id) => {
+    this.setState({ selectedIndex: [] });
     this.setState({ stalkedDirectory: [] });
     this.setState({ currentDirectory: id });
     localStorage.setItem("dir", id);
-    if(id!="/ 0"){
-      var tempArr = []
+    if (id != "/ 0") {
+      var tempArr = [];
       const v = (id) => {
         var targetObj = this.findElemIndex(id, true);
         tempArr.unshift({
           id: targetObj.id,
           name: targetObj.name,
-        })
+        });
         if (targetObj.dir != "/ 0") {
           v(targetObj.dir);
-        }else{
+        } else {
           this.setState({
-            stalkedDirectory: tempArr
+            stalkedDirectory: tempArr,
           });
         }
       };
@@ -202,234 +206,285 @@ export class Files extends React.Component {
     var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };
 
     return (
-      <div
-        ref={this.dragDetectionArea}
-        onContextMenu={(e) => this.ctxMenuCalled(e)}
-      >
-        <div id="ctxMenuWillCome"></div>
-        <div id="fileInfoWillCome"></div>
-        <div id="folderCreationWillCome"></div>
+      <>
         <div
-          className="dragSquare"
-          style={{
-            top:
-              this.state.currentPos[1] - this.state.startPos[1] > 0
-                ? this.state.startPos[1]
-                : this.state.currentPos[1],
-
-            left:
-              this.state.currentPos[0] - this.state.startPos[0] > 0
-                ? this.state.startPos[0]
-                : this.state.currentPos[0],
-            width: Math.abs(this.state.currentPos[0] - this.state.startPos[0]),
-            height: Math.abs(this.state.currentPos[1] - this.state.startPos[1]),
-          }}
-          ref={this.dragBoxRef}
-        ></div>
-        <div className="fileControlOptions">
-          <b className="Newbtn" onClick={() => this.newBtnClicked()}>
-            <div className="Newbtn-icon">
-              <BsCloudPlusFill />
-            </div>
-            New
-          </b>
-          <b className="viewStyle" onClick={() => this.changedAlign()}>
-            {this.state.Aligngrid ? (
-              <RiLayoutGridFill />
-            ) : (
-              <RiLayoutBottomFill />
-            )}
-          </b>
-          <div
-            className={
-              this.state.newDropdown
-                ? "newDropdown"
-                : "newDropdown dropDownShow"
-            }
-          >
-            <div
-              className="dropdown-buttonIcon"
-              onClick={() => this.showFileCreation()}
-            >
-              <RiFolderAddFill />{" "}
-            </div>
-            <div className="dropdown-buttonIcon">
-              <RiFolderUploadFill />{" "}
-            </div>
-            <input
-              type="file"
-              ref={this.fileInputBox}
-              style={{ display: "none" }}
-              id="fileInput"
-              onChange={() => this.startUpload()}
-              multiple
-            ></input>
-            <label className="dropdown-buttonIcon" htmlFor="fileInput">
-              <RiFileUploadFill />{" "}
-            </label>
-          </div>
-          <div
-            className={
-              this.state.selectedIndex.length === 0 ? "FCObtn hidden" : "FCObtn"
-            }
-          >
-            <b className="howManySelected">
-              selected {this.state.selectedIndex.length} file(s)
-            </b>{" "}
-            <b
-              className="unselectButton"
-              onClick={() => {
-                this.setState({ selectedIndex: [] });
-              }}
-            >
-              unselect
-            </b>
-            <div className="FileOptButtons">
-              <div
-                className={
-                  this.state.selectedIndex.length !== 1
-                    ? "FileOptIcons hidden"
-                    : "FileOptIcons"
-                }
-                onClick={() => this.FileInfo()}
-              >
-                <RiInformationFill />
-              </div>
-              <div className="FileOptIcons">
-                <RiDeleteBin7Fill />
-              </div>
-              <div className="FileOptIcons">
-                <RiPencilFill />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          className="arrangeBar"
-          style={{ display: this.state.Aligngrid ? "none" : "" }}
+          ref={this.dragDetectionArea}
+          onContextMenu={(e) => this.ctxMenuCalled(e)}
         >
-          <b onClick={() => this.alignBySomething(1)}>
-            Name
-            <RiArrowDownSFill
-              style={{
-                transform: this.state.ascending
-                  ? "rotate(0deg)"
-                  : "rotate(180deg)",
-                transition: "all 0.1s linear",
-              }}
-            />
-          </b>
-        </div>
-        <div
-          ref={this.clickDetectionArea}
-          className={
-            this.state.Aligngrid ? "filecont-cont displayGrid" : "filecont-cont"
+          <div className="dragger" style={{display:this.state.moveFileBoxPos[0]==0?"none":"flex", top: this.state.moveFileBoxPos[1]+5+"px", left: this.state.moveFileBoxPos[0]+5+"px"}}>
+          <p>
+          {this.findElemIndex(this.state.selectedIds[0],true).name}
+          </p>
+          {this.state.selectedIds.length>1?
+            <div className="howManyselected">{this.state.selectedIds.length}</div>:<></>
           }
-        >
-          {this.state.data.map((elem, index) => {
-            if (elem.dir == this.state.currentDirectory) {
-              if (elem.type == "folder") {
-                return (
-                  <div
-                    className={
-                      this.state.Aligngrid
-                        ? "fileContainer grid"
-                        : "fileContainer"
-                    }
-                    onDoubleClick={() => this.moveToDir(elem.id)}
-                    style={
-                      this.state.selectedIndex.indexOf(index + 1) != -1
-                        ? selectedStyle
-                        : {}
-                    }
-                    objectid={elem.id}
-                    key={elem.id}
-                    data-index={index + 1}
-                    ref={(ref) => {
-                      this.fileItemsRef[index] = ref;
-                      return true;
-                    }}
-                  >
+          </div>
+          <div id="ctxMenuWillCome"></div>
+          <div id="fileInfoWillCome"></div>
+          <div id="folderCreationWillCome"></div>
+          <div
+            className="dragSquare"
+            style={{
+              top:
+                this.state.currentPos[1] - this.state.startPos[1] > 0
+                  ? this.state.startPos[1]
+                  : this.state.currentPos[1],
+
+              left:
+                this.state.currentPos[0] - this.state.startPos[0] > 0
+                  ? this.state.startPos[0]
+                  : this.state.currentPos[0],
+              width: Math.abs(
+                this.state.currentPos[0] - this.state.startPos[0]
+              ),
+              height: Math.abs(
+                this.state.currentPos[1] - this.state.startPos[1]
+              ),
+            }}
+            ref={this.dragBoxRef}
+          ></div>
+          <div className="fileControlOptions">
+            <b className="Newbtn" onClick={() => this.newBtnClicked()}>
+              <div className="Newbtn-icon">
+                <BsCloudPlusFill />
+              </div>
+              New
+            </b>
+            <b className="viewStyle" onClick={() => this.changedAlign()}>
+              {this.state.Aligngrid ? (
+                <RiLayoutGridFill />
+              ) : (
+                <RiLayoutBottomFill />
+              )}
+            </b>
+            <div
+              className={
+                this.state.newDropdown
+                  ? "newDropdown"
+                  : "newDropdown dropDownShow"
+              }
+            >
+              <div
+                className="dropdown-buttonIcon"
+                onClick={() => this.showFileCreation()}
+              >
+                <RiFolderAddFill />{" "}
+              </div>
+              <div className="dropdown-buttonIcon">
+                <RiFolderUploadFill />{" "}
+              </div>
+              <input
+                type="file"
+                ref={this.fileInputBox}
+                style={{ display: "none" }}
+                id="fileInput"
+                onChange={() => this.startUpload()}
+                multiple
+              ></input>
+              <label className="dropdown-buttonIcon" htmlFor="fileInput">
+                <RiFileUploadFill />{" "}
+              </label>
+            </div>
+            <div
+              className={
+                this.state.selectedIndex.length === 0
+                  ? "FCObtn hidden"
+                  : "FCObtn"
+              }
+            >
+              <b className="howManySelected">
+                selected {this.state.selectedIndex.length} file(s)
+              </b>{" "}
+              <b
+                className="unselectButton"
+                onClick={() => {
+                  this.setState({ selectedIndex: [] });
+                }}
+              >
+                unselect
+              </b>
+              <div className="FileOptButtons">
+                <div
+                  className={
+                    this.state.selectedIndex.length !== 1
+                      ? "FileOptIcons hidden"
+                      : "FileOptIcons"
+                  }
+                  onClick={() => this.FileInfo()}
+                >
+                  <RiInformationFill />
+                </div>
+                <div className="FileOptIcons">
+                  <RiDeleteBin7Fill />
+                </div>
+                <div className="FileOptIcons">
+                  <RiPencilFill />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            className="arrangeBar"
+            style={{ display: this.state.Aligngrid ? "none" : "" }}
+          >
+            <b onClick={() => this.alignBySomething(1)}>
+              Name
+              <RiArrowDownSFill
+                style={{
+                  transform: this.state.ascending
+                    ? "rotate(0deg)"
+                    : "rotate(180deg)",
+                  transition: "all 0.1s linear",
+                }}
+              />
+            </b>
+          </div>
+          <div
+            ref={this.clickDetectionArea}
+            className={
+              this.state.Aligngrid
+                ? "filecont-cont displayGrid"
+                : "filecont-cont"
+            }
+          >
+            {this.state.data.filter(elem=>elem.dir==this.state.currentDirectory).map((elem, index) => {
+
+                if (elem.type == "folder") {
+                  return (
                     <div
-                      className="fileThumbnail"
-                      style={{
-                        fontSize: this.state.Aligngrid ? "40pt" : "20pt",
+                      className={
+                        this.state.Aligngrid
+                          ? "fileContainer grid"
+                          : "fileContainer"
+                      }
+                      onMouseUp={()=>this.moveFilesToDir(this.state.selectedIds, elem.id)}
+                      style={
+                        this.state.selectedIndex.indexOf(index + 1) != -1
+                          ? selectedStyle
+                          : {}
+                      }
+                      objectid={elem.id}
+                      key={elem.id}
+                      data-index={index + 1}
+                      ref={(ref) => {
+                        this.fileItemsRef[index] = ref;
+                        return true;
+                      }}
+                      onDoubleClick={() => this.moveToDir(elem.id)}
+                    >
+                      <div
+                        className="fileThumbnail"
+                        style={{
+                          fontSize: this.state.Aligngrid ? "40pt" : "20pt",
+                        }}
+                      >
+                        <FcFolder />
+                      </div>
+                      <p
+                        className="elemName"
+                        onMouseDown={() => this.moveToDir(elem.id)}
+                      >
+                        {elem.name}
+                      </p>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div
+                      className={
+                        this.state.Aligngrid
+                          ? "fileContainer grid"
+                          : "fileContainer"
+                      }
+                      style={
+                        this.state.selectedIndex.indexOf(index + 1) != -1
+                          ? selectedStyle
+                          : {}
+                      }
+                      objectid={elem.id}
+                      key={elem.id}
+                      data-index={index + 1}
+                      ref={(ref) => {
+                        this.fileItemsRef[index] = ref;
+                        return true;
                       }}
                     >
-                      <FcFolder />
+                      {elem.completed ? (
+                        <>
+                          <div className="fileThumbnail">
+                            <img src={elem.thumb} width={20} />
+                          </div>
+                          <p className="elemName">{elem.name}</p>
+                        </>
+                      ) : (
+                        <>
+                          <progress
+                            className="uploadingProgress"
+                            max="100"
+                            value={this.state.uploadsInProgress[elem.id][0]}
+                          ></progress>
+                          <p className="fileName">{`${elem.name}`}</p>
+                          {`${this.state.uploadsInProgress[elem.id][1]}MB/s`}
+                          <RiArrowUpLine />
+                        </>
+                      )}
                     </div>
-                    <p className="elemName">{elem.name}</p>
-                  </div>
-                );
-              } else {
-                return (
-                  <div
-                    className={
-                      this.state.Aligngrid
-                        ? "fileContainer grid"
-                        : "fileContainer"
-                    }
-                    style={
-                      this.state.selectedIndex.indexOf(index + 1) != -1
-                        ? selectedStyle
-                        : {}
-                    }
-                    objectid={elem.id}
-                    key={elem.id}
-                    data-index={index + 1}
-                    ref={(ref) => {
-                      this.fileItemsRef[index] = ref;
-                      return true;
-                    }}
+                  );
+                }
+            })}
+          </div>
+          <div className="directory">
+            <b className="directoryBtn" onClick={() => this.moveToDir("/ 0")}>
+              Crypithm
+            </b>
+            {this.state.stalkedDirectory.map((elem, index) => {
+              return (
+                <span key={index}>
+                  <RiArrowDropRightLine />
+                  <b
+                    className="directoryBtn"
+                    onClick={() => this.moveToDir(elem.id)}
                   >
-                    {elem.completed ? (
-                      <>
-                        <div className="fileThumbnail">
-                          <img src={elem.thumb} width={20} />
-                        </div>
-                        <p className="elemName">{elem.name}</p>
-                      </>
-                    ) : (
-                      <>
-                        <progress
-                          className="uploadingProgress"
-                          max="100"
-                          value={this.state.uploadsInProgress[elem.id][0]}
-                        ></progress>
-                        <p className="fileName">{`${elem.name}`}</p>
-                        {`${this.state.uploadsInProgress[elem.id][1]}MB/s`}
-                        <RiArrowUpLine />
-                      </>
-                    )}
-                  </div>
-                );
-              }
-            }
-          })}
+                    {elem.name}
+                  </b>
+                </span>
+              );
+            })}
+          </div>
         </div>
-        <div className="directory">
-          <b className="directoryBtn" onClick={() => this.moveToDir("/ 0")}>
-            Crypithm
-          </b>
-          {this.state.stalkedDirectory.map((elem, index) => {
-            return(
-              <span key={index}>
-              <RiArrowDropRightLine />
-              <b
-                className="directoryBtn"
-                onClick={() => this.moveToDir(elem.id)}
-              >
-                {elem.name}
-              </b>
-            </span>
-            )
-          })}
-        </div>
-      </div>
+      </>
     );
   };
-  /*
-   */
+  moveFilesToDir=async(idList, target)=>{
+    if(idList.indexOf(target)==-1){
+      console.log("moved",idList, "to", target)
+      var newForm = new FormData()
+      newForm.append("targetObjs", JSON.stringify(idList))
+      newForm.append("target", target)
+      newForm.append("action","move")
+      var resp = await fetch(`https://crypithm.com/api/folder`,{
+        headers : {
+          'Authorization': localStorage.getItem("tk")
+        },
+        method: "POST",
+        body: newForm
+      })
+      var jsn = await resp.json()
+      if(jsn.StatusMessage== "Success"){
+        var q=[]
+        for(var i=0;i<idList.length;i++){
+          let index = this.findElemIndex(idList[i]);
+          var elem = this.state.data[index];
+          elem.dir = target;
+          this.state.data.splice(index, 1);
+          q.push(elem)
+        }
+        this.setState({ data: this.state.data.concat(q) });
+        this.setState({selectedIndex:[]})
+      }
+    }
+  }
+
   newBtnClicked = () => {
     this.setState({ newDropdown: this.state.newDropdown ? false : true });
   };
@@ -442,8 +497,28 @@ export class Files extends React.Component {
   mouseDown = (e) => {
     this.setState({ startPos: [0, 0], currentPos: [0, 0] });
     var targetIndex = e.target.getAttribute("data-index");
-    if (targetIndex == null) {
-      //dragsquare
+    //dragsquare
+    if (this.state.selectedIndex.indexOf(parseInt(targetIndex)) != -1) {
+      
+      this.state.selectedIndex.map((elem, _) => {
+        this.state.selectedIds.unshift(this.getIdFromIndex(elem))
+        this.setState({selectedIds: this.state.selectedIds})
+        this.dragDetectionArea.current.addEventListener(
+          "mousemove",
+          this.moveElems
+        );
+        window.addEventListener("mouseup", () => {
+          if (this.dragDetectionArea.current) {
+            this.dragDetectionArea.current.removeEventListener(
+              "mousemove",
+              this.moveElems
+            );
+          }
+          this.setState({selectedIds:[]});
+          this.setState({moveFileBoxPos:[0,0]})
+        });
+      });
+    } else {
       this.setState({ startPos: [e.pageX, e.pageY] });
       this.mouseMove(e);
       this.dragDetectionArea.current.addEventListener(
@@ -460,7 +535,6 @@ export class Files extends React.Component {
         }
       });
       this.setState({ selectedIndex: [] });
-    } else {
       targetIndex = parseInt(targetIndex);
       //click,shift,ctrl
       if (e.shiftKey) {
@@ -503,13 +577,20 @@ export class Files extends React.Component {
         }
       } else if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
         this.setState({ selectedIndex: [] });
-        this.setState({
-          selectedIndex: [targetIndex],
-        });
+        if (targetIndex) {
+          this.setState({
+            selectedIndex: [targetIndex],
+          });
+        }
       }
     }
   };
 
+  moveElems = (mouseMoveEvent) => {
+    this.setState({
+      moveFileBoxPos: [mouseMoveEvent.pageX, mouseMoveEvent.pageY],
+    });
+  };
   mouseMove = (mouseMoveEvent) => {
     var a = this.dragBoxRef.current.getBoundingClientRect();
     this.fileItemsRef.map((elem, _) => {

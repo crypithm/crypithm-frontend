@@ -26,6 +26,9 @@ export class Crypithm extends React.Component {
   toggleMobileMenu=()=>{
     this.setState({mobileMenuOpen:this.state.mobileMenuOpen?false:true})
   }
+  closeViewer = ()=>{
+
+  }
   render = () => {
     return (
       <>

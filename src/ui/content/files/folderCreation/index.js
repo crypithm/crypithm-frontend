@@ -24,8 +24,9 @@ export class Foldercreation extends React.Component {
         blankSpaceForKey.set(clientIV,16)
         blankSpaceForKey.set(encryptedFolderName,32)
         var form = new FormData()
+        var currentDir = localStorage.getItem("dir")
         form.append("action", "create")
-        form.append("curentdirindex", localStorage.getItem("dir"))
+        form.append("curentdirindex", currentDir)
         form.append("name", encode(blankSpaceForKey))
         var resp = await fetch("https://crypithm.com/api/folder",{
             headers : {
@@ -37,7 +38,7 @@ export class Foldercreation extends React.Component {
           var jsn = await resp.json()
           if(jsn.StatusMessage== "Success"){
               var dec = new TextDecoder()
-              var obj = {type:"folder", name: dec.decode(folderNameAb), id:jsn.Id}
+              var obj = {type:"folder", name: dec.decode(folderNameAb), id:jsn.Id, dir: currentDir}
               this.props.appendToView(obj)
           }
     }

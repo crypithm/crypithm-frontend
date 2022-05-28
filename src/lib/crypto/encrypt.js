@@ -56,7 +56,8 @@ export async function encryptAndUploadFile(
   clientKey,
   updateStatus,
   ongoingFileId,
-  finishedUpload
+  finishedUpload,
+  directory
 ) {
   var keysalt = crypto.getRandomValues(new Uint8Array(16));
 var usedClientKey = await importAndDeriveKeyFromRaw(clientKey,keysalt)
@@ -102,7 +103,8 @@ var Filekey = await crypto.subtle.generateKey(
   form.append("fileSize", file.size + 32);
   form.append("fileName", encode(encryptedFileNameArr));
   form.append("chunkKey", encode(encryptedFileKeyArr));
-  form.append("id",ongoingFileId)
+  form.append("id",ongoingFileId);
+  form.append("dir",directory)
 
   var resp = await fetch(`${baseEndpointURL}/pre`,{
     headers : {

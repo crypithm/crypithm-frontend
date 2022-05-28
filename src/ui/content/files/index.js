@@ -9,10 +9,10 @@ import {
   RiLayoutBottomFill,
   RiArrowDownSFill,
   RiArrowUpLine,
-  RiArrowDropRightLine
+  RiArrowDropRightLine,
 } from "react-icons/ri";
 
-import {FcFolder} from 'react-icons/fc'
+import { FcFolder } from "react-icons/fc";
 import { BsCloudPlusFill } from "react-icons/bs";
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -22,7 +22,7 @@ import { ContextMenu } from "./contextMenu/index.js";
 import { encryptAndUploadFile } from "../../../lib/crypto/encrypt.js";
 import { randString } from "../../../lib/crypto/random";
 import { getAllFiledata } from "../../../lib/crypto/decrypt";
-import {Foldercreation} from "./folderCreation"
+import { Foldercreation } from "./folderCreation";
 
 export class Files extends React.Component {
   constructor(props) {
@@ -40,12 +40,16 @@ export class Files extends React.Component {
       ascending: false,
       Aligngrid: false,
       data: [],
-      uploadsInProgress: {}
+      stalkedDirectory: [],
+      uploadsInProgress: {},
+      currentDirectory: "/ 0",
     };
   }
 
-  pushToQueue = async (id, name) => {
-    this.setState({ data: this.state.data.concat({ id: id, name: name }) });
+  pushToQueue = async (id, name, dir) => {
+    this.setState({
+      data: this.state.data.concat({ id: id, name: name, dir: dir }),
+    });
     this.state.uploadsInProgress[id] = [0, 0];
     this.setState({ uploadsInProgress: this.state.uploadsInProgress });
   };
@@ -63,18 +67,23 @@ export class Files extends React.Component {
   };
 
   FileInfo = () => {
-    const root = ReactDOM.createRoot(document.querySelector("#fileInfoWillCome"))
-    root.render(
-      <FileInfo root={root} />
+    const root = ReactDOM.createRoot(
+      document.querySelector("#fileInfoWillCome")
     );
+    root.render(<FileInfo root={root} />);
   };
   ctxMenuCalled = (ctxMenuEvent) => {
     ctxMenuEvent.preventDefault();
-    const root = ReactDOM.createRoot(document.querySelector("#ctxMenuWillCome"))
-    root.render(
-      <ContextMenu x={ctxMenuEvent.clientX} y={ctxMenuEvent.clientY} root={root}/>
+    const root = ReactDOM.createRoot(
+      document.querySelector("#ctxMenuWillCome")
     );
-
+    root.render(
+      <ContextMenu
+        x={ctxMenuEvent.clientX}
+        y={ctxMenuEvent.clientY}
+        root={root}
+      />
+    );
   };
   alignBySomething = (byindex) => {
     if (byindex == 1) {
@@ -98,26 +107,31 @@ export class Files extends React.Component {
     this.setState({ Aligngrid: this.state.Aligngrid == true ? false : true });
   };
 
-  findElemIndex = (id)=>{
-    for(var i=0;i<this.state.data.length;i++){
-      if(this.state.data[i].id==id){
-        return i
+  findElemIndex = (id, returnFullObj) => {
+    for (var i = 0; i < this.state.data.length; i++) {
+      if (this.state.data[i].id == id) {
+        if (returnFullObj) {
+          return this.state.data[i];
+        } else {
+          return i;
+        }
       }
     }
-    return -1
-  }
+    return -1;
+  };
 
-  uploadDone = async(id)=>{
-    let index = this.findElemIndex(id)
-    var elem = this.state.data[index]
-    elem.completed=true
-    this.state.data.splice(index,1)
-    this.appendToView(elem)
-  }
-  appendToView = (elem)=>{
-    this.setState({data:this.state.data.concat(elem)})
-  }
+  uploadDone = async (id) => {
+    let index = this.findElemIndex(id);
+    var elem = this.state.data[index];
+    elem.completed = true;
+    this.state.data.splice(index, 1);
+    this.appendToView(elem);
+  };
+  appendToView = (elem) => {
+    this.setState({ data: this.state.data.concat(elem) });
+  };
   startUpload = async () => {
+    var currentDir = localStorage.getItem("dir");
     var clientKey = localStorage.getItem("key");
     var files = this.fileInputBox.current.files;
     var current = 0;
@@ -125,7 +139,7 @@ export class Files extends React.Component {
     for (var b = 0; b < files.length; b++) {
       var currentId = randString(11);
       this.changedUploadProgress(0, 0, currentId);
-      await this.pushToQueue(currentId, files[b].name);
+      await this.pushToQueue(currentId, files[b].name, currentDir);
       idList[b] = currentId;
     }
     var loopFiles = async (leftover) => {
@@ -136,7 +150,8 @@ export class Files extends React.Component {
           clientKey,
           this.changedUploadProgress,
           idList[current],
-          this.uploadDone
+          this.uploadDone,
+          currentDir
         );
         current += 1;
       }
@@ -148,13 +163,41 @@ export class Files extends React.Component {
     current = 0;
   };
 
-  showFileCreation = ()=>{
-    const root = ReactDOM.createRoot(document.querySelector("#folderCreationWillCome"))
-    root.render(
-      <Foldercreation root={root} appendToView={(elem)=>this.appendToView(elem)}/>
+  showFileCreation = () => {
+    const root = ReactDOM.createRoot(
+      document.querySelector("#folderCreationWillCome")
     );
-  }
+    root.render(
+      <Foldercreation
+        root={root}
+        appendToView={(elem) => this.appendToView(elem)}
+      />
+    );
+  };
 
+  moveToDir = (id) => {
+    this.setState({ stalkedDirectory: [] });
+    this.setState({ currentDirectory: id });
+    localStorage.setItem("dir", id);
+    if(id!="/ 0"){
+      var tempArr = []
+      const v = (id) => {
+        var targetObj = this.findElemIndex(id, true);
+        tempArr.unshift({
+          id: targetObj.id,
+          name: targetObj.name,
+        })
+        if (targetObj.dir != "/ 0") {
+          v(targetObj.dir);
+        }else{
+          this.setState({
+            stalkedDirectory: tempArr
+          });
+        }
+      };
+      v(id);
+    }
+  };
   render = () => {
     var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };
 
@@ -204,7 +247,10 @@ export class Files extends React.Component {
                 : "newDropdown dropDownShow"
             }
           >
-            <div className="dropdown-buttonIcon" onClick={()=>this.showFileCreation()}>
+            <div
+              className="dropdown-buttonIcon"
+              onClick={() => this.showFileCreation()}
+            >
               <RiFolderAddFill />{" "}
             </div>
             <div className="dropdown-buttonIcon">
@@ -281,93 +327,109 @@ export class Files extends React.Component {
           }
         >
           {this.state.data.map((elem, index) => {
-
-            if(elem.type=="folder"){
-              return(
-                <div
-                className={
-                  this.state.Aligngrid ? "fileContainer grid" : "fileContainer"
-                }
-                style={
-                  this.state.selectedIndex.indexOf(index + 1) != -1
-                    ? selectedStyle
-                    : {}
-                }
-                objectid={elem.id}
-                key={elem.id}
-                data-index={index + 1}
-                ref={(ref) => {
-                  this.fileItemsRef[index] = ref;
-                  return true;
-                }}
-              >
-                  <div className="fileThumbnail" style={{fontSize: this.state.Aligngrid?"40pt":"20pt"}}>
-                        <FcFolder />
-                      </div>
-                      <p className="elemName">
-                      {elem.name}
-                      </p>
-              </div>
-              )
-            }else{
-              return (
-                <div
-                  className={
-                    this.state.Aligngrid ? "fileContainer grid" : "fileContainer"
-                  }
-                  style={
-                    this.state.selectedIndex.indexOf(index + 1) != -1
-                      ? selectedStyle
-                      : {}
-                  }
-                  objectid={elem.id}
-                  key={elem.id}
-                  data-index={index + 1}
-                  ref={(ref) => {
-                    this.fileItemsRef[index] = ref;
-                    return true;
-                  }}
-                >
-                  {elem.completed ? (
-                    <>
-                      <div className="fileThumbnail">
-                        <img src={elem.thumb} width={20} />
-                      </div>
-                      <p className="elemName">
-                      {elem.name}
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <progress
-                        className="uploadingProgress"
-                        max="100"
-                        value={this.state.uploadsInProgress[elem.id][0]}
-                      ></progress>
-                      <p className="fileName">{`${elem.name}`}</p>
-                      {`${this.state.uploadsInProgress[elem.id][1]}MB/s`}
-                      <RiArrowUpLine />
-                    </>
-                  )}
-                </div>
-              ); 
+            if (elem.dir == this.state.currentDirectory) {
+              if (elem.type == "folder") {
+                return (
+                  <div
+                    className={
+                      this.state.Aligngrid
+                        ? "fileContainer grid"
+                        : "fileContainer"
+                    }
+                    onDoubleClick={() => this.moveToDir(elem.id)}
+                    style={
+                      this.state.selectedIndex.indexOf(index + 1) != -1
+                        ? selectedStyle
+                        : {}
+                    }
+                    objectid={elem.id}
+                    key={elem.id}
+                    data-index={index + 1}
+                    ref={(ref) => {
+                      this.fileItemsRef[index] = ref;
+                      return true;
+                    }}
+                  >
+                    <div
+                      className="fileThumbnail"
+                      style={{
+                        fontSize: this.state.Aligngrid ? "40pt" : "20pt",
+                      }}
+                    >
+                      <FcFolder />
+                    </div>
+                    <p className="elemName">{elem.name}</p>
+                  </div>
+                );
+              } else {
+                return (
+                  <div
+                    className={
+                      this.state.Aligngrid
+                        ? "fileContainer grid"
+                        : "fileContainer"
+                    }
+                    style={
+                      this.state.selectedIndex.indexOf(index + 1) != -1
+                        ? selectedStyle
+                        : {}
+                    }
+                    objectid={elem.id}
+                    key={elem.id}
+                    data-index={index + 1}
+                    ref={(ref) => {
+                      this.fileItemsRef[index] = ref;
+                      return true;
+                    }}
+                  >
+                    {elem.completed ? (
+                      <>
+                        <div className="fileThumbnail">
+                          <img src={elem.thumb} width={20} />
+                        </div>
+                        <p className="elemName">{elem.name}</p>
+                      </>
+                    ) : (
+                      <>
+                        <progress
+                          className="uploadingProgress"
+                          max="100"
+                          value={this.state.uploadsInProgress[elem.id][0]}
+                        ></progress>
+                        <p className="fileName">{`${elem.name}`}</p>
+                        {`${this.state.uploadsInProgress[elem.id][1]}MB/s`}
+                        <RiArrowUpLine />
+                      </>
+                    )}
+                  </div>
+                );
+              }
             }
           })}
         </div>
         <div className="directory">
-          <b className="directoryBtn">
-          Crypithm
+          <b className="directoryBtn" onClick={() => this.moveToDir("/ 0")}>
+            Crypithm
           </b>
-          <RiArrowDropRightLine />
-          <b className="directoryBtn">
-          File
-          </b>
-          </div>
+          {this.state.stalkedDirectory.map((elem, index) => {
+            return(
+              <span key={index}>
+              <RiArrowDropRightLine />
+              <b
+                className="directoryBtn"
+                onClick={() => this.moveToDir(elem.id)}
+              >
+                {elem.name}
+              </b>
+            </span>
+            )
+          })}
+        </div>
       </div>
     );
   };
-/*
-*/
+  /*
+   */
   newBtnClicked = () => {
     this.setState({ newDropdown: this.state.newDropdown ? false : true });
   };
@@ -427,8 +489,7 @@ export class Files extends React.Component {
           }
           this.setState({ selectedIndex: intlist });
         }
-      }else
-      if (e.ctrlKey || e.metaKey) {
+      } else if (e.ctrlKey || e.metaKey) {
         if (this.state.selectedIndex.indexOf(targetIndex) == -1) {
           this.setState({
             selectedIndex: this.state.selectedIndex.concat([targetIndex]),
@@ -440,8 +501,7 @@ export class Files extends React.Component {
             this.setState({ selectedIndex: this.state.selectedIndex });
           }
         }
-      }else
-      if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
+      } else if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
         this.setState({ selectedIndex: [] });
         this.setState({
           selectedIndex: [targetIndex],
@@ -453,25 +513,27 @@ export class Files extends React.Component {
   mouseMove = (mouseMoveEvent) => {
     var a = this.dragBoxRef.current.getBoundingClientRect();
     this.fileItemsRef.map((elem, _) => {
-      var b = elem.getBoundingClientRect();
-      if (
-        a.left < b.right &&
-        a.right > b.left &&
-        a.top < b.bottom &&
-        a.bottom > b.top &&
-        this.state.currentPos[1] != 0 &&
-        this.state.currentPos[0] != 0
-      ) {
+      if (elem != null) {
+        var b = elem.getBoundingClientRect();
         if (
-          this.state.selectedIndex.indexOf(
-            parseInt(elem.getAttribute("data-index"))
-          ) == -1
+          a.left < b.right &&
+          a.right > b.left &&
+          a.top < b.bottom &&
+          a.bottom > b.top &&
+          this.state.currentPos[1] != 0 &&
+          this.state.currentPos[0] != 0
         ) {
-          this.setState({
-            selectedIndex: this.state.selectedIndex.concat([
-              parseInt(elem.getAttribute("data-index")),
-            ]),
-          });
+          if (
+            this.state.selectedIndex.indexOf(
+              parseInt(elem.getAttribute("data-index"))
+            ) == -1
+          ) {
+            this.setState({
+              selectedIndex: this.state.selectedIndex.concat([
+                parseInt(elem.getAttribute("data-index")),
+              ]),
+            });
+          }
         }
       }
     });

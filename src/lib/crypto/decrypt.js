@@ -59,7 +59,8 @@ export async function getAllFiledata(key) {
           name: decoder.decode(decryptedData),
           date: jsn.Folders[v].Date,
           id: jsn.Folders[v].Id,
-          type: "folder"
+          type: "folder",
+          dir: jsn.Folders[v].Index
         }); 
       }
     }
@@ -94,6 +95,7 @@ export async function getAllFiledata(key) {
           thumb:
             "https://i1.sndcdn.com/avatars-zUGIpyyW010rJFrc-rdl0PQ-t240x240.jpg",
           completed: true,
+          dir: jsn.Files[v].Dir
         }); 
       }
     }

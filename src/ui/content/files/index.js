@@ -33,7 +33,8 @@ export class Files extends React.Component {
     this.dragBoxRef = React.createRef();
     this.fileInputBox = React.createRef();
     this.state = {
-      selectedIds : [],
+      onFolderId:"",
+      selectedIds: [],
       selectedIndex: [],
       moveFileBoxPos: [0, 0],
       onFolder: "",
@@ -211,13 +212,22 @@ export class Files extends React.Component {
           ref={this.dragDetectionArea}
           onContextMenu={(e) => this.ctxMenuCalled(e)}
         >
-          <div className="dragger" style={{display:this.state.moveFileBoxPos[0]==0?"none":"flex", top: this.state.moveFileBoxPos[1]+5+"px", left: this.state.moveFileBoxPos[0]+5+"px"}}>
-          <p>
-          {this.findElemIndex(this.state.selectedIds[0],true).name}
-          </p>
-          {this.state.selectedIds.length>1?
-            <div className="howManyselected">{this.state.selectedIds.length}</div>:<></>
-          }
+          <div
+            className="dragger"
+            style={{
+              display: this.state.moveFileBoxPos[0] == 0 ? "none" : "flex",
+              top: this.state.moveFileBoxPos[1] + 5 + "px",
+              left: this.state.moveFileBoxPos[0] + 5 + "px",
+            }}
+          >
+            <p>{this.findElemIndex(this.state.selectedIds[0], true).name}</p>
+            {this.state.selectedIds.length > 1 ? (
+              <div className="howManyselected" style={{backgroundColor: this.state.onFolderId==""?"#949494":"#fff"}}>
+                {this.state.selectedIds.length}
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
           <div id="ctxMenuWillCome"></div>
           <div id="fileInfoWillCome"></div>
@@ -347,8 +357,9 @@ export class Files extends React.Component {
                 : "filecont-cont"
             }
           >
-            {this.state.data.filter(elem=>elem.dir==this.state.currentDirectory).map((elem, index) => {
-
+            {this.state.data
+              .filter((elem) => elem.dir == this.state.currentDirectory)
+              .map((elem, index) => {
                 if (elem.type == "folder") {
                   return (
                     <div
@@ -357,7 +368,11 @@ export class Files extends React.Component {
                           ? "fileContainer grid"
                           : "fileContainer"
                       }
-                      onMouseUp={()=>this.moveFilesToDir(this.state.selectedIds, elem.id)}
+                      onMouseUp={() =>
+                        this.moveFilesToDir(this.state.selectedIds, elem.id)
+                      }
+                      onMouseEnter={()=>this.folderEnterLeave(true, elem.id)}
+                      onMouseLeave={()=>this.folderEnterLeave(false, elem.id)}
                       style={
                         this.state.selectedIndex.indexOf(index + 1) != -1
                           ? selectedStyle
@@ -431,10 +446,10 @@ export class Files extends React.Component {
                     </div>
                   );
                 }
-            })}
+              })}
           </div>
           <div className="directory">
-            <b className="directoryBtn" onClick={() => this.moveToDir("/ 0")}>
+            <b className="directoryBtn" onClick={() => this.moveToDir("/ 0")} onMouseUp={()=>this.MoveToBtmDir("/ 0")}>
               Crypithm
             </b>
             {this.state.stalkedDirectory.map((elem, index) => {
@@ -444,6 +459,7 @@ export class Files extends React.Component {
                   <b
                     className="directoryBtn"
                     onClick={() => this.moveToDir(elem.id)}
+                    onMouseUp={()=>this.MoveToBtmDir(elem.id)}
                   >
                     {elem.name}
                   </b>
@@ -455,35 +471,49 @@ export class Files extends React.Component {
       </>
     );
   };
-  moveFilesToDir=async(idList, target)=>{
-    if(idList.indexOf(target)==-1){
-      console.log("moved",idList, "to", target)
-      var newForm = new FormData()
-      newForm.append("targetObjs", JSON.stringify(idList))
-      newForm.append("target", target)
-      newForm.append("action","move")
-      var resp = await fetch(`https://crypithm.com/api/folder`,{
-        headers : {
-          'Authorization': localStorage.getItem("tk")
+
+  MoveToBtmDir = (id)=>{
+    if(this.state.selectedIds.length>0){
+      if(localStorage.getItem("dir")!=id){
+        this.moveFilesToDir(this.state.selectedIds, id)
+      }
+    }
+  }
+  folderEnterLeave=(enter, target)=>{
+    if(enter){
+      this.setState({onFolderId: target})
+    }else{
+      this.setState({onFolderId: ""})
+    }
+  }
+  moveFilesToDir = async (idList, target) => {
+    if (idList.indexOf(target) == -1) {
+      var newForm = new FormData();
+      newForm.append("targetObjs", JSON.stringify(idList));
+      newForm.append("target", target);
+      newForm.append("action", "move");
+      var resp = await fetch(`https://crypithm.com/api/folder`, {
+        headers: {
+          Authorization: localStorage.getItem("tk"),
         },
         method: "POST",
-        body: newForm
-      })
-      var jsn = await resp.json()
-      if(jsn.StatusMessage== "Success"){
-        var q=[]
-        for(var i=0;i<idList.length;i++){
+        body: newForm,
+      });
+      var jsn = await resp.json();
+      if (jsn.StatusMessage == "Success") {
+        var q = [];
+        for (var i = 0; i < idList.length; i++) {
           let index = this.findElemIndex(idList[i]);
           var elem = this.state.data[index];
           elem.dir = target;
           this.state.data.splice(index, 1);
-          q.push(elem)
+          q.push(elem);
         }
         this.setState({ data: this.state.data.concat(q) });
-        this.setState({selectedIndex:[]})
+        this.setState({ selectedIndex: [] });
       }
     }
-  }
+  };
 
   newBtnClicked = () => {
     this.setState({ newDropdown: this.state.newDropdown ? false : true });
@@ -499,10 +529,9 @@ export class Files extends React.Component {
     var targetIndex = e.target.getAttribute("data-index");
     //dragsquare
     if (this.state.selectedIndex.indexOf(parseInt(targetIndex)) != -1) {
-      
       this.state.selectedIndex.map((elem, _) => {
-        this.state.selectedIds.unshift(this.getIdFromIndex(elem))
-        this.setState({selectedIds: this.state.selectedIds})
+        this.state.selectedIds.unshift(this.getIdFromIndex(elem));
+        this.setState({ selectedIds: this.state.selectedIds });
         this.dragDetectionArea.current.addEventListener(
           "mousemove",
           this.moveElems
@@ -514,8 +543,8 @@ export class Files extends React.Component {
               this.moveElems
             );
           }
-          this.setState({selectedIds:[]});
-          this.setState({moveFileBoxPos:[0,0]})
+          this.setState({ selectedIds: [] });
+          this.setState({ moveFileBoxPos: [0, 0] });
         });
       });
     } else {

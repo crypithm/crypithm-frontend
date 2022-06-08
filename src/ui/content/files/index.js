@@ -33,7 +33,7 @@ export class Files extends React.Component {
     this.dragBoxRef = React.createRef();
     this.fileInputBox = React.createRef();
     this.state = {
-      onFolderId:"",
+      onFolderId: "",
       selectedIds: [],
       selectedIndex: [],
       moveFileBoxPos: [0, 0],
@@ -204,8 +204,6 @@ export class Files extends React.Component {
     }
   };
   render = () => {
-    var selectedStyle = { backgroundColor: "rgba(255,255,255,0.1)" };
-
     return (
       <>
         <div
@@ -222,7 +220,13 @@ export class Files extends React.Component {
           >
             <p>{this.findElemIndex(this.state.selectedIds[0], true).name}</p>
             {this.state.selectedIds.length > 1 ? (
-              <div className="howManyselected" style={{backgroundColor: this.state.onFolderId==""?"#949494":"#fff"}}>
+              <div
+                className="howManyselected"
+                style={{
+                  backgroundColor:
+                    this.state.onFolderId == "" ? "#949494" : "#fff",
+                }}
+              >
                 {this.state.selectedIds.length}
               </div>
             ) : (
@@ -371,13 +375,18 @@ export class Files extends React.Component {
                       onMouseUp={() =>
                         this.moveFilesToDir(this.state.selectedIds, elem.id)
                       }
-                      onMouseEnter={()=>this.folderEnterLeave(true, elem.id)}
-                      onMouseLeave={()=>this.folderEnterLeave(false, elem.id)}
-                      style={
-                        this.state.selectedIndex.indexOf(index + 1) != -1
-                          ? selectedStyle
-                          : {}
-                      }
+                      onMouseEnter={() => this.folderEnterLeave(true, elem.id)}
+                      onMouseLeave={() => this.folderEnterLeave(false, elem.id)}
+                      style={{
+                        backgroundColor:
+                          this.state.selectedIndex.indexOf(index + 1) != -1
+                            ? "rgba(255,255,255,0.1)"
+                            : "",
+                        border:
+                          this.state.onFolderId == elem.id
+                            ? "solid 1px rgba(255,255,255,0.6)"
+                            : "",
+                      }}
                       objectid={elem.id}
                       key={elem.id}
                       data-index={index + 1}
@@ -406,16 +415,18 @@ export class Files extends React.Component {
                 } else {
                   return (
                     <div
+                    onDoubleClick={()=>this.props.viewFile(elem.id, elem.name)}
                       className={
                         this.state.Aligngrid
                           ? "fileContainer grid"
                           : "fileContainer"
                       }
-                      style={
-                        this.state.selectedIndex.indexOf(index + 1) != -1
-                          ? selectedStyle
-                          : {}
-                      }
+                      style={{
+                        backgroundColor:
+                          this.state.selectedIndex.indexOf(index + 1) != -1
+                            ? "rgba(255,255,255,0.1)"
+                            : "",
+                      }}
                       objectid={elem.id}
                       key={elem.id}
                       data-index={index + 1}
@@ -449,7 +460,11 @@ export class Files extends React.Component {
               })}
           </div>
           <div className="directory">
-            <b className="directoryBtn" onClick={() => this.moveToDir("/ 0")} onMouseUp={()=>this.MoveToBtmDir("/ 0")}>
+            <b
+              className="directoryBtn"
+              onClick={() => this.moveToDir("/ 0")}
+              onMouseUp={() => this.MoveToBtmDir("/ 0")}
+            >
               Crypithm
             </b>
             {this.state.stalkedDirectory.map((elem, index) => {
@@ -459,7 +474,7 @@ export class Files extends React.Component {
                   <b
                     className="directoryBtn"
                     onClick={() => this.moveToDir(elem.id)}
-                    onMouseUp={()=>this.MoveToBtmDir(elem.id)}
+                    onMouseUp={() => this.MoveToBtmDir(elem.id)}
                   >
                     {elem.name}
                   </b>
@@ -472,22 +487,27 @@ export class Files extends React.Component {
     );
   };
 
-  MoveToBtmDir = (id)=>{
-    if(this.state.selectedIds.length>0){
-      if(localStorage.getItem("dir")!=id){
-        this.moveFilesToDir(this.state.selectedIds, id)
+  MoveToBtmDir = (id) => {
+    if (this.state.selectedIds.length > 0) {
+      if (localStorage.getItem("dir") != id) {
+        this.moveFilesToDir(this.state.selectedIds, id);
       }
     }
-  }
-  folderEnterLeave=(enter, target)=>{
-    if(enter){
-      this.setState({onFolderId: target})
-    }else{
-      this.setState({onFolderId: ""})
+  };
+  folderEnterLeave = (enter, target) => {
+    if (this.state.selectedIds.length > 0) {
+      if (this.state.selectedIds.indexOf(target) == -1) {
+        if (enter) {
+          this.setState({ onFolderId: target });
+        } else {
+          this.setState({ onFolderId: "" });
+        }
+      }
     }
-  }
+  };
   moveFilesToDir = async (idList, target) => {
     if (idList.indexOf(target) == -1) {
+      this.setState({ onFolderId: "" });
       var newForm = new FormData();
       newForm.append("targetObjs", JSON.stringify(idList));
       newForm.append("target", target);

@@ -97,7 +97,6 @@ var Filekey = await crypto.subtle.generateKey(
   encryptedFileNameArr.set(fnIV,0)
   encryptedFileNameArr.set(keysalt,16)
   encryptedFileNameArr.set(new Uint8Array(encryptedFileName),32)
-  console.log(encryptedFileName)
   var form = new FormData();
 
   form.append("fileSize", file.size + 32);
@@ -136,6 +135,8 @@ var Filekey = await crypto.subtle.generateKey(
       finishedBytes.set(iv, 0);
       finishedBytes.set(new Uint8Array(encryptedBlobSlice), 16);
 
+
+      console.log(finishedBytes.byteLength)
       var Form = new FormData()
       Form.append("token",jsn.StatusMessage)
       Form.append("partialFileDta", new Blob([finishedBytes]))

@@ -42,6 +42,7 @@ export class Files extends React.Component {
       currentPos: [0, 0],
       newDropdown: true,
       ascending: false,
+      Sizeascending: false,
       Aligngrid: false,
       data: [],
       stalkedDirectory: [],
@@ -105,6 +106,21 @@ export class Files extends React.Component {
         });
       }
       this.setState({ ascending: this.state.ascending ? false : true });
+    }else if(byindex == 2){
+      if (this.state.Sizeascending) {
+        this.setState({
+          data: this.state.data.sort((a, b) => {
+            return a.size - b.size
+          }),
+        });
+      } else {
+        this.setState({
+          data: this.state.data.sort((a, b) => {
+            return b.size - a.size
+          }),
+        });
+      }
+      this.setState({ Sizeascending: this.state.Sizeascending ? false : true });
     }
   };
   changedAlign = () => {
@@ -203,6 +219,24 @@ export class Files extends React.Component {
       v(id);
     }
   };
+
+  addPrefixToSize=(length)=>{
+    var fs
+    if(1024 >= length) {
+      fs = Math.round(length*10)/10 + "B"
+
+  }else if(length > 1024 && length < 1024*1024) {
+      fs = Math.round(length/1024*10)/10 + "KB"
+
+  }else if(length >= 1024*1024 && length < 1024*1024*1024) {
+      fs = Math.round(length/(1024*1024)*10)/10 + "MB"
+
+  }else if(length >= 1024*1024*1024 && length < 1024*1024*1024*1024) {
+      fs = Math.round(length/(1024*1024*1024)*10)/10 + "GB"
+      
+  }
+  return fs
+  }
   render = () => {
     return (
       <>
@@ -352,6 +386,17 @@ export class Files extends React.Component {
                 }}
               />
             </b>
+            <b onClick={() => this.alignBySomething(2)}>
+              Size
+              <RiArrowDownSFill
+                style={{
+                  transform: this.state.Sizeascending
+                    ? "rotate(0deg)"
+                    : "rotate(180deg)",
+                  transition: "all 0.1s linear",
+                }}
+              />
+            </b>
           </div>
           <div
             ref={this.clickDetectionArea}
@@ -410,6 +455,7 @@ export class Files extends React.Component {
                       >
                         {elem.name}
                       </p>
+                      <p className="elemSize">-</p>
                     </div>
                   );
                 } else {
@@ -441,6 +487,7 @@ export class Files extends React.Component {
                             <img src={elem.thumb} width={20} />
                           </div>
                           <p className="elemName">{elem.name}</p>
+                          <p className="elemSize">{this.addPrefixToSize(elem.size)}</p>
                         </>
                       ) : (
                         <>

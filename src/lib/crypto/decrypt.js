@@ -2,6 +2,7 @@ import { decode } from "base64-arraybuffer";
 const mimeDB = require("mime-db");
 
 //mime database by: jshttp
+//(c)2022 Oh Eunchong
 
 const baseEndpointURL = "https://crypithm.com/api";
 const megabyte = 1048576;
@@ -29,7 +30,7 @@ async function deriveCryptoKey(keyAB, salt) {
   );
 }
 
-export async function getFileBlob(id, name) {
+export async function getFileBlob(id, name, updateStatus) {
   var form = new FormData();
   form.append("id", id);
   var resp = await fetch(`${baseEndpointURL}/predown`, {
@@ -70,18 +71,20 @@ export async function getFileBlob(id, name) {
   var hmc = calchunk(fileDetailJSON.Size);
 
   var intArr = Array.from(Array(hmc).keys());
-  const promises = intArr.map((_, i) =>
+  const promises = intArr.map((i, _) =>
     sendAndDownloadData(
       fileDetailJSON.Token,
       5 * megabyte * i + 32 * i,
       5 * megabyte * (i + 1) + 32 * (i + 1),
-      fileKey
+      fileKey,
+      updateStatus
     ).then((decData) => {
       var respAb = new Uint8Array(decData);
       totalBlobList[i] = new Blob([respAb]);
     })
   );
   await Promise.all(promises);
+
   var re = /\.[^.\\/:*?"<>|\r\n]+$/;
   var ext = re.exec(name)[0];
   ext = ext ? ext.split(".")[1] : ext;
@@ -110,7 +113,7 @@ function calchunk(filelength) {
   return chunkcount;
 }
 
-function sendAndDownloadData(token, startrange, endrange, fileKey) {
+function sendAndDownloadData(token, startrange, endrange, fileKey, updateStatus) {
   return new Promise((resolve, _) => {
     var xhr = new XMLHttpRequest();
     xhr.open("POST", `${baseEndpointURL}/download`);
@@ -119,7 +122,9 @@ function sendAndDownloadData(token, startrange, endrange, fileKey) {
     form.append("token", token);
     xhr.setRequestHeader("StartRange", startrange);
     xhr.setRequestHeader("EndRange", endrange);
-    xhr.onprogress = (e) => {};
+    xhr.onprogress = (e) => {
+      updateStatus()
+    };
     xhr.onloadend = async () => {
       var data = await decryptBlob(
         fileKey,
@@ -171,6 +176,7 @@ export async function getAllFiledata(key) {
           id: jsn.Folders[v].Id,
           type: "folder",
           dir: jsn.Folders[v].Index,
+          size:0
         });
       }
     }

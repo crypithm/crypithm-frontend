@@ -89,7 +89,6 @@ export async function getFileBlob(id, name, updateStatus) {
   var ext = re.exec(name)[0];
   ext = ext ? ext.split(".")[1] : ext;
   var Filemime = false;
-
   Object.keys(mimeDB).forEach((value, _) => {
     try {
       if (mimeDB[value]["extensions"].indexOf(ext) != -1) {
@@ -101,7 +100,10 @@ export async function getFileBlob(id, name, updateStatus) {
   var q = new Blob(totalBlobList, {
     type: Filemime ? Filemime : "application/octet-stream",
   });
-  return [URL.createObjectURL(q), Filemime ? Filemime : "application/octet-stream"];
+  return [
+    URL.createObjectURL(q),
+    Filemime ? Filemime : "application/octet-stream",
+  ];
 }
 
 function calchunk(filelength) {
@@ -113,7 +115,13 @@ function calchunk(filelength) {
   return chunkcount;
 }
 
-function sendAndDownloadData(token, startrange, endrange, fileKey, updateStatus) {
+function sendAndDownloadData(
+  token,
+  startrange,
+  endrange,
+  fileKey,
+  updateStatus
+) {
   return new Promise((resolve, _) => {
     var xhr = new XMLHttpRequest();
     xhr.open("POST", `${baseEndpointURL}/download`);
@@ -123,8 +131,8 @@ function sendAndDownloadData(token, startrange, endrange, fileKey, updateStatus)
     xhr.setRequestHeader("StartRange", startrange);
     xhr.setRequestHeader("EndRange", endrange);
     xhr.onprogress = (e) => {
-      console.log(e.loaded)
-      updateStatus()
+      console.log(e.loaded);
+      updateStatus();
     };
     xhr.onloadend = async () => {
       var data = await decryptBlob(
@@ -177,7 +185,7 @@ export async function getAllFiledata(key) {
           id: jsn.Folders[v].Id,
           type: "folder",
           dir: jsn.Folders[v].Index,
-          size:0
+          size: 0,
         });
       }
     }

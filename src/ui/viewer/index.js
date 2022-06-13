@@ -8,7 +8,7 @@ import { getFileBlob } from "../../lib/crypto/decrypt";
 class ViewBox extends React.Component {
   constructor(props){
     super(props)
-    this.state={imgSize:['',window.innerHeight*0.65]}
+    this.state={imgSize:['',window.innerHeight*0.85]}
   }
 
 

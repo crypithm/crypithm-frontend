@@ -123,6 +123,7 @@ function sendAndDownloadData(token, startrange, endrange, fileKey, updateStatus)
     xhr.setRequestHeader("StartRange", startrange);
     xhr.setRequestHeader("EndRange", endrange);
     xhr.onprogress = (e) => {
+      console.log(e.loaded)
       updateStatus()
     };
     xhr.onloadend = async () => {

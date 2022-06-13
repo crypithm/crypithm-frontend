@@ -1,4 +1,5 @@
 import { encode } from "base64-arraybuffer";
+import { FileThumbnail } from "../utils/thumbnail"; 
 
 const megabyte = 1048576;
 const baseEndpointURL = "https://crypithm.com/api"
@@ -21,6 +22,27 @@ export async function encryptBlob(binary, key, randomiv, iv) {
   return cryptdata;
 }
 
+//rawKeyBytes:string, keysalt: ArrayBuffer => AES-256-GCM CryptoKey Obj (PBKDF2)
+export async function importAndDeriveKeyFromRaw(rawKeyBytes, keysalt){
+  var enc = new TextEncoder();
+  var importedClientKey = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(rawKeyBytes),
+    "PBKDF2",
+    false,
+    ["deriveKey", "deriveBits"]
+  );
+  var usedClientKey = await crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: keysalt, iterations: 100000, hash: "SHA-256" },
+    importedClientKey,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt"]
+  );
+
+return usedClientKey;
+}
+
 //data:binary
 export async function hashBinary(algo, data) {
   var digest = await window.crypto.subtle.digest(algo, data);
@@ -34,35 +56,19 @@ export async function encryptAndUploadFile(
   clientKey,
   updateStatus,
   ongoingFileId,
-  finishedUpload
+  finishedUpload,
+  directory
 ) {
-  //update Status==> await updateStatus(100, 0, ongoingFileId);
   var keysalt = crypto.getRandomValues(new Uint8Array(16));
-  var enc = new TextEncoder();
-  var importedClientKey = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(clientKey),
-    "PBKDF2",
-    false,
-    ["deriveKey", "deriveBits"]
-  );
-  var usedClientKey = await crypto.subtle.deriveKey(
-    { name: "PBKDF2", salt: keysalt, iterations: 100000, hash: "SHA-256" },
-    importedClientKey,
-    { name: "AES-GCM", length: 256 },
-    false,
-    ["encrypt"]
-  );
-
-  var Filekey = await crypto.subtle.generateKey(
-    {
-      name: "AES-GCM",
-      length: 256,
-    },
-    true,
-    ["encrypt", "decrypt"]
-  );
-
+var usedClientKey = await importAndDeriveKeyFromRaw(clientKey,keysalt)
+var Filekey = await crypto.subtle.generateKey(
+  {
+    name: "AES-GCM",
+    length: 256,
+  },
+  true,
+  ["encrypt", "decrypt"]
+);
   var FileKeyRaw = await crypto.subtle.exportKey("raw", Filekey);
   var keyIV = crypto.getRandomValues(new Uint8Array(16));
   var encryptedFileKey = await encryptBlob(
@@ -91,13 +97,13 @@ export async function encryptAndUploadFile(
   encryptedFileNameArr.set(fnIV,0)
   encryptedFileNameArr.set(keysalt,16)
   encryptedFileNameArr.set(new Uint8Array(encryptedFileName),32)
-  console.log(encryptedFileName)
   var form = new FormData();
 
   form.append("fileSize", file.size + 32);
   form.append("fileName", encode(encryptedFileNameArr));
   form.append("chunkKey", encode(encryptedFileKeyArr));
-  form.append("id",ongoingFileId)
+  form.append("id",ongoingFileId);
+  form.append("dir",directory)
 
   var resp = await fetch(`${baseEndpointURL}/pre`,{
     headers : {
@@ -110,7 +116,6 @@ export async function encryptAndUploadFile(
   if (file.size < megabyte * 5) {
     await loopEncryptChunk([0, file.size],0);
   } else {
-    
     await loopEncryptChunk([0, megabyte * 5],0);
   }
   var varForConcurrent = 0
@@ -130,6 +135,8 @@ export async function encryptAndUploadFile(
       finishedBytes.set(iv, 0);
       finishedBytes.set(new Uint8Array(encryptedBlobSlice), 16);
 
+
+      console.log(finishedBytes.byteLength)
       var Form = new FormData()
       Form.append("token",jsn.StatusMessage)
       Form.append("partialFileDta", new Blob([finishedBytes]))

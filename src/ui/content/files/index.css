@@ -8,23 +8,92 @@
 }
 
 .filecont-cont{
-    min-height: 100vh;
+    min-height: calc(100vh - 240px);
+    padding-bottom: 55px;
 }
 
-.fileContainer {
+.directory{
     width: 100%;
+    height: 50px;
+    background-color: #191919;
+    border-top: solid 1px rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.5);
+    font-size: 17pt;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    position: fixed;
+    bottom: 0px;
+    padding-left: 10px;
+}
+.directory span {
+    display: flex;
+    flex-direction: row;
+}
+
+.directoryBtn {
+    padding: 4px 6px 4px 6px;
+    font-weight: normal;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 10pt;
+}
+
+.directoryBtn:hover {
+    background-color: rgba(255,255,255,0.2);
+}
+.fileContainer {
+    width: calc(100% - 2px);
+    border: solid 1px #191919;
     border-bottom: solid 1px rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.5);
     height: 50px;
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Ubuntu', sans-serif;
     font-size: 10pt;
     animation: appearFile ease-in-out 0.2s;
     white-space:nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+.dragger{
+    max-width: 150px;
+    height: 35px;
+    background-color: #191919;
+    align-items: center;
+    justify-content: center;
+    font-size: 10pt;
+    position: absolute;
+    color: #fff;
+    z-index: 80;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: solid 1px rgba(255,255,255,0.1);
+}
+
+.dragger p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dragger .howManyselected {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: background-color 0.2s ease-in-out;
+    color: #3d3d3d;
 }
 
 @keyframes appearFile{
@@ -36,9 +105,22 @@
     }
 }
 
+.elemName {
+    max-width: 80%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin: 0;
+    margin-right: auto;
+}
+.elemSize {
+    width: 55px;
+    text-align: left;
+    margin-right: calc(20% - 105px);
+    margin-left: auto;
+}
 .grid {
     width: 150px;
-    height: 150px;
+    height: 160px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -46,6 +128,8 @@
     border: none;
     border-radius: 0.3em;
     margin-top: 20px;
+    text-align: center;
+    border: solid 1px transparent;
 }
 .fileThumbnail {
  width: 25px;
@@ -53,13 +137,30 @@
  overflow: hidden;
  margin :0 13px 0 10px;
  filter: grayscale(70%);
+ display: flex;
+ align-items: center;
+ justify-content: center;
  border-radius: 2px;
 }
 
+
+
 .fileContainer.grid>.fileThumbnail {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 20px;
+    border: solid 1px rgba(255,255,255,0.1);
+    background-color: rgba(255,255,255,0.05);
+    width: 100px;
+    height: 100px;
+    margin: 0;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.fileContainer.grid>.elemName {
+    margin-right: 0;
+}
+
+.fileContainer.grid>.elemSize {
+    display: none;
 }
 
 .fileThumbnail>img{
@@ -99,7 +200,7 @@
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: 185px;
+    top: 200px;
     background-color: #242424;
     padding: 20px;
     opacity: 0;
@@ -130,7 +231,7 @@
 
 
 .dropDownShow {
-    top: 210px;
+    top: 142px;
     opacity: 1;
     visibility: visible;
 }
@@ -168,13 +269,14 @@
     background-color: #191919;
     width: 100%;
     height: 70px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Ubuntu', sans-serif;
     color: rgba(255,255,255,0.6);
     font-size: 10pt;
     position: sticky;
-    top: 131px;
+    top: 71px;
     display: flex;
     align-items: center;
+    border-bottom: solid 1px rgba(255,255,255,0.2);
 }
 .FCObtn {
     display: flex;
@@ -210,26 +312,26 @@
 }
 
 .arrangeBar{
-    width: calc(100%-43px);
     border-bottom: solid 1px rgba(255,255,255,0.2);
     color: rgba(255,255,255,0.4);
     height: 30px;
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Ubuntu', sans-serif;
     font-size: 10pt;
-    padding-left: 43px;
+    padding-left: 48px;
     position: sticky;
     background-color: #191919;
     z-index: 1;
-    top: 191px;
+    top: 141px;
 }
 
-.arrangeBar>b{
+.arrangeBar>b:nth-child(1){
     display: flex;
     align-items: center;
     z-index: 1;
+    width: calc((100% + 48px)*0.8);
 }
 
 .uploadingProgress{
@@ -297,6 +399,7 @@
     
     .fileControlOptions {
         top: 71px;
+        position: sticky;
     }
     .fileContainer {
         width: 90%;
@@ -335,7 +438,10 @@
         display: none;
     }
   }
-  @media (max-width: 450px) {
+  @media (max-width: 500px) {
+    .elemSize {
+        display: none;
+    }
     .grid {
         width: 40%;
         height: 150px;

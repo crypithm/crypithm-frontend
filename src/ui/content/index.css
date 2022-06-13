@@ -3,7 +3,7 @@
     width: calc(100% - 360px);
     margin-right: 0;
     margin-left: 360px;
-    padding-top: 131px;
+    padding-top: 80px;
     background-color: inherit;
     flex-direction: column;
 }

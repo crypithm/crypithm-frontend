@@ -37,15 +37,15 @@ export class Leftmenu extends React.Component {
   render = () => {
     var ActivatedMenuStyle = {
       fontWeight: "bold",
-      color: "rgba(255,255,255,0.7)",
+      color: "rgba(255,255,255,1)",
     };
     
     return (
       <>
         <div className={`leftmenu ${this.props.ismobileMenuOpen?"open":""}`}>
           <div className="logo">
-            <Logo width={30} opacity={0.3} color={"#fff"} />
-            <b>Crypithm Cloud</b>
+            <Logo width={25} opacity={0.3} color={"#fff"} />
+            <b>crypithm cloud</b>
           </div>
           <div className="buttonArea">
             <div
@@ -80,11 +80,13 @@ export class Leftmenu extends React.Component {
             </div>
           </div>
           <div className="userInfoArea">
-            <b>User: Developer</b>
             <div className="progressArea">
+            <b>8GB out of 10GB used</b>
               <progress max="90" value="80"></progress>
-              <b>8GB out of 10GB used</b>
             </div>
+          </div>
+          <div className="btmLeftOver">
+            Privacy Policy | Terms Of Service
           </div>
         </div>
       </>

@@ -1,6 +1,18 @@
 import React from "react";
 import './index.css'
 export class ContextMenu extends React.Component {
+
+    componentDidMount=()=>{
+        window.addEventListener('mousedown',(e)=>{
+            this.unMount()
+        })
+    }
+    componentWillUnmount=()=>{
+        window.removeEventListener('mousedown',window)
+    }
+    unMount = () => {
+        this.props.root.unmount();
+    }
     render() {
         return (
             <div className="contextMenu" style={{top: this.props.y, left: this.props.x}}>

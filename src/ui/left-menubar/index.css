@@ -1,23 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@700&display=swap');
 
 .leftmenu {
     padding: 60px;
+    padding-top: 0;
+    padding-bottom: 0;
     position: fixed;
     left: 0;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Ubuntu', sans-serif;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 120px);
+    height: calc(100vh);
 }
 .logo {
-    padding: 20px;
+    height: 70px;
     display: flex;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Lato', sans-serif;
     align-items: center;
     justify-content: center;
-    border-bottom: solid 1px rgba(255,255,255,0.3);
+    border-bottom: solid 1px rgba(255,255,255,0.4);
   }
   .logo b {
-    font-size: 11pt;
+    font-size: 12pt;
     margin-left: 10px;
     opacity: 0.5;
     font-weight: bold;
@@ -35,7 +38,7 @@
     padding: 20px;
     padding-left: 30px;
     padding-right: 30px;
-    color: rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.5);
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -64,9 +67,15 @@
     flex-direction: column;
     align-items: center;
     margin-top: auto;
-    padding-bottom: 20px;
+    padding-bottom: 40px;
+    border-bottom: solid 1px rgba(255,255,255,0.4);
   }
-  .userInfoArea b {
+  .btmLeftOver{
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5pt;
     color: rgba(255,255,255,0.3);
   }
   .userInfoArea progress {
@@ -84,12 +93,18 @@
   .progressArea {
     display: flex;
     flex-direction: column;
-    color: rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.5);
     align-items: center;
     
     margin-top: 20px;
     width: 100%;
     padding-top: 20px;
+  }
+  .progressArea b {
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 20px;
+    margin-top: 20px;
+    font-weight: normal;
   }
 @media (max-width:1200px) {
   .button:hover {
@@ -114,7 +129,7 @@
     background-color: #191919;
     z-index: 3;
     padding: 30px;
-    border-right: solid 1px rgba(255,255,255,0.3);
+    border-right: solid 1px rgba(255,255,255,0.5);
 }
   .open{
     left: 0px;

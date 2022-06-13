@@ -11,7 +11,7 @@ export class Content extends React.Component {
     return (
       <>
         <div className="mainContentArea">
-          {index != -1 ? [<Files />, <Vault />, <Links />][index] : <Files />}
+          {index != -1 ? [<Files viewFile={(id,name)=>this.props.viewFile(id,name)}/>, <Vault />, <Links />][index] : <Files />}
         </div>
       </>
     );

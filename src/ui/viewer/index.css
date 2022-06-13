@@ -1,0 +1,68 @@
+.ViewArea{
+    position: fixed;
+    z-index:999;
+    background-color: #161616;
+    width: 100vw;
+    height: 100vh;
+    animation: load 0.2s ease-in;
+}
+
+@keyframes load{
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+.viewHeader {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    background-color: #191919;
+    border-bottom: solid 1px rgba(255,255,255,0.3);
+    z-index: 1;
+    position: absolute;
+    z-index: 2;
+    top:0;
+    transition: top .2s ease-in-out;
+}
+
+.hiddenvh {
+    top: -61px;
+}
+.viewHeader .fileName {
+    margin: 0;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.viewHeader .close {
+    margin: 0;
+    font-size: 25pt;
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.1s ease-in-out;
+}
+
+.viewHeader .close:hover {
+    background-color: rgba(255,255,255,0.2);
+}
+.viewBody{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.viewBody img {
+    position: absolute;
+    z-index: 1;
+}

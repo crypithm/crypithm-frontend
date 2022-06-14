@@ -171,46 +171,54 @@ export async function getAllFiledata(key) {
     if (jsn.Folders) {
       var decoder = new TextDecoder();
       for (var v = 0; v < jsn.Folders.length; v++) {
-        var keysalt = decode(jsn.Folders[v].Name).slice(0, 16);
-        var usedClientKey = await deriveCryptoKey(importedClientKey, keysalt);
-        var Fullname = decode(jsn.Folders[v].Name);
-        var decryptedData = await decryptBlob(
-          usedClientKey,
-          Fullname.slice(16, 32),
-          Fullname.slice(32)
-        );
-        foldersArr.push({
-          name: decoder.decode(decryptedData),
-          date: jsn.Folders[v].Date,
-          id: jsn.Folders[v].Id,
-          type: "folder",
-          dir: jsn.Folders[v].Index,
-          size: 0,
-        });
+        try{
+          var keysalt = decode(jsn.Folders[v].Name).slice(0, 16);
+          var usedClientKey = await deriveCryptoKey(importedClientKey, keysalt);
+          var Fullname = decode(jsn.Folders[v].Name);
+          var decryptedData = await decryptBlob(
+            usedClientKey,
+            Fullname.slice(16, 32),
+            Fullname.slice(32)
+          );
+          foldersArr.push({
+            name: decoder.decode(decryptedData),
+            date: jsn.Folders[v].Date,
+            id: jsn.Folders[v].Id,
+            type: "folder",
+            dir: jsn.Folders[v].Index,
+            size: 0,
+          });
+        }catch(e){
+          console.error("An error occured while decrypting folder: "+jsn.Folders[v].Id)
+        }
       }
     }
     var filesArr = [];
     if (jsn.Files) {
       var decoder = new TextDecoder();
       for (var v = 0; v < jsn.Files.length; v++) {
-        var keysalt = decode(jsn.Files[v].Name).slice(16, 32);
-        var usedClientKey = await deriveCryptoKey(importedClientKey, keysalt);
-        var Fullname = decode(jsn.Files[v].Name);
-        var decryptedData = await decryptBlob(
-          usedClientKey,
-          Fullname.slice(0, 16),
-          Fullname.slice(32)
-        );
-        filesArr.push({
-          name: decoder.decode(decryptedData),
-          size: parseInt(jsn.Files[v].Size),
-          date: "2022 1 19",
-          id: jsn.Files[v].Id,
-          thumb:
-            "https://i1.sndcdn.com/avatars-zUGIpyyW010rJFrc-rdl0PQ-t240x240.jpg",
-          completed: true,
-          dir: jsn.Files[v].Dir,
-        });
+        try{
+          var keysalt = decode(jsn.Files[v].Name).slice(16, 32);
+          var usedClientKey = await deriveCryptoKey(importedClientKey, keysalt);
+          var Fullname = decode(jsn.Files[v].Name);
+          var decryptedData = await decryptBlob(
+            usedClientKey,
+            Fullname.slice(0, 16),
+            Fullname.slice(32)
+          );
+          filesArr.push({
+            name: decoder.decode(decryptedData),
+            size: parseInt(jsn.Files[v].Size),
+            date: "2022 1 19",
+            id: jsn.Files[v].Id,
+            thumb:
+              "https://i1.sndcdn.com/avatars-zUGIpyyW010rJFrc-rdl0PQ-t240x240.jpg",
+            completed: true,
+            dir: jsn.Files[v].Dir,
+          });
+        }catch(e){
+          console.error("An error occured while decrypting file: "+jsn.Files[v].Id)
+        }
       }
     }
     return [...foldersArr, ...filesArr];

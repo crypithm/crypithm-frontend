@@ -4,6 +4,8 @@ import { viewableType } from "../../vars";
 import { RiArrowDropLeftLine } from "react-icons/ri";
 import { getFileBlob } from "../../lib/crypto/decrypt";
 
+
+
 class ViewBox extends React.Component {
   constructor(props) {
     super(props);
@@ -44,6 +46,7 @@ export class Viewer extends React.Component {
     var re = /[a-zA-Z0-9_]*(\/)/;
     var type = re.exec(mime)[0];
     type = type.split("/")[0];
+    console.log(type)
     var tf = true;
     if (viewableType.indexOf(type) == -1) {
       tf = false;

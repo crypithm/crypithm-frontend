@@ -130,10 +130,7 @@ function sendAndDownloadData(
     form.append("token", token);
     xhr.setRequestHeader("StartRange", startrange);
     xhr.setRequestHeader("EndRange", endrange);
-    xhr.onprogress = (e) => {
-      console.log(e.loaded);
-      updateStatus();
-    };
+    xhr.onprogress = (e) => {};
     xhr.onloadend = async () => {
       var data = await decryptBlob(
         fileKey,
@@ -171,7 +168,7 @@ export async function getAllFiledata(key) {
     if (jsn.Folders) {
       var decoder = new TextDecoder();
       for (var v = 0; v < jsn.Folders.length; v++) {
-        try{
+        try {
           var keysalt = decode(jsn.Folders[v].Name).slice(0, 16);
           var usedClientKey = await deriveCryptoKey(importedClientKey, keysalt);
           var Fullname = decode(jsn.Folders[v].Name);
@@ -188,8 +185,10 @@ export async function getAllFiledata(key) {
             dir: jsn.Folders[v].Index,
             size: 0,
           });
-        }catch(e){
-          console.error("An error occured while decrypting folder: "+jsn.Folders[v].Id)
+        } catch (e) {
+          console.error(
+            "An error occured while decrypting folder: " + jsn.Folders[v].Id
+          );
         }
       }
     }
@@ -197,7 +196,7 @@ export async function getAllFiledata(key) {
     if (jsn.Files) {
       var decoder = new TextDecoder();
       for (var v = 0; v < jsn.Files.length; v++) {
-        try{
+        try {
           var keysalt = decode(jsn.Files[v].Name).slice(16, 32);
           var usedClientKey = await deriveCryptoKey(importedClientKey, keysalt);
           var Fullname = decode(jsn.Files[v].Name);
@@ -216,8 +215,10 @@ export async function getAllFiledata(key) {
             completed: true,
             dir: jsn.Files[v].Dir,
           });
-        }catch(e){
-          console.error("An error occured while decrypting file: "+jsn.Files[v].Id)
+        } catch (e) {
+          console.error(
+            "An error occured while decrypting file: " + jsn.Files[v].Id
+          );
         }
       }
     }

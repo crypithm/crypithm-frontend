@@ -1,9 +1,8 @@
 import { encode } from "base64-arraybuffer";
-import { FileThumbnail } from "../utils/thumbnail"; 
+import { FileThumbnail } from "../utils/thumbnail";
 
 const megabyte = 1048576;
-const baseEndpointURL = "https://crypithm.com/api"
-
+const baseEndpointURL = "https://crypithm.com/api";
 
 //(c)2022 Oh Eunchong
 // (AES-256-GCM) binary: blob, key: cryptokey(256bits), iv: iv
@@ -23,7 +22,7 @@ export async function encryptBlob(binary, key, randomiv, iv) {
 }
 
 //rawKeyBytes:string, keysalt: ArrayBuffer => AES-256-GCM CryptoKey Obj (PBKDF2)
-export async function importAndDeriveKeyFromRaw(rawKeyBytes, keysalt){
+export async function importAndDeriveKeyFromRaw(rawKeyBytes, keysalt) {
   var enc = new TextEncoder();
   var importedClientKey = await crypto.subtle.importKey(
     "raw",
@@ -40,7 +39,7 @@ export async function importAndDeriveKeyFromRaw(rawKeyBytes, keysalt){
     ["encrypt"]
   );
 
-return usedClientKey;
+  return usedClientKey;
 }
 
 //data:binary
@@ -49,6 +48,15 @@ export async function hashBinary(algo, data) {
   return Array.from(new Uint8Array(digest))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
+}
+
+function calchunk(filelength) {
+  var chunkcount;
+  chunkcount = parseInt(filelength / (1024 * 1024 * 5));
+  if (filelength % (1024 * 1024 * 5) > 0) {
+    chunkcount = chunkcount + 1;
+  }
+  return chunkcount;
 }
 
 export async function encryptAndUploadFile(
@@ -60,15 +68,15 @@ export async function encryptAndUploadFile(
   directory
 ) {
   var keysalt = crypto.getRandomValues(new Uint8Array(16));
-var usedClientKey = await importAndDeriveKeyFromRaw(clientKey,keysalt)
-var Filekey = await crypto.subtle.generateKey(
-  {
-    name: "AES-GCM",
-    length: 256,
-  },
-  true,
-  ["encrypt", "decrypt"]
-);
+  var usedClientKey = await importAndDeriveKeyFromRaw(clientKey, keysalt);
+  var Filekey = await crypto.subtle.generateKey(
+    {
+      name: "AES-GCM",
+      length: 256,
+    },
+    true,
+    ["encrypt", "decrypt"]
+  );
   var FileKeyRaw = await crypto.subtle.exportKey("raw", Filekey);
   var keyIV = crypto.getRandomValues(new Uint8Array(16));
   var encryptedFileKey = await encryptBlob(
@@ -78,94 +86,128 @@ var Filekey = await crypto.subtle.generateKey(
     keyIV
   );
 
-  var encryptedFileKeyArr = new Uint8Array(encryptedFileKey.byteLength + 32)
-  encryptedFileKeyArr.set(keyIV,0)
-  encryptedFileKeyArr.set(keysalt,16)
-  encryptedFileKeyArr.set(new Uint8Array(encryptedFileKey),32)
+  var encryptedFileKeyArr = new Uint8Array(encryptedFileKey.byteLength + 32);
+  encryptedFileKeyArr.set(keyIV, 0);
+  encryptedFileKeyArr.set(keysalt, 16);
+  encryptedFileKeyArr.set(new Uint8Array(encryptedFileKey), 32);
 
-  var fnIV = crypto.getRandomValues(new Uint8Array(16))
-  var enc = new TextEncoder()
+  var fnIV = crypto.getRandomValues(new Uint8Array(16));
+  var enc = new TextEncoder();
 
   var encryptedFileName = await encryptBlob(
     enc.encode(file.name),
     usedClientKey,
     false,
     fnIV
-  )
+  );
 
-  var encryptedFileNameArr = new Uint8Array(encryptedFileName.byteLength + 32)
-  encryptedFileNameArr.set(fnIV,0)
-  encryptedFileNameArr.set(keysalt,16)
-  encryptedFileNameArr.set(new Uint8Array(encryptedFileName),32)
+  var encryptedFileNameArr = new Uint8Array(encryptedFileName.byteLength + 32);
+  encryptedFileNameArr.set(fnIV, 0);
+  encryptedFileNameArr.set(keysalt, 16);
+  encryptedFileNameArr.set(new Uint8Array(encryptedFileName), 32);
   var form = new FormData();
 
   form.append("fileSize", file.size + 32);
   form.append("fileName", encode(encryptedFileNameArr));
   form.append("chunkKey", encode(encryptedFileKeyArr));
-  form.append("id",ongoingFileId);
-  form.append("dir",directory)
+  form.append("id", ongoingFileId);
+  form.append("dir", directory);
 
-  var resp = await fetch(`${baseEndpointURL}/pre`,{
-    headers : {
-      'Authorization': localStorage.getItem("tk")
+  var resp = await fetch(`${baseEndpointURL}/pre`, {
+    headers: {
+      Authorization: localStorage.getItem("tk"),
     },
     method: "POST",
-    body: form
-  })
-  var jsn = await resp.json()
+    body: form,
+  });
+  var tA = [0, 1, 2, 3, 4];
+  var jsn = await resp.json();
   if (file.size < megabyte * 5) {
-    await loopEncryptChunk([0, file.size],0);
+    await loopEncryptChunk([0, file.size], 0);
   } else {
-    await loopEncryptChunk([0, megabyte * 5],0);
+    for (
+      var i = 0;
+      i <
+      parseInt(calchunk(file.size) / 5) +
+        (calchunk(file.size) % 5 == 0 ? 0 : 1);
+      i++
+    ) {
+      const promises = tA.map(async (v) => {
+        await loopEncryptChunk(
+          [megabyte * 5 * (i + v), megabyte * 5 * (i + v + 1)],
+          5242912 * (i + v)
+        );
+      });
+      await Promise.all(promises);
+    }
   }
-  var varForConcurrent = 0
-  var fullUploadedBytes=0
-  async function loopEncryptChunk(offset, previous) {
-    var sliced = file.slice(offset[0], offset[1]);
-    var reader = new FileReader();
-    var iv = crypto.getRandomValues(new Uint8Array(16));
-    reader.onloadend = async (slicedFile) => {
-      var encryptedBlobSlice = await encryptBlob(
-        slicedFile.target.result,
-        Filekey,
-        false,
-        iv
-      );
-      var finishedBytes = new Uint8Array(encryptedBlobSlice.byteLength + 16);
-      finishedBytes.set(iv, 0);
-      finishedBytes.set(new Uint8Array(encryptedBlobSlice), 16);
+  var varForConcurrent = 0;
+  var fullUploadedBytes = 0;
+  async function loopEncryptChunk(offset, startFrom) {
+    return new Promise((resolve, _) => {
+      if (offset[0] > file.size) {
+        resolve();
+      } else {
+        var sliced = file.slice(offset[0], offset[1]);
+        var reader = new FileReader();
+        var iv = crypto.getRandomValues(new Uint8Array(16));
+        reader.onloadend = async (slicedFile) => {
+          var encryptedBlobSlice = await encryptBlob(
+            slicedFile.target.result,
+            Filekey,
+            false,
+            iv
+          );
+          var finishedBytes = new Uint8Array(
+            encryptedBlobSlice.byteLength + 16
+          );
+          finishedBytes.set(iv, 0);
+          finishedBytes.set(new Uint8Array(encryptedBlobSlice), 16);
+          var Form = new FormData();
+          Form.append("token", jsn.StatusMessage);
+          Form.append("partialFileDta", new Blob([finishedBytes]));
+          console.log(
+            "slicing: ",
+            offset,
+            "uploading from offset: ",
+            startFrom,
+            "encrypted Bytelength: ",
+            finishedBytes.byteLength
+          );
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", `${baseEndpointURL}/upload`);
+          xhr.setRequestHeader("StartRange", startFrom);
 
+          var prevVal = 0;
+          var prevloaded = 0,
+            nowloaded = 0;
+          xhr.upload.onprogress = (e) => {
+            setTimeout(() => {
+              prevloaded = e.loaded;
+            }, 1000);
+            nowloaded = e.loaded;
+            varForConcurrent += e.loaded - prevVal;
+            updateStatus(
+              (varForConcurrent / file.size) * 100,
+              Math.round(((nowloaded - prevloaded) / megabyte) * 10) / 10,
+              ongoingFileId
+            );
+            prevVal = e.loaded;
+          };
 
-      console.log(finishedBytes.byteLength)
-      var Form = new FormData()
-      Form.append("token",jsn.StatusMessage)
-      Form.append("partialFileDta", new Blob([finishedBytes]))
-      var xhr = new XMLHttpRequest()
-      xhr.open("POST", `${baseEndpointURL}/upload`)
-      xhr.setRequestHeader("StartRange",previous)
-      
-      var prevVal=0
-      var prevloaded=0, nowloaded=0
-      xhr.upload.onprogress=function(e){
-        setTimeout(()=>{prevloaded = e.loaded},1000)
-        nowloaded = e.loaded
-        varForConcurrent += e.loaded - prevVal
-        updateStatus((varForConcurrent/file.size)*100, Math.round(((nowloaded - prevloaded)/megabyte)*10)/10, ongoingFileId)
-        prevVal=e.loaded
+          xhr.onloadend = function () {
+            fullUploadedBytes += offset[1] - offset[0];
+            if (fullUploadedBytes >= file.size) {
+              finishedUpload(ongoingFileId);
+            }
+            if (offset[1] < file.size) {
+              resolve();
+            }
+          };
+          xhr.send(Form);
+        };
+        reader.readAsArrayBuffer(sliced);
       }
-
-      xhr.onloadend=function(){
-        fullUploadedBytes+=offset[1]-offset[0]
-        if(fullUploadedBytes>=file.size){
-          finishedUpload(ongoingFileId)
-        }
-      }
-      xhr.send(Form)
-
-      if (offset[1] < file.size) {
-        loopEncryptChunk([offset[1], offset[1] + megabyte * 5], previous+finishedBytes.byteLength);
-      }
-    };
-    reader.readAsArrayBuffer(sliced);
+    });
   }
 }

@@ -125,6 +125,9 @@ export async function encryptAndUploadFile(
   if (file.size < megabyte * 5) {
     await loopEncryptChunk([0, file.size], 0);
   } else {
+    console.log(
+      parseInt(calchunk(file.size) / 5) + (calchunk(file.size) % 5 == 0 ? 0 : 1)
+    );
     for (
       var i = 0;
       i <
@@ -134,12 +137,13 @@ export async function encryptAndUploadFile(
     ) {
       const promises = tA.map(async (v) => {
         await loopEncryptChunk(
-          [megabyte * 5 * (i + v), megabyte * 5 * (i + v + 1)],
-          5242912 * (i + v)
+          [megabyte * 5 * (5 * i + v), megabyte * 5 * (5 * i + v + 1)],
+          5242912 * (5*i + v)
         );
       });
       await Promise.all(promises);
     }
+    await finishedUpload(ongoingFileId);
   }
   var varForConcurrent = 0;
   var fullUploadedBytes = 0;
@@ -148,7 +152,11 @@ export async function encryptAndUploadFile(
       if (offset[0] > file.size) {
         resolve();
       } else {
-        var sliced = file.slice(offset[0], offset[1]);
+        var qoffset = offset[1];
+        if (offset[1] > file.size) {
+          qoffset = file.size;
+        }
+        var sliced = file.slice(offset[0], qoffset);
         var reader = new FileReader();
         var iv = crypto.getRandomValues(new Uint8Array(16));
         reader.onloadend = async (slicedFile) => {
@@ -196,13 +204,8 @@ export async function encryptAndUploadFile(
           };
 
           xhr.onloadend = function () {
-            fullUploadedBytes += offset[1] - offset[0];
-            if (fullUploadedBytes >= file.size) {
-              finishedUpload(ongoingFileId);
-            }
-            if (offset[1] < file.size) {
-              resolve();
-            }
+            fullUploadedBytes += qoffset - offset[0];
+            resolve();
           };
           xhr.send(Form);
         };

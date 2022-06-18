@@ -125,9 +125,6 @@ export async function encryptAndUploadFile(
   if (file.size < megabyte * 5) {
     await loopEncryptChunk([0, file.size], 0);
   } else {
-    console.log(
-      parseInt(calchunk(file.size) / 5) + (calchunk(file.size) % 5 == 0 ? 0 : 1)
-    );
     for (
       var i = 0;
       i <
@@ -141,7 +138,7 @@ export async function encryptAndUploadFile(
           5242912 * (5*i + v)
         );
       });
-      await Promise.all(promises);
+      await Promise.any(promises);
     }
     await finishedUpload(ongoingFileId);
   }
@@ -174,14 +171,6 @@ export async function encryptAndUploadFile(
           var Form = new FormData();
           Form.append("token", jsn.StatusMessage);
           Form.append("partialFileDta", new Blob([finishedBytes]));
-          console.log(
-            "slicing: ",
-            offset,
-            "uploading from offset: ",
-            startFrom,
-            "encrypted Bytelength: ",
-            finishedBytes.byteLength
-          );
           var xhr = new XMLHttpRequest();
           xhr.open("POST", `${baseEndpointURL}/upload`);
           xhr.setRequestHeader("StartRange", startFrom);

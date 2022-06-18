@@ -70,20 +70,25 @@ export async function getFileBlob(id, name, updateStatus) {
   var totalBlobList = [];
   var hmc = calchunk(fileDetailJSON.Size);
 
-  var intArr = Array.from(Array(hmc).keys());
-  const promises = intArr.map((i, _) =>
-    sendAndDownloadData(
-      fileDetailJSON.Token,
-      5 * megabyte * i + 32 * i,
-      5 * megabyte * (i + 1) + 32 * (i + 1),
-      fileKey,
-      updateStatus
-    ).then((decData) => {
-      var respAb = new Uint8Array(decData);
-      totalBlobList[i] = new Blob([respAb]);
-    })
-  );
-  await Promise.all(promises);
+  var intArr = [0, 1, 2, 3, 4];
+  console.log(parseInt(hmc / 5) + (hmc % 5 == 0 ? 0 : 1));
+  for (var i = 0; i < parseInt(hmc / 5) + (hmc % 5 == 0 ? 0 : 1); i++) {
+    const promises = intArr.map(async (v) =>
+      sendAndDownloadData(
+        fileDetailJSON.Token,
+        5242912 * (5 * i + v),
+        5242912 * (5 * i + v + 1),
+        fileKey,
+        fileDetailJSON.Size,
+        updateStatus
+      ).then((decData) => {
+        var respAb = new Uint8Array(decData);
+        totalBlobList[5 * i + v] = new Blob([respAb]);
+      })
+    );
+
+    await Promise.all(promises);
+  }
 
   var re = /\.[^.\\/:*?"<>|\r\n]+$/;
   var ext = re.exec(name)[0];
@@ -120,26 +125,31 @@ function sendAndDownloadData(
   startrange,
   endrange,
   fileKey,
+  fileSize,
   updateStatus
 ) {
   return new Promise((resolve, _) => {
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", `${baseEndpointURL}/download`);
-    xhr.responseType = "arraybuffer";
-    var form = new FormData();
-    form.append("token", token);
-    xhr.setRequestHeader("StartRange", startrange);
-    xhr.setRequestHeader("EndRange", endrange);
-    xhr.onprogress = (e) => {};
-    xhr.onloadend = async () => {
-      var data = await decryptBlob(
-        fileKey,
-        xhr.response.slice(0, 16),
-        xhr.response.slice(16)
-      );
-      resolve(data);
-    };
-    xhr.send(form);
+    if (startrange > fileSize) {
+      resolve();
+    } else {
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", `${baseEndpointURL}/download`);
+      xhr.responseType = "arraybuffer";
+      var form = new FormData();
+      form.append("token", token);
+      xhr.setRequestHeader("StartRange", startrange);
+      xhr.setRequestHeader("EndRange", endrange);
+      xhr.onprogress = (e) => {};
+      xhr.onloadend = async () => {
+        var data = await decryptBlob(
+          fileKey,
+          xhr.response.slice(0, 16),
+          xhr.response.slice(16)
+        );
+        resolve(data);
+      };
+      xhr.send(form);
+    }
   });
 }
 

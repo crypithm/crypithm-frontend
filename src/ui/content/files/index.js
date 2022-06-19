@@ -23,7 +23,7 @@ import { encryptAndUploadFile } from "../../../lib/crypto/encrypt.js";
 import { randString } from "../../../lib/crypto/random";
 import { getAllFiledata } from "../../../lib/crypto/decrypt";
 import { Foldercreation } from "./folderCreation";
-
+import { filesWithoutThumb } from "../../../vars";
 export class Files extends React.Component {
   constructor(props) {
     super(props);
@@ -106,17 +106,17 @@ export class Files extends React.Component {
         });
       }
       this.setState({ ascending: this.state.ascending ? false : true });
-    }else if(byindex == 2){
+    } else if (byindex == 2) {
       if (this.state.Sizeascending) {
         this.setState({
           data: this.state.data.sort((a, b) => {
-            return a.size - b.size
+            return a.size - b.size;
           }),
         });
       } else {
         this.setState({
           data: this.state.data.sort((a, b) => {
-            return b.size - a.size
+            return b.size - a.size;
           }),
         });
       }
@@ -220,23 +220,22 @@ export class Files extends React.Component {
     }
   };
 
-  addPrefixToSize=(length)=>{
-    var fs
-    if(1024 >= length) {
-      fs = Math.round(length*10)/10 + "B"
-
-  }else if(length > 1024 && length < 1024*1024) {
-      fs = Math.round(length/1024*10)/10 + "KB"
-
-  }else if(length >= 1024*1024 && length < 1024*1024*1024) {
-      fs = Math.round(length/(1024*1024)*10)/10 + "MB"
-
-  }else if(length >= 1024*1024*1024 && length < 1024*1024*1024*1024) {
-      fs = Math.round(length/(1024*1024*1024)*10)/10 + "GB"
-      
-  }
-  return fs
-  }
+  addPrefixToSize = (length) => {
+    var fs;
+    if (1024 >= length) {
+      fs = Math.round(length * 10) / 10 + "B";
+    } else if (length > 1024 && length < 1024 * 1024) {
+      fs = Math.round((length / 1024) * 10) / 10 + "KB";
+    } else if (length >= 1024 * 1024 && length < 1024 * 1024 * 1024) {
+      fs = Math.round((length / (1024 * 1024)) * 10) / 10 + "MB";
+    } else if (
+      length >= 1024 * 1024 * 1024 &&
+      length < 1024 * 1024 * 1024 * 1024
+    ) {
+      fs = Math.round((length / (1024 * 1024 * 1024)) * 10) / 10 + "GB";
+    }
+    return fs;
+  };
   render = () => {
     return (
       <>
@@ -459,9 +458,12 @@ export class Files extends React.Component {
                     </div>
                   );
                 } else {
+                  var fileFormat=/\.[^.\\/:*?"<>|\r\n]+$/.exec(elem.name)[0].split('.')[1]
                   return (
                     <div
-                    onDoubleClick={()=>this.props.viewFile(elem.id, elem.name)}
+                      onDoubleClick={() =>
+                        this.props.viewFile(elem.id, elem.name)
+                      }
                       className={
                         this.state.Aligngrid
                           ? "fileContainer grid"
@@ -483,11 +485,24 @@ export class Files extends React.Component {
                     >
                       {elem.completed ? (
                         <>
-                          <div className="fileThumbnail">
-                            <img src={elem.thumb} width={20} />
+                          <div
+                            className="fileThumbnail"
+                            style={{
+                              fontSize: this.state.Aligngrid ? "30pt" : "15pt",
+                              backgroundColor: 'rgba(255,255,255,0.1)',
+                            }}
+                          >
+                            {
+                            filesWithoutThumb[fileFormat] ? (
+                              filesWithoutThumb[fileFormat]
+                            ) : (
+                              <img src={elem.thumb} width={20} />
+                            )}
                           </div>
                           <p className="elemName">{elem.name}</p>
-                          <p className="elemSize">{this.addPrefixToSize(elem.size)}</p>
+                          <p className="elemSize">
+                            {this.addPrefixToSize(elem.size)}
+                          </p>
                         </>
                       ) : (
                         <>

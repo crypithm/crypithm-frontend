@@ -5,7 +5,7 @@
     z-index: 5;
     width: 400px;
     height: 200px;
-    background-color: #191919;
+    background-color: var(--var-dt-bodyColor);
     display: flex;
     flex-direction: column;
     align-items: center;

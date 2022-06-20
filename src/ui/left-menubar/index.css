@@ -79,21 +79,28 @@
     color: rgba(255,255,255,0.3);
   }
   .userInfoArea progress {
-    background-color: #000;
-    height: 1px;
+    background-color: #fff;
+    height: 2px;
     width: 100%;
     margin-bottom: 20px;
   }
   .userInfoArea progress::-webkit-progress-value {
-    background-color: #000;
+    background-color: #3a3a3a;
+  }
+  .userInfoArea progress::-webkit-progress-bar {
+    background-color: rgba(0,0,0,0.5);
+  }
+  .userInfoArea progress::-moz-progress-value {
+    background-color: #3a3a3a;
   }
   .userInfoArea progress::-moz-progress-bar {
-    background-color: #000;
+    background-color: rgba(0,0,0,0.5);
   }
+
   .progressArea {
     display: flex;
     flex-direction: column;
-    color: rgba(255,255,255,0.5);
+    color: var(--var-dt-highLightColorStrong);
     align-items: center;
     
     margin-top: 20px;
@@ -101,7 +108,7 @@
     padding-top: 20px;
   }
   .progressArea b {
-    color: rgba(255,255,255,0.5);
+    color: var(--var-dt-highLightColorStrong);
     margin-bottom: 20px;
     margin-top: 20px;
     font-weight: normal;
@@ -112,7 +119,7 @@
   }
   .button:active {
     background-color: inherit;
-    background-color: rgba(255,255,255,0.2);
+    background-color: var(--var-dt-highLightColorLight);
   }
 }
 

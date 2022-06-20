@@ -1,0 +1,10 @@
+:root{
+    --var-dt-bodyColor: #000;
+    --var-dt-viewBackColor: #161616;
+    --var-dt-btnColor: #242424;
+    --var-dt-highLightColorLight: rgba(255,255,255,0.2);
+    --var-dt-highLightColorStrong: rgba(255,255,255,0.5);
+
+    --var-lt-bodyColor: #fff;
+    --var-lt-textColor: rgba(0,0,0,0.5);
+}

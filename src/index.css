@@ -3,7 +3,7 @@
 body, html {
   margin: 0;
   padding: 0;
-  background-color: #191919;
+  background-color: var(--var-dt-bodyColor);
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;

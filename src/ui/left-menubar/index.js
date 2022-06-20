@@ -37,7 +37,7 @@ export class Leftmenu extends React.Component {
   render = () => {
     var ActivatedMenuStyle = {
       fontWeight: "bold",
-      color: "rgba(255,255,255,1)",
+      color: "#fff",
     };
     
     return (

@@ -15,9 +15,9 @@
 .directory{
     width: 100%;
     height: 50px;
-    background-color: #191919;
+    background-color: var(--var-dt-bodyColor);
     border-top: solid 1px rgba(255,255,255,0.3);
-    color: rgba(255,255,255,0.5);
+    color: rgba(255,255,255,0.7);
     font-size: 17pt;
     display: flex;
     align-items: center;
@@ -44,14 +44,13 @@
 }
 .fileContainer {
     width: calc(100% - 2px);
-    border: solid 1px #191919;
+    border: solid 1px var(--var-dt-bodyColor);
     border-bottom: solid 1px rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.5);
+    color: rgba(255,255,255,.7);
     height: 50px;
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-family: 'Ubuntu', sans-serif;
     font-size: 10pt;
     animation: appearFile ease-in-out 0.2s;
     white-space:nowrap;
@@ -62,7 +61,7 @@
 .dragger{
     max-width: 150px;
     height: 35px;
-    background-color: #191919;
+    background-color: var(--var-dt-bodyColor);
     align-items: center;
     justify-content: center;
     font-size: 10pt;
@@ -179,7 +178,7 @@
     cursor: pointer;
 }
 .FileOptIcons:hover {
-    color: rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.6);
 }
 .FileOptButtons {
     display: flex;
@@ -245,11 +244,11 @@
     background-color: #242424;
     padding: 7px 13px 7px 13px;
 
-    color: #636363;
+    color: rgba(255,255,255,.5);
     transition: color 0.1s ease-in-out;
 }
 .Newbtn:hover {
-    color: #9c9c9c;
+    color: rgba(255,255,255,.7);
 }
 .Newbtn-icon {
     font-size: 15pt;
@@ -266,10 +265,9 @@
 }
 .fileControlOptions {
     z-index: 2;
-    background-color: #191919;
+    background-color: var(--var-dt-bodyColor);
     width: 100%;
     height: 70px;
-    font-family: 'Ubuntu', sans-serif;
     color: rgba(255,255,255,0.6);
     font-size: 10pt;
     position: sticky;
@@ -313,16 +311,15 @@
 
 .arrangeBar{
     border-bottom: solid 1px rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.7);
     height: 30px;
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-family: 'Ubuntu', sans-serif;
     font-size: 10pt;
     padding-left: 48px;
     position: sticky;
-    background-color: #191919;
+    background-color: var(--var-dt-bodyColor);
     z-index: 1;
     top: 141px;
 }

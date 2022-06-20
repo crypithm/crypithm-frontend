@@ -6,6 +6,7 @@
     padding-top: 80px;
     background-color: inherit;
     flex-direction: column;
+    font-family: 'Ubuntu', sans-serif;
 }
 
 @media (max-width: 800px) {

@@ -140,7 +140,7 @@ export class Files extends React.Component {
     return -1;
   };
 
-  uploadDone = async (id) => {
+  uploadDone = (id) => {
     let index = this.findElemIndex(id);
     var elem = this.state.data[index];
     elem.completed = true;

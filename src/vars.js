@@ -1,6 +1,6 @@
 import { IoIosSettings } from "react-icons/io";
 import { DiJavascript1, DiPhp, DiJava } from "react-icons/di";
-import { AiFillFileText, AiFillFileImage, AiFillFilePpt } from "react-icons/ai";
+import { AiFillFileText, AiFillFileImage, AiFillFilePpt,AiFillPlayCircle } from "react-icons/ai";
 
 export const menus = ["files", "vault", "links"];
 export const viewableType = ["image"];
@@ -20,6 +20,9 @@ export const filesWithoutThumb = {
   pdf: <AiFillFileText />,
   pptx: <AiFillFilePpt />,
   docx: <AiFillFileText />,
-  
+  hwp: <AiFillFileText />,
+  hwpx: <AiFillFileText />,
+  mp4: <AiFillPlayCircle />,
+  avi: <AiFillPlayCircle />
 
 };

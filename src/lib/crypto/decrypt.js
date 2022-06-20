@@ -71,8 +71,8 @@ export async function getFileBlob(id, name, updateStatus) {
   var hmc = calchunk(fileDetailJSON.Size);
 
   var intArr = [0, 1, 2, 3, 4];
-  console.log(parseInt(hmc / 5) + (hmc % 5 == 0 ? 0 : 1));
-  for (var i = 0; i < parseInt(hmc / 5) + (hmc % 5 == 0 ? 0 : 1); i++) {
+  var loops=parseInt(hmc / 5) + (hmc % 5 == 0 ? 0 : 1)
+  for (var i = 0; i < loops; i++) {
     const promises = intArr.map(async (v) =>
       sendAndDownloadData(
         fileDetailJSON.Token,

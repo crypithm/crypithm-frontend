@@ -125,24 +125,24 @@ export async function encryptAndUploadFile(
   if (file.size < megabyte * 5) {
     await loopEncryptChunk([0, file.size], 0);
   } else {
-    for (
-      var i = 0;
-      i <
+    var giantLoop =
       parseInt(calchunk(file.size) / 5) +
-        (calchunk(file.size) % 5 == 0 ? 0 : 1);
-      i++
-    ) {
+      (calchunk(file.size) % 5 == 0 ? 0 : 1);
+    for (var i = 0; i < giantLoop; i++) {
       const promises = tA.map(async (v) => {
         await loopEncryptChunk(
           [megabyte * 5 * (5 * i + v), megabyte * 5 * (5 * i + v + 1)],
-          5242912 * (5*i + v)
+          5242912 * (5 * i + v)
         );
       });
-      await Promise.any(promises);
+      if (giantLoop - 1 == i) {
+        await Promise.all(promises);
+      } else {
+        await Promise.any(promises);
+      }
     }
-    await finishedUpload(ongoingFileId);
   }
-  var varForConcurrent = 0;
+  await finishedUpload(ongoingFileId);
   var fullUploadedBytes = 0;
   async function loopEncryptChunk(offset, startFrom) {
     return new Promise((resolve, _) => {
@@ -183,9 +183,9 @@ export async function encryptAndUploadFile(
               prevloaded = e.loaded;
             }, 1000);
             nowloaded = e.loaded;
-            varForConcurrent += e.loaded - prevVal;
-            updateStatus(
-              (varForConcurrent / file.size) * 100,
+            console.log(e.loaded , prevVal)
+             updateStatus(
+              ((e.loaded - prevVal) / file.size) * 100,
               Math.round(((nowloaded - prevloaded) / megabyte) * 10) / 10,
               ongoingFileId
             );

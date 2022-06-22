@@ -96,6 +96,9 @@ export class Leftmenu extends React.Component {
   };
 
   LeftMenuButtonClicked = (n) => {
+    if(n==0){
+      this.props.setDirectory("/ 0")
+    }
     this.setState({ ActiveMenuIndex: n });
     if (this.props.currentPage != menus[n]) {
       window.history.pushState({}, "", `/${menus[n]}`);

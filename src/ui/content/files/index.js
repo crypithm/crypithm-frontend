@@ -315,10 +315,10 @@ export class Files extends React.Component {
                 className="dropdown-buttonIcon"
                 onClick={() => this.showFileCreation()}
               >
-                <RiFolderAddFill />{" "}
+                <RiFolderAddFill />{"Folder"}
               </div>
               <div className="dropdown-buttonIcon">
-                <RiFolderUploadFill />{" "}
+                <RiFolderUploadFill />{"Folder"}
               </div>
               <input
                 type="file"
@@ -329,7 +329,7 @@ export class Files extends React.Component {
                 multiple
               ></input>
               <label className="dropdown-buttonIcon" htmlFor="fileInput">
-                <RiFileUploadFill />{" "}
+                <RiFileUploadFill />{"File"}
               </label>
             </div>
             <div

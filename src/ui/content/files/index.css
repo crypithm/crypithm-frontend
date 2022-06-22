@@ -213,15 +213,16 @@
     display: flex;
     align-items: center;
     font-size: 15pt;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 0;
     margin: 0;
     padding: 5px 0 5px 0;
     cursor: pointer;
     font-size: 10pt;
     display: flex;
-    align-items: center;
-    justify-content: center;
+}
+.dropdown-buttonIcon svg {
+    margin-right: 10px;
 }
 .dropdown-buttonIcon:hover {
     color: rgba(255,255,255,0.3)

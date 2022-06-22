@@ -1,5 +1,5 @@
 .header {
-    width: calc(100% - 360px);
+    width: calc(100%);
     border-bottom: solid 1px rgba(255,255,255,0.3);
     position: fixed;
     right: 0;
@@ -11,12 +11,30 @@
     font-family: 'Ubuntu', sans-serif;
     background-color: var(--var-dt-bodyColor);
     z-index: 4;
+    
 }
+
+.logo {
+    height: 70px;
+    width: 325px;
+    display: flex;
+    font-family: 'Lato', sans-serif;
+    align-items: center;
+    justify-content: center;
+    margin-right: 30px;
+  }
+  .logo b {
+    font-size: 12pt;
+    margin-left: 10px;
+    opacity: 0.5;
+    font-weight: bold;
+    color: #fff;
+  }
 
 .header input[type="text"] {
     border: none;
-    background-color: transparent;
-    border-bottom: solid 1px rgba(255,255,255,0.3);
+    background-color: #000;
+    border-radius: 5px;
     color: rgba(255,255,255,0.6);
     padding: 10px;
     width: 500px;
@@ -33,6 +51,9 @@
 }
 
 @media (max-width: 800px) {
+    .logo {
+        display: none;
+      }
     .header {
         width: 100vw;
         border-bottom: solid 1px rgba(255,255,255,0.3);

@@ -8,13 +8,19 @@ import { Viewer } from "./ui/viewer";
 export class Crypithm extends React.Component {
   constructor(props) {
     super(props);
+    this.dragDetectionArea= React.createRef()
     this.state = {
       currentPage: window.location.pathname.split("/")[1],
       mobileMenuOpen: false,
       viewingFileId: "",
-      viewingFileName: ""
+      viewingFileName: "",
+      currentDir: "/ 0",
     };
   }
+
+  setDirectory = (id) => {
+    this.setState({ currentDir: id });
+  };
   pushedToState = () => {
     this.setState({ currentPage: window.location.pathname.split("/")[1] });
   };
@@ -28,26 +34,47 @@ export class Crypithm extends React.Component {
       window.history.pushState({}, "", "files");
     }
   };
+
   toggleMobileMenu = () => {
     this.setState({ mobileMenuOpen: this.state.mobileMenuOpen ? false : true });
   };
   closeViewer = () => {
-    this.setState({viewingFileId:null})
+    this.setState({ viewingFileId: null });
   };
-  startView = async (id,name)=>{
-    this.setState({viewingFileId:id, viewingFileName:name})
-  }
+  startView = async (id, name) => {
+    this.setState({ viewingFileId: id, viewingFileName: name });
+  };
   render = () => {
     return (
       <>
-        {this.state.viewingFileId?<Viewer id={this.state.viewingFileId} close={() => this.closeViewer()} name={this.state.viewingFileName}></Viewer>:<></>}
-        <Leftmenu
+        {this.state.viewingFileId ? (
+          <Viewer
+            id={this.state.viewingFileId}
+            close={() => this.closeViewer()}
+            name={this.state.viewingFileName}
+          ></Viewer>
+        ) : (
+          <></>
+        )}
+        <Header mobileMenu={() => this.toggleMobileMenu()} />
+
+          <div ref={this.dragDetectionArea}>
+          <Leftmenu
           currentPage={this.state.currentPage}
           updateFunc={() => this.pushedToState()}
           ismobileMenuOpen={this.state.mobileMenuOpen}
+          setDirectory={(id) => this.setDirectory(id)}
+          currentDir={this.state.currentDir}
         />
-        <Header mobileMenu={() => this.toggleMobileMenu()} />
-        <Content currentPage={this.state.currentPage} viewFile={(id,name)=>this.startView(id,name)} />
+        <Content
+          currentPage={this.state.currentPage}
+          viewFile={(id, name) => this.startView(id, name)}
+          dir={this.state.currentDir}
+          setDirectory={(id) => this.setDirectory(id)}
+          dragDetectionArea={this.dragDetectionArea}
+        />
+          </div>
+
       </>
     );
   };

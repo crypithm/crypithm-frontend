@@ -30,6 +30,47 @@ async function deriveCryptoKey(keyAB, salt) {
   );
 }
 
+export async function getFolders(key) {
+  var encoder = new TextEncoder();
+  var stringKeyAb = encoder.encode(key);
+  var importedClientKey = await crypto.subtle.importKey(
+    "raw",
+    stringKeyAb,
+    "PBKDF2",
+    false,
+    ["deriveKey", "deriveBits"]
+  );
+  var form = new FormData();
+  form.append("action", "getOnlyFolder");
+  var fetchData = await fetch(`${baseEndpointURL}/dta`, {
+    headers: {
+      Authorization: localStorage.getItem("tk"),
+    },
+    method: "POST",
+    body: form,
+  });
+  var folderJson = await fetchData.json();
+  if (folderJson.Message == "Success") {
+    var data = [];
+    for (var i = 0; i < folderJson.Folders.length; i++) {
+      var dec = new TextDecoder();
+      var keysalt = decode(folderJson.Folders[i].Name).slice(0, 16);
+      var usedClientKey = await deriveCryptoKey(importedClientKey, keysalt);
+      var Fullname = decode(folderJson.Folders[i].Name);
+      var decryptedData = await decryptBlob(
+        usedClientKey,
+        Fullname.slice(16, 32),
+        Fullname.slice(32)
+      );
+      data.push({
+        Name: dec.decode(decryptedData),
+        Parent: folderJson.Folders[i].Index,
+        Id: folderJson.Folders[i].Id,
+      });
+    }
+    return data;
+  }
+}
 export async function getFileBlob(id, name, updateStatus) {
   var form = new FormData();
   form.append("id", id);
@@ -71,7 +112,7 @@ export async function getFileBlob(id, name, updateStatus) {
   var hmc = calchunk(fileDetailJSON.Size);
 
   var intArr = [0, 1, 2, 3, 4];
-  var loops=parseInt(hmc / 5) + (hmc % 5 == 0 ? 0 : 1)
+  var loops = parseInt(hmc / 5) + (hmc % 5 == 0 ? 0 : 1);
   for (var i = 0; i < loops; i++) {
     const promises = intArr.map(async (v) =>
       sendAndDownloadData(

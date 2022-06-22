@@ -28,7 +28,6 @@ export class Files extends React.Component {
   constructor(props) {
     super(props);
     this.clickDetectionArea = React.createRef();
-    this.dragDetectionArea = React.createRef();
     this.fileItemsRef = [];
     this.dragBoxRef = React.createRef();
     this.fileInputBox = React.createRef();
@@ -47,7 +46,6 @@ export class Files extends React.Component {
       data: [],
       stalkedDirectory: [],
       uploadsInProgress: {},
-      currentDirectory: "/ 0",
     };
   }
 
@@ -195,29 +193,33 @@ export class Files extends React.Component {
     );
   };
 
+  componentDidUpdate(prevProps) {
+    if (this.props.dir !== prevProps.dir) {
+      if (this.props.dir != "/ 0") {
+        var tempArr = [];
+        const v = (id) => {
+          var targetObj = this.findElemIndex(id, true);
+          tempArr.unshift({
+            id: targetObj.id,
+            name: targetObj.name,
+          });
+          if (targetObj.dir != "/ 0") {
+            v(targetObj.dir);
+          } else {
+            this.setState({
+              stalkedDirectory: tempArr,
+            });
+          }
+        };
+        v(this.props.dir);
+      }
+    }
+  }
   moveToDir = (id) => {
     this.setState({ selectedIndex: [] });
     this.setState({ stalkedDirectory: [] });
-    this.setState({ currentDirectory: id });
+    this.props.setDirectory(id);
     localStorage.setItem("dir", id);
-    if (id != "/ 0") {
-      var tempArr = [];
-      const v = (id) => {
-        var targetObj = this.findElemIndex(id, true);
-        tempArr.unshift({
-          id: targetObj.id,
-          name: targetObj.name,
-        });
-        if (targetObj.dir != "/ 0") {
-          v(targetObj.dir);
-        } else {
-          this.setState({
-            stalkedDirectory: tempArr,
-          });
-        }
-      };
-      v(id);
-    }
   };
 
   addPrefixToSize = (length) => {
@@ -240,7 +242,6 @@ export class Files extends React.Component {
     return (
       <>
         <div
-          ref={this.dragDetectionArea}
           onContextMenu={(e) => this.ctxMenuCalled(e)}
         >
           <div
@@ -315,10 +316,12 @@ export class Files extends React.Component {
                 className="dropdown-buttonIcon"
                 onClick={() => this.showFileCreation()}
               >
-                <RiFolderAddFill />{"Folder"}
+                <RiFolderAddFill />
+                {"Folder"}
               </div>
               <div className="dropdown-buttonIcon">
-                <RiFolderUploadFill />{"Folder"}
+                <RiFolderUploadFill />
+                {"Folder"}
               </div>
               <input
                 type="file"
@@ -329,7 +332,8 @@ export class Files extends React.Component {
                 multiple
               ></input>
               <label className="dropdown-buttonIcon" htmlFor="fileInput">
-                <RiFileUploadFill />{"File"}
+                <RiFileUploadFill />
+                {"File"}
               </label>
             </div>
             <div
@@ -406,7 +410,7 @@ export class Files extends React.Component {
             }
           >
             {this.state.data
-              .filter((elem) => elem.dir == this.state.currentDirectory)
+              .filter((elem) => elem.dir == this.props.dir)
               .map((elem, index) => {
                 if (elem.type == "folder") {
                   return (
@@ -458,7 +462,9 @@ export class Files extends React.Component {
                     </div>
                   );
                 } else {
-                  var fileFormat=/\.[^.\\/:*?"<>|\r\n]+$/.exec(elem.name)[0].split('.')[1]
+                  var fileFormat = /\.[^.\\/:*?"<>|\r\n]+$/
+                    .exec(elem.name)[0]
+                    .split(".")[1];
                   return (
                     <div
                       onDoubleClick={() =>
@@ -489,11 +495,10 @@ export class Files extends React.Component {
                             className="fileThumbnail"
                             style={{
                               fontSize: this.state.Aligngrid ? "30pt" : "15pt",
-                              backgroundColor: 'rgba(255,255,255,0.1)',
+                              backgroundColor: "rgba(255,255,255,0.1)",
                             }}
                           >
-                            {
-                            filesWithoutThumb[fileFormat] ? (
+                            {filesWithoutThumb[fileFormat] ? (
                               filesWithoutThumb[fileFormat]
                             ) : (
                               <img src={elem.thumb} width={20} />
@@ -614,13 +619,13 @@ export class Files extends React.Component {
       this.state.selectedIndex.map((elem, _) => {
         this.state.selectedIds.unshift(this.getIdFromIndex(elem));
         this.setState({ selectedIds: this.state.selectedIds });
-        this.dragDetectionArea.current.addEventListener(
+        this.props.dragDetectionArea.current.addEventListener(
           "mousemove",
           this.moveElems
         );
         window.addEventListener("mouseup", () => {
-          if (this.dragDetectionArea.current) {
-            this.dragDetectionArea.current.removeEventListener(
+          if (this.props.dragDetectionArea.current) {
+            this.props.dragDetectionArea.current.removeEventListener(
               "mousemove",
               this.moveElems
             );
@@ -632,13 +637,13 @@ export class Files extends React.Component {
     } else {
       this.setState({ startPos: [e.pageX, e.pageY] });
       this.mouseMove(e);
-      this.dragDetectionArea.current.addEventListener(
+      this.props.dragDetectionArea.current.addEventListener(
         "mousemove",
         this.mouseMove
       );
       window.addEventListener("mouseup", () => {
-        if (this.dragDetectionArea.current) {
-          this.dragDetectionArea.current.removeEventListener(
+        if (this.props.dragDetectionArea.current) {
+          this.props.dragDetectionArea.current.removeEventListener(
             "mousemove",
             this.mouseMove
           );

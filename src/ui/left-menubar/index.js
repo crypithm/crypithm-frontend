@@ -1,18 +1,93 @@
 import React from "react";
+import { getFolders } from "../../lib/crypto/decrypt";
+import { FcFolder } from "react-icons/fc";
 import { AiFillFolder, AiFillLock, AiOutlinePaperClip } from "react-icons/ai";
 import { RiArrowDownSFill } from "react-icons/ri";
 import { menus } from "../../vars.js";
 import "./index.css";
 
-export class Leftmenu extends React.Component {
+class RecursiveFolders extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { ActiveMenuIndex: 0, fileBtnExtended: false };
+    this.state = { dropped: [] };
   }
 
   componentDidMount = () => {
-    this.refreshIndex();
+    var arr = [];
+    for (var i = 0; i < this.state.dropped.length; i++) {
+      arr.push(false);
+    }
+  };
+  toggleDrop = (index) => {
+    this.state.dropped[index] = this.state.dropped[index] ? false : true;
+    this.setState({ dropped: this.state.dropped });
+  };
+  findFolderFromId = (id) => {
+    var foundList = [];
+    for (var i = 0; i < this.props.folders.length; i++) {
+      if (this.props.folders[i].Parent == id) {
+        foundList.push(this.props.folders[i]);
+      }
+    }
+    return foundList;
+  };
 
+  render() {
+    var lst = this.findFolderFromId(this.props.id);
+    return lst.map((elem, index) => {
+      return (
+        <div className="lmenuFolderPre" key={index}>
+          <div className="lmenuFolderBtn">
+            <span onClick={() => this.props.setDirectory(elem.Id)}>
+              <div className="lmenuFolderico">
+                <FcFolder />
+              </div>
+              <p
+                style={{
+                  color: this.props.currentDir == elem.Id ? "#fff" : "",
+                }}
+              >
+                {elem.Name}
+              </p>
+            </span>
+            <div
+              className="da-btnico"
+              onClick={() => this.toggleDrop(index)}
+              style={{
+                transform: this.state.dropped[index]
+                  ? "rotate(180deg)"
+                  : "rotate(0deg)",
+              }}
+            >
+              <RiArrowDownSFill />
+            </div>
+          </div>
+          {this.state.dropped[index] ? (
+            <div className="childDropDown">
+              <RecursiveFolders
+                id={elem.Id}
+                folders={this.props.folders}
+                setDirectory={(id) => this.props.setDirectory(id)}
+                currentDir={this.props.currentDir}
+              />
+            </div>
+          ) : (
+            <></>
+          )}
+        </div>
+      );
+    });
+  }
+}
+export class Leftmenu extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { ActiveMenuIndex: 0, fileBtnExtended: false, folders: [] };
+  }
+
+  componentDidMount = async () => {
+    this.refreshIndex();
+    this.setState({ folders: await getFolders(localStorage.getItem("key")) });
   };
   componentDidUpdate = (prevProps) => {
     if (this.props.currentPage !== prevProps.currentPage) {
@@ -35,11 +110,12 @@ export class Leftmenu extends React.Component {
           : 0,
     });
   };
-  extendFiles = () => {
+  extendFiles = async () => {
     this.setState({
       fileBtnExtended: this.state.fileBtnExtended ? false : true,
     });
   };
+
   render = () => {
     var ActivatedMenuStyle = {
       fontWeight: "bold",
@@ -80,7 +156,12 @@ export class Leftmenu extends React.Component {
                 this.state.fileBtnExtended ? "show" : ""
               }`}
             >
-              
+              <RecursiveFolders
+                id={"/ 0"}
+                folders={this.state.folders}
+                setDirectory={(id) => this.props.setDirectory(id)}
+                currentDir={this.props.currentDir}
+              />
             </div>
             <div
               className="button"

@@ -81,13 +81,24 @@
     max-height: 0px;
     overflow: hidden;
     transition: max-height 0.2s ease-in-out;
-    width: 100%;
-    padding-left: 50px;
+    width: 80%;
+    margin-left: 0px;
     overflow: hidden;
+    background-color: #000;
+    border-radius: 5px;
   }
   .folderExtended.show{
     max-height: 200px;
     overflow: scroll;
+  }
+
+  .folderExtended::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .folderExtended {
+    -ms-overflow-style: none;  
+    scrollbar-width: none;
   }
   .icoBtn{
     display: flex;
@@ -123,7 +134,7 @@
     border-bottom: solid 1px rgba(255,255,255,0.4);
   }
   .btmLeftOver{
-    height: 50px;
+    min-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -166,6 +177,7 @@
     font-weight: normal;
   }
 @media (max-width:1200px) {
+
   .button:hover {
     background-color: inherit;
   }
@@ -176,6 +188,9 @@
 }
 
 @media (max-width: 800px) {
+  .folderExtended{
+    width: 100%;
+  }
   .logo{
     display: none;
   }

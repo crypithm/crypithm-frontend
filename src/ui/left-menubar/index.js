@@ -37,18 +37,17 @@ class RecursiveFolders extends React.Component {
     return lst.map((elem, index) => {
       return (
         <div className="lmenuFolderPre" key={index}>
-          <div className="lmenuFolderBtn">
+          <div
+            className="lmenuFolderBtn"
+            style={{
+              color: this.props.currentDir == elem.Id ? "#fff" : "",
+            }}
+          >
             <span onClick={() => this.props.setDirectory(elem.Id)}>
               <div className="lmenuFolderico">
                 <FcFolder />
               </div>
-              <p
-                style={{
-                  color: this.props.currentDir == elem.Id ? "#fff" : "",
-                }}
-              >
-                {elem.Name}
-              </p>
+              <p>{elem.Name}</p>
             </span>
             <div
               className="da-btnico"
@@ -96,8 +95,8 @@ export class Leftmenu extends React.Component {
   };
 
   LeftMenuButtonClicked = (n) => {
-    if(n==0){
-      this.props.setDirectory("/ 0")
+    if (n == 0) {
+      this.props.setDirectory("/ 0");
     }
     this.setState({ ActiveMenuIndex: n });
     if (this.props.currentPage != menus[n]) {

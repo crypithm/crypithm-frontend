@@ -9,7 +9,8 @@ import "./index.css";
 class RecursiveFolders extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { dropped: [] };
+    this.mouseOn = false;
+    this.state = { dropped: [], onWhere: "" };
   }
 
   componentDidMount = () => {
@@ -32,6 +33,68 @@ class RecursiveFolders extends React.Component {
     return foundList;
   };
 
+  mouseEnteredOnFolder = (id) => {
+    if (this.props.selectedIds.length > 0) {
+      if (this.props.selectedIds.indexOf(id) == -1) {
+        this.setState({ onWhere: id });
+      }
+    }
+
+    this.mouseOn = true;
+  };
+
+  findElemIndex = (id, returnFullObj) => {
+    for (var i = 0; i < this.props.data.length; i++) {
+      if (this.props.data[i].id == id) {
+        if (returnFullObj) {
+          return this.props.data[i];
+        } else {
+          return i;
+        }
+      }
+    }
+    return -1;
+  };
+
+  mouseReleased = async (onId) => {
+    var target = onId;
+    var idList = this.props.selectedIds;
+    if (this.mouseOn && this.props.selectedIds.length > 0) {
+      if (idList.indexOf(target) == -1) {
+        this.setState({ onFolderId: "" });
+        var newForm = new FormData();
+        newForm.append("targetObjs", JSON.stringify(idList));
+        newForm.append("target", target);
+        newForm.append("action", "move");
+        var resp = await fetch(`https://crypithm.com/api/folder`, {
+          headers: {
+            Authorization: localStorage.getItem("tk"),
+          },
+          method: "POST",
+          body: newForm,
+        });
+        var jsn = await resp.json();
+        if (jsn.StatusMessage == "Success") {
+          var q = [];
+          for (var i = 0; i < idList.length; i++) {
+            let index = this.findElemIndex(idList[i]);
+            var elem = this.props.data[index];
+            elem.dir = target;
+            this.props.spliceFromData(index, 1);
+            q.push(elem);
+          }
+          this.props.setData(this.props.data.concat(q));
+          this.setState({ selectedIndex: [] });
+          this.props.refreshFolders();
+        }
+      }
+    }
+  };
+
+  mouseLeftOnFolder = () => {
+    this.mouseOn = false;
+    this.setState({ onWhere: "" });
+  };
   render() {
     var lst = this.findFolderFromId(this.props.id);
     return lst.map((elem, index) => {
@@ -41,9 +104,14 @@ class RecursiveFolders extends React.Component {
             className="lmenuFolderBtn"
             style={{
               color: this.props.currentDir == elem.Id ? "#fff" : "",
+              border: this.state.onWhere == elem.Id ? "solid 1px #fff" : "",
             }}
+            onClick={() => this.props.setDirectory(elem.Id)}
+            onMouseEnter={() => this.mouseEnteredOnFolder(elem.Id)}
+            onMouseLeave={this.mouseLeftOnFolder}
+            onMouseUp={() => this.mouseReleased(elem.Id)}
           >
-            <span onClick={() => this.props.setDirectory(elem.Id)}>
+            <span>
               <div className="lmenuFolderico">
                 <FcFolder />
               </div>
@@ -68,6 +136,13 @@ class RecursiveFolders extends React.Component {
                 folders={this.props.folders}
                 setDirectory={(id) => this.props.setDirectory(id)}
                 currentDir={this.props.currentDir}
+                selectedIds={this.props.selectedIds}
+                setData={(data) => this.props.setData(data)}
+                data={this.props.data}
+                spliceFromData={(strt, fnsh) =>
+                  this.props.spliceFromData(strt, fnsh)
+                }
+                refreshFolders={() => this.props.refreshFolders()}
               />
             </div>
           ) : (
@@ -84,6 +159,9 @@ export class Leftmenu extends React.Component {
     this.state = { ActiveMenuIndex: 0, fileBtnExtended: false, folders: [] };
   }
 
+  refreshFolders = async () => {
+    this.setState({ folders: await getFolders(localStorage.getItem("key")) });
+  };
   componentDidMount = async () => {
     this.refreshIndex();
     this.setState({ folders: await getFolders(localStorage.getItem("key")) });
@@ -116,6 +194,7 @@ export class Leftmenu extends React.Component {
     this.setState({
       fileBtnExtended: this.state.fileBtnExtended ? false : true,
     });
+    this.setState({ folders: await getFolders(localStorage.getItem("key")) });
   };
 
   render = () => {
@@ -163,6 +242,13 @@ export class Leftmenu extends React.Component {
                 folders={this.state.folders}
                 setDirectory={(id) => this.props.setDirectory(id)}
                 currentDir={this.props.currentDir}
+                selectedIds={this.props.selectedIds}
+                setData={(data) => this.props.setData(data)}
+                data={this.props.data}
+                spliceFromData={(strt, fnsh) =>
+                  this.props.spliceFromData(strt, fnsh)
+                }
+                refreshFolders={() => this.refreshFolders()}
               />
             </div>
             <div

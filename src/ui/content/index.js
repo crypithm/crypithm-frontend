@@ -7,7 +7,6 @@ import "./index.css";
 export class Content extends React.Component {
   render = () => {
     var index = menus.indexOf(this.props.currentPage);
-
     return (
       <>
         <div className="mainContentArea">
@@ -18,6 +17,16 @@ export class Content extends React.Component {
                 dir={this.props.dir}
                 setDirectory={(id) => this.props.setDirectory(id)}
                 dragDetectionArea={this.props.dragDetectionArea}
+                selectedIds={this.props.selectedIds}
+                setSelected={(idl) => this.props.setSelected(idl)}
+                pushToUpData={(id, name, dir) =>
+                  this.props.pushToUpData(id, name, dir)
+                }
+                setData={(data) => this.props.setData(data)}
+                data={this.props.data}
+                spliceFromData={(strt, fnsh) =>
+                  this.props.spliceFromData(strt, fnsh)
+                }
               />,
               <Vault />,
               <Links />,

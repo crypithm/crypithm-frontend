@@ -24,6 +24,9 @@ import { randString } from "../../../lib/crypto/random";
 import { getAllFiledata } from "../../../lib/crypto/decrypt";
 import { Foldercreation } from "./folderCreation";
 import { filesWithoutThumb } from "../../../vars";
+
+// selectedIds: updates on drag event
+// selectedIndex: updates on select
 export class Files extends React.Component {
   constructor(props) {
     super(props);
@@ -33,7 +36,6 @@ export class Files extends React.Component {
     this.fileInputBox = React.createRef();
     this.state = {
       onFolderId: "",
-      selectedIds: [],
       selectedIndex: [],
       moveFileBoxPos: [0, 0],
       onFolder: "",
@@ -43,16 +45,13 @@ export class Files extends React.Component {
       ascending: false,
       Sizeascending: false,
       Aligngrid: false,
-      data: [],
       stalkedDirectory: [],
       uploadsInProgress: {},
     };
   }
 
   pushToQueue = async (id, name, dir) => {
-    this.setState({
-      data: this.state.data.concat({ id: id, name: name, dir: dir }),
-    });
+    this.props.pushToUpData(id, name, dir);
     this.state.uploadsInProgress[id] = [0, 0];
     this.setState({ uploadsInProgress: this.state.uploadsInProgress });
   };
@@ -65,8 +64,6 @@ export class Files extends React.Component {
       "mousedown",
       this.mouseDown
     );
-    var decryptedJsonarray = await getAllFiledata(localStorage.getItem("key"));
-    this.setState({ data: decryptedJsonarray });
   };
 
   FileInfo = () => {
@@ -91,32 +88,32 @@ export class Files extends React.Component {
   alignBySomething = (byindex) => {
     if (byindex == 1) {
       if (this.state.ascending) {
-        this.setState({
-          data: this.state.data.sort((a, b) => {
+        this.props.setData(
+          this.props.data.sort((a, b) => {
             return a.name.localeCompare(b.name);
-          }),
-        });
+          })
+        );
       } else {
-        this.setState({
-          data: this.state.data.sort((a, b) => {
+        this.props.setData(
+          this.props.data.sort((a, b) => {
             return b.name.localeCompare(a.name);
-          }),
-        });
+          })
+        );
       }
       this.setState({ ascending: this.state.ascending ? false : true });
     } else if (byindex == 2) {
       if (this.state.Sizeascending) {
-        this.setState({
-          data: this.state.data.sort((a, b) => {
+        this.props.setData(
+          this.props.data.sort((a, b) => {
             return a.size - b.size;
-          }),
-        });
+          })
+        );
       } else {
-        this.setState({
-          data: this.state.data.sort((a, b) => {
+        this.props.setData(
+          this.props.data.sort((a, b) => {
             return b.size - a.size;
-          }),
-        });
+          })
+        );
       }
       this.setState({ Sizeascending: this.state.Sizeascending ? false : true });
     }
@@ -126,10 +123,10 @@ export class Files extends React.Component {
   };
 
   findElemIndex = (id, returnFullObj) => {
-    for (var i = 0; i < this.state.data.length; i++) {
-      if (this.state.data[i].id == id) {
+    for (var i = 0; i < this.props.data.length; i++) {
+      if (this.props.data[i].id == id) {
         if (returnFullObj) {
-          return this.state.data[i];
+          return this.props.data[i];
         } else {
           return i;
         }
@@ -140,13 +137,13 @@ export class Files extends React.Component {
 
   uploadDone = (id) => {
     let index = this.findElemIndex(id);
-    var elem = this.state.data[index];
+    var elem = this.props.data[index];
     elem.completed = true;
-    this.state.data.splice(index, 1);
+    this.props.data.splice(index, 1);
     this.appendToView(elem);
   };
   appendToView = (elem) => {
-    this.setState({ data: this.state.data.concat(elem) });
+    this.props.setData(this.props.data.concat(elem));
   };
   startUpload = async () => {
     var currentDir = localStorage.getItem("dir");
@@ -240,8 +237,7 @@ export class Files extends React.Component {
   };
 
   changeElemName = () => {
-    var id = this.state.selectedIds;
-    console.log(id);
+    var id = this.props.selectedIndex;
   };
   render = () => {
     return (
@@ -255,8 +251,8 @@ export class Files extends React.Component {
               left: this.state.moveFileBoxPos[0] + 5 + "px",
             }}
           >
-            <p>{this.findElemIndex(this.state.selectedIds[0], true).name}</p>
-            {this.state.selectedIds.length > 1 ? (
+            <p>{this.findElemIndex(this.props.selectedIds[0], true).name}</p>
+            {this.props.selectedIds.length > 1 ? (
               <div
                 className="howManyselected"
                 style={{
@@ -264,7 +260,7 @@ export class Files extends React.Component {
                     this.state.onFolderId == "" ? "#949494" : "#fff",
                 }}
               >
-                {this.state.selectedIds.length}
+                {this.props.selectedIds.length}
               </div>
             ) : (
               <></>
@@ -415,7 +411,7 @@ export class Files extends React.Component {
                 : "filecont-cont"
             }
           >
-            {this.state.data
+            {this.props.data
               .filter((elem) => elem.dir == this.props.dir)
               .map((elem, index) => {
                 if (elem.type == "folder") {
@@ -427,7 +423,7 @@ export class Files extends React.Component {
                           : "fileContainer"
                       }
                       onMouseUp={() =>
-                        this.moveFilesToDir(this.state.selectedIds, elem.id)
+                        this.moveFilesToDir(this.props.selectedIds, elem.id)
                       }
                       onMouseEnter={() => this.folderEnterLeave(true, elem.id)}
                       onMouseLeave={() => this.folderEnterLeave(false, elem.id)}
@@ -561,15 +557,15 @@ export class Files extends React.Component {
   };
 
   MoveToBtmDir = (id) => {
-    if (this.state.selectedIds.length > 0) {
+    if (this.props.selectedIds.length > 0) {
       if (localStorage.getItem("dir") != id) {
-        this.moveFilesToDir(this.state.selectedIds, id);
+        this.moveFilesToDir(this.props.selectedIds, id);
       }
     }
   };
   folderEnterLeave = (enter, target) => {
-    if (this.state.selectedIds.length > 0) {
-      if (this.state.selectedIds.indexOf(target) == -1) {
+    if (this.props.selectedIds.length > 0) {
+      if (this.props.selectedIds.indexOf(target) == -1) {
         if (enter) {
           this.setState({ onFolderId: target });
         } else {
@@ -579,7 +575,8 @@ export class Files extends React.Component {
     }
   };
   moveFilesToDir = async (idList, target) => {
-    if (idList.indexOf(target) == -1) {
+    var idList = this.props.selectedIds;
+    if (idList.indexOf(target) == -1 && idList.length > 1) {
       this.setState({ onFolderId: "" });
       var newForm = new FormData();
       newForm.append("targetObjs", JSON.stringify(idList));
@@ -597,12 +594,12 @@ export class Files extends React.Component {
         var q = [];
         for (var i = 0; i < idList.length; i++) {
           let index = this.findElemIndex(idList[i]);
-          var elem = this.state.data[index];
+          var elem = this.props.data[index];
           elem.dir = target;
-          this.state.data.splice(index, 1);
+          this.props.spliceFromData(index, 1);
           q.push(elem);
         }
-        this.setState({ data: this.state.data.concat(q) });
+        this.props.setData(this.props.data.concat(q));
         this.setState({ selectedIndex: [] });
       }
     }
@@ -618,13 +615,13 @@ export class Files extends React.Component {
   };
 
   mouseDown = (e) => {
+    var tempIdArr = [];
     this.setState({ startPos: [0, 0], currentPos: [0, 0] });
     var targetIndex = e.target.getAttribute("data-index");
     //dragsquare
     if (this.state.selectedIndex.indexOf(parseInt(targetIndex)) != -1) {
       this.state.selectedIndex.map((elem, _) => {
-        this.state.selectedIds.unshift(this.getIdFromIndex(elem));
-        this.setState({ selectedIds: this.state.selectedIds });
+        tempIdArr.unshift(this.getIdFromIndex(elem));
         targetIndex = parseInt(targetIndex);
         //click,shift,ctrl
         if (e.shiftKey) {
@@ -677,10 +674,12 @@ export class Files extends React.Component {
               this.moveElems
             );
           }
-          this.setState({ selectedIds: [] });
+
+          this.props.setSelected([]);
           this.setState({ moveFileBoxPos: [0, 0] });
         });
       });
+      this.props.setSelected(tempIdArr);
     } else {
       this.setState({ startPos: [e.pageX, e.pageY] });
       this.mouseMove(e);

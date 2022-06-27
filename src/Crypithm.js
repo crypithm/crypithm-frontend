@@ -45,7 +45,7 @@ export class Crypithm extends React.Component {
       this.setState({ currentPage: currentPage });
     };
     if (menus.indexOf(this.state.currentPage) == -1) {
-      window.history.pushState({}, "", "files");
+      window.location.href="/files"
     }
     var decryptedJsonarray = await getAllFiledata(localStorage.getItem("key"));
     this.setState({ data: decryptedJsonarray });

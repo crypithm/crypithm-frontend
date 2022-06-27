@@ -11,9 +11,9 @@ import {
   RiArrowUpLine,
   RiArrowDropRightLine,
 } from "react-icons/ri";
-
 import { FcFolder } from "react-icons/fc";
 import { BsCloudPlusFill } from "react-icons/bs";
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -238,12 +238,15 @@ export class Files extends React.Component {
     }
     return fs;
   };
+
+  changeElemName = () => {
+    var id = this.state.selectedIds;
+    console.log(id);
+  };
   render = () => {
     return (
       <>
-        <div
-          onContextMenu={(e) => this.ctxMenuCalled(e)}
-        >
+        <div onContextMenu={(e) => this.ctxMenuCalled(e)}>
           <div
             className="dragger"
             style={{
@@ -368,7 +371,10 @@ export class Files extends React.Component {
                 <div className="FileOptIcons">
                   <RiDeleteBin7Fill />
                 </div>
-                <div className="FileOptIcons">
+                <div
+                  className="FileOptIcons"
+                  onClick={() => this.changeElemName()}
+                >
                   <RiPencilFill />
                 </div>
               </div>
@@ -619,6 +625,47 @@ export class Files extends React.Component {
       this.state.selectedIndex.map((elem, _) => {
         this.state.selectedIds.unshift(this.getIdFromIndex(elem));
         this.setState({ selectedIds: this.state.selectedIds });
+        targetIndex = parseInt(targetIndex);
+        //click,shift,ctrl
+        if (e.shiftKey) {
+          if (this.state.selectedIndex.length == 0) {
+            this.setState({
+              selectedIndex: this.state.selectedIndex.concat([targetIndex]),
+            });
+          } else {
+            var intlist = [];
+            if (this.state.selectedIndex.at(0) - targetIndex < 0) {
+              for (
+                var i = this.state.selectedIndex.at(0);
+                i <= targetIndex;
+                i++
+              ) {
+                intlist.push(i);
+              }
+            } else {
+              for (
+                var i = this.state.selectedIndex.at(0);
+                i >= targetIndex;
+                i--
+              ) {
+                intlist.push(i);
+              }
+            }
+            this.setState({ selectedIndex: intlist });
+          }
+        } else if (e.ctrlKey || e.metaKey) {
+          if (this.state.selectedIndex.indexOf(targetIndex) == -1) {
+            this.setState({
+              selectedIndex: this.state.selectedIndex.concat([targetIndex]),
+            });
+          } else {
+            var index = this.state.selectedIndex.indexOf(targetIndex);
+            if (index > -1) {
+              this.state.selectedIndex.splice(index, 1);
+              this.setState({ selectedIndex: this.state.selectedIndex });
+            }
+          }
+        }
         this.props.dragDetectionArea.current.addEventListener(
           "mousemove",
           this.moveElems
@@ -651,54 +698,6 @@ export class Files extends React.Component {
         }
       });
       this.setState({ selectedIndex: [] });
-      targetIndex = parseInt(targetIndex);
-      //click,shift,ctrl
-      if (e.shiftKey) {
-        if (this.state.selectedIndex.length == 0) {
-          this.setState({
-            selectedIndex: this.state.selectedIndex.concat([targetIndex]),
-          });
-        } else {
-          var intlist = [];
-          if (this.state.selectedIndex.at(0) - targetIndex < 0) {
-            for (
-              var i = this.state.selectedIndex.at(0);
-              i <= targetIndex;
-              i++
-            ) {
-              intlist.push(i);
-            }
-          } else {
-            for (
-              var i = this.state.selectedIndex.at(0);
-              i >= targetIndex;
-              i--
-            ) {
-              intlist.push(i);
-            }
-          }
-          this.setState({ selectedIndex: intlist });
-        }
-      } else if (e.ctrlKey || e.metaKey) {
-        if (this.state.selectedIndex.indexOf(targetIndex) == -1) {
-          this.setState({
-            selectedIndex: this.state.selectedIndex.concat([targetIndex]),
-          });
-        } else {
-          var index = this.state.selectedIndex.indexOf(targetIndex);
-          if (index > -1) {
-            this.state.selectedIndex.splice(index, 1);
-            this.setState({ selectedIndex: this.state.selectedIndex });
-          }
-        }
-      } else if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
-        this.setState({ selectedIndex: [] });
-        if (targetIndex) {
-          this.setState({
-            selectedIndex: [targetIndex],
-          });
-        }
-      }
     }
   };
 

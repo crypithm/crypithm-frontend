@@ -4,7 +4,7 @@ import { Header } from "./ui/header/index.js";
 import { menus } from "./vars";
 import { Content } from "./ui/content/index.js";
 import { Viewer } from "./ui/viewer";
-import { getAllFiledata } from "./lib/crypto/decrypt";
+import { getAllFiledata, getFolders } from "./lib/crypto/decrypt";
 
 export class Crypithm extends React.Component {
   constructor(props) {
@@ -18,8 +18,14 @@ export class Crypithm extends React.Component {
       currentDir: "/ 0",
       selectedIds: [],
       data: [],
+      folders:[]
     };
   }
+
+  refreshFolders = async () => {
+    this.setState({ folders: await getFolders(localStorage.getItem("key")) });
+  };
+  
 
   setDirectory = (id) => {
     this.setState({ currentDir: id });
@@ -48,6 +54,7 @@ export class Crypithm extends React.Component {
       window.location.href="/files"
     }
     var decryptedJsonarray = await getAllFiledata(localStorage.getItem("key"));
+    this.setState({ folders: await getFolders(localStorage.getItem("key")) });
     this.setState({ data: decryptedJsonarray });
   };
 
@@ -62,6 +69,46 @@ export class Crypithm extends React.Component {
   };
   setSelIds = (idList) => {
     this.setState({ selectedIds: idList });
+  };
+  findElemIndex = (id, returnFullObj) => {
+    for (var i = 0; i < this.state.data.length; i++) {
+      if (this.state.data[i].id == id) {
+        if (returnFullObj) {
+          return this.state.data[i];
+        } else {
+          return i;
+        }
+      }
+    }
+    return -1;
+  };
+  moveFilesToDir = async (idList, target) => {
+    if (idList.indexOf(target) == -1 && idList.length > 0) {
+      var newForm = new FormData();
+      newForm.append("targetObjs", JSON.stringify(idList));
+      newForm.append("target", target);
+      newForm.append("action", "move");
+      var resp = await fetch(`https://crypithm.com/api/folder`, {
+        headers: {
+          Authorization: localStorage.getItem("tk"),
+        },
+        method: "POST",
+        body: newForm,
+      });
+      var jsn = await resp.json();
+      await this.refreshFolders()
+      if (jsn.StatusMessage == "Success") {
+        var q = [];
+        for (var i = 0; i < idList.length; i++) {
+          let index = this.findElemIndex(idList[i]);
+          var elem = this.state.data[index];
+          elem.dir = target;
+          this.spliceFromData(index, 1);
+          q.push(elem);
+        }
+        this.setData(this.state.data.concat(q));
+      }
+    }
   };
   render = () => {
     return (
@@ -89,6 +136,8 @@ export class Crypithm extends React.Component {
             setData={(data) => this.setData(data)}
             data={this.state.data}
             spliceFromData={(strt, fnsh) => this.spliceFromData(strt, fnsh)}
+            moveFtoD={(idl, targ)=>this.moveFilesToDir(idl, targ)}
+            folders={this.state.folders}
           />
           <Content
             currentPage={this.state.currentPage}
@@ -102,6 +151,7 @@ export class Crypithm extends React.Component {
             pushToUpData={(id, name, dir) => this.pushToUpData(id, name, dir)}
             setData={(data) => this.setData(data)}
             spliceFromData={(strt, fnsh) => this.spliceFromData(strt, fnsh)}
+            moveFtoD={(idl, targ)=>this.moveFilesToDir(idl, targ)}
           />
         </div>
       </>

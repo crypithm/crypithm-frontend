@@ -30,7 +30,16 @@
   align-items: center;
   justify-content: space-between;
   border-radius: 5px;
+  animation: loadedFbtn 0.4s ease-in;
 
+}
+@keyframes loadedFbtn {
+  0%{
+    opacity:0;
+  }
+  100%{
+    opacity:1;
+  }
 }
 .lmenuFolderBtn span{
   display: flex;

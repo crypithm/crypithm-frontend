@@ -557,11 +557,10 @@ export class Files extends React.Component {
   };
 
   MoveToBtmDir = (id) => {
-    if (this.props.selectedIds.length > 0) {
       if (localStorage.getItem("dir") != id) {
+        this.setState({ onFolderId: id });
         this.moveFilesToDir(this.props.selectedIds, id);
       }
-    }
   };
   folderEnterLeave = (enter, target) => {
     if (this.props.selectedIds.length > 0) {
@@ -575,33 +574,10 @@ export class Files extends React.Component {
     }
   };
   moveFilesToDir = async (idList, target) => {
-    var idList = this.props.selectedIds;
-    if (idList.indexOf(target) == -1 && idList.length > 1) {
-      this.setState({ onFolderId: "" });
-      var newForm = new FormData();
-      newForm.append("targetObjs", JSON.stringify(idList));
-      newForm.append("target", target);
-      newForm.append("action", "move");
-      var resp = await fetch(`https://crypithm.com/api/folder`, {
-        headers: {
-          Authorization: localStorage.getItem("tk"),
-        },
-        method: "POST",
-        body: newForm,
-      });
-      var jsn = await resp.json();
-      if (jsn.StatusMessage == "Success") {
-        var q = [];
-        for (var i = 0; i < idList.length; i++) {
-          let index = this.findElemIndex(idList[i]);
-          var elem = this.props.data[index];
-          elem.dir = target;
-          this.props.spliceFromData(index, 1);
-          q.push(elem);
-        }
-        this.props.setData(this.props.data.concat(q));
-        this.setState({ selectedIndex: [] });
-      }
+    if(this.state.onFolderId!=""){
+      await this.props.moveFtoD(idList,target)
+      this.setState({ selectedIndex: [] });
+      this.setState({onFolderId:""})
     }
   };
 

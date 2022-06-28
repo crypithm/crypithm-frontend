@@ -7,7 +7,6 @@ import "./index.css";
 export class Content extends React.Component {
   render = () => {
     var index = menus.indexOf(this.props.currentPage);
-    console.log(index);
     var files = (
       <Files
         viewFile={(id, name) => this.props.viewFile(id, name)}
@@ -20,6 +19,7 @@ export class Content extends React.Component {
         setData={(data) => this.props.setData(data)}
         data={this.props.data}
         spliceFromData={(strt, fnsh) => this.props.spliceFromData(strt, fnsh)}
+        moveFtoD={(idl, targ)=>this.props.moveFtoD(idl, targ)}
       />
     );
     return (

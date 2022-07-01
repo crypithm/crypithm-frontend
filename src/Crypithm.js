@@ -18,24 +18,29 @@ export class Crypithm extends React.Component {
       currentDir: "/ 0",
       selectedIds: [],
       data: [],
-      folders:[]
+      folders: [],
     };
   }
 
   refreshFolders = async () => {
     this.setState({ folders: await getFolders(localStorage.getItem("key")) });
   };
-  
 
   setDirectory = (id) => {
+    localStorage.setItem("dir", id);
     this.setState({ currentDir: id });
   };
   pushedToState = () => {
     this.setState({ currentPage: window.location.pathname.split("/")[1] });
   };
-  pushToUpData = (id, name, dir) => {
+  pushToUpData = (id, name, dir, size) => {
     this.setState({
-      data: this.state.data.concat({ id: id, name: name, dir: dir }),
+      data: this.state.data.concat({
+        id: id,
+        name: name,
+        dir: dir,
+        size: size,
+      }),
     });
   };
   setData = (data) => {
@@ -51,7 +56,7 @@ export class Crypithm extends React.Component {
       this.setState({ currentPage: currentPage });
     };
     if (menus.indexOf(this.state.currentPage) == -1) {
-      window.location.href="/files"
+      window.location.href = "/files";
     }
     var decryptedJsonarray = await getAllFiledata(localStorage.getItem("key"));
     this.setState({ folders: await getFolders(localStorage.getItem("key")) });
@@ -96,7 +101,7 @@ export class Crypithm extends React.Component {
         body: newForm,
       });
       var jsn = await resp.json();
-      await this.refreshFolders()
+      await this.refreshFolders();
       if (jsn.StatusMessage == "Success") {
         var q = [];
         for (var i = 0; i < idList.length; i++) {
@@ -136,7 +141,7 @@ export class Crypithm extends React.Component {
             setData={(data) => this.setData(data)}
             data={this.state.data}
             spliceFromData={(strt, fnsh) => this.spliceFromData(strt, fnsh)}
-            moveFtoD={(idl, targ)=>this.moveFilesToDir(idl, targ)}
+            moveFtoD={(idl, targ) => this.moveFilesToDir(idl, targ)}
             folders={this.state.folders}
           />
           <Content
@@ -148,10 +153,12 @@ export class Crypithm extends React.Component {
             selectedIds={this.state.selectedIds}
             setSelected={(idl) => this.setSelIds(idl)}
             data={this.state.data}
-            pushToUpData={(id, name, dir) => this.pushToUpData(id, name, dir)}
+            pushToUpData={(id, name, dir, size) =>
+              this.pushToUpData(id, name, dir, size)
+            }
             setData={(data) => this.setData(data)}
             spliceFromData={(strt, fnsh) => this.spliceFromData(strt, fnsh)}
-            moveFtoD={(idl, targ)=>this.moveFilesToDir(idl, targ)}
+            moveFtoD={(idl, targ) => this.moveFilesToDir(idl, targ)}
           />
         </div>
       </>

@@ -49,7 +49,7 @@
 .lmenuFolderPre{
   display: flex;
   flex-direction: column;
-  padding: 0 0 0 10px;
+  margin-left: 20px;
 }
 .lmenuFolderico{
   display: flex;

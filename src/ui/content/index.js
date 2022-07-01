@@ -15,7 +15,7 @@ export class Content extends React.Component {
         dragDetectionArea={this.props.dragDetectionArea}
         selectedIds={this.props.selectedIds}
         setSelected={(idl) => this.props.setSelected(idl)}
-        pushToUpData={(id, name, dir) => this.props.pushToUpData(id, name, dir)}
+        pushToUpData={(id, name, dir, size) => this.props.pushToUpData(id, name, dir, size)}
         setData={(data) => this.props.setData(data)}
         data={this.props.data}
         spliceFromData={(strt, fnsh) => this.props.spliceFromData(strt, fnsh)}

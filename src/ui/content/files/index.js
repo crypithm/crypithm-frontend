@@ -50,8 +50,8 @@ export class Files extends React.Component {
     };
   }
 
-  pushToQueue = async (id, name, dir) => {
-    this.props.pushToUpData(id, name, dir);
+  pushToQueue = async (id, name, dir, size) => {
+    this.props.pushToUpData(id, name, dir, size);
     this.state.uploadsInProgress[id] = [0, 0];
     this.setState({ uploadsInProgress: this.state.uploadsInProgress });
   };
@@ -135,6 +135,7 @@ export class Files extends React.Component {
     return -1;
   };
 
+
   uploadDone = (id) => {
     let index = this.findElemIndex(id);
     var elem = this.props.data[index];
@@ -142,6 +143,8 @@ export class Files extends React.Component {
     this.props.data.splice(index, 1);
     this.appendToView(elem);
   };
+
+
   appendToView = (elem) => {
     this.props.setData(this.props.data.concat(elem));
   };
@@ -154,7 +157,7 @@ export class Files extends React.Component {
     for (var b = 0; b < files.length; b++) {
       var currentId = randString(11);
       this.changedUploadProgress(0, 0, currentId);
-      await this.pushToQueue(currentId, files[b].name, currentDir);
+      await this.pushToQueue(currentId, files[b].name, currentDir, files[b].size);
       idList[b] = currentId;
     }
     var loopFiles = async (leftover) => {
@@ -216,7 +219,6 @@ export class Files extends React.Component {
     this.setState({ selectedIndex: [] });
     this.setState({ stalkedDirectory: [] });
     this.props.setDirectory(id);
-    localStorage.setItem("dir", id);
   };
 
   addPrefixToSize = (length) => {

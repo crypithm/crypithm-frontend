@@ -10,6 +10,7 @@ import {
   RiArrowDownSFill,
   RiArrowUpLine,
   RiArrowDropRightLine,
+  RiEmotionSadLine
 } from "react-icons/ri";
 import { FcFolder } from "react-icons/fc";
 import { BsCloudPlusFill } from "react-icons/bs";
@@ -37,7 +38,9 @@ class Nofiles extends React.Component {
           </>
         ) : (
           <>
-            <b>No Files Here</b>
+          <div className="emojiArea"><RiEmotionSadLine /></div>
+            <h3>Nothing Here</h3>
+            <b>You can upload using the -New- button above</b>
           </>
         )}
       </div>

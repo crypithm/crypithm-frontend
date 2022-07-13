@@ -232,11 +232,25 @@
     width: 100%;
     height: calc(100vh - 240px);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     color:rgba(255,255,255,.8);
 }
 
+.noFiles h3 {
+    margin-bottom: 5px;
+}
+
+.noFiles p {
+    margin: 0;
+}
+.noFiles b {
+    font-size: 10pt;
+}
+.noFiles .emojiArea{
+    font-size: 50pt;
+}
 .dropDownShow {
     top: 142px;
     opacity: 1;

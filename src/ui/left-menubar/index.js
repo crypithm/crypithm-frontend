@@ -26,7 +26,7 @@ class RecursiveFolders extends React.Component {
   findFolderFromId = (id) => {
     var foundList = [];
     for (var i = 0; i < this.props.folders.length; i++) {
-      if (this.props.folders[i].Parent == id) {
+      if (this.props.folders[i].dir == id) {
         foundList.push(this.props.folders[i]);
       }
     }
@@ -59,6 +59,7 @@ class RecursiveFolders extends React.Component {
   mouseReleased = async (onId) => {
     if (this.mouseOn && this.props.selectedIds.length > 0) {
       await this.props.moveFtoD(this.props.selectedIds,onId)
+      this.setState({ onWhere: "" });
     }
   };
 
@@ -74,19 +75,19 @@ class RecursiveFolders extends React.Component {
           <div
             className="lmenuFolderBtn"
             style={{
-              color: this.props.currentDir == elem.Id ? "#fff" : "",
-              border: this.state.onWhere == elem.Id ? "solid 1px #fff" : "",
+              color: this.props.currentDir == elem.id ? "#fff" : "",
+              border: this.state.onWhere == elem.id ? "solid 1px #fff" : "",
             }}
-            onClick={() => this.props.setDirectory(elem.Id)}
-            onMouseEnter={() => this.mouseEnteredOnFolder(elem.Id)}
+            onClick={() => this.props.setDirectory(elem.id)}
+            onMouseEnter={() => this.mouseEnteredOnFolder(elem.id)}
             onMouseLeave={this.mouseLeftOnFolder}
-            onMouseUp={() => this.mouseReleased(elem.Id)}
+            onMouseUp={() => this.mouseReleased(elem.id)}
           >
             <span>
               <div className="lmenuFolderico">
                 <FcFolder />
               </div>
-              <p>{elem.Name}</p>
+              <p>{elem.name}</p>
             </span>
             <div
               className="da-btnico"
@@ -103,7 +104,7 @@ class RecursiveFolders extends React.Component {
           {this.state.dropped[index] ? (
             <div className="childDropDown">
               <RecursiveFolders
-                id={elem.Id}
+                id={elem.id}
                 folders={this.props.folders}
                 setDirectory={(id) => this.props.setDirectory(id)}
                 currentDir={this.props.currentDir}

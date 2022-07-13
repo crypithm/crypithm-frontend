@@ -5,7 +5,6 @@ import { RiArrowDropLeftLine } from "react-icons/ri";
 import { getFileBlob } from "../../lib/crypto/decrypt";
 
 
-
 class ViewBox extends React.Component {
   constructor(props) {
     super(props);
@@ -21,7 +20,7 @@ class ViewBox extends React.Component {
   };
 
   render() {
-    switch (this.props.type) {
+    switch (this.props.fullMime.split("/")[0]) {
       case "image":
         return (
           <>
@@ -32,6 +31,13 @@ class ViewBox extends React.Component {
             />
           </>
         );
+      case "application":
+        console.log(this.props.fullMime)
+        if(this.props.fullMime.split("/")[1]=="pdf"){
+          return(
+            <></>
+          )
+        }
     }
   }
 }
@@ -39,19 +45,16 @@ class ViewBox extends React.Component {
 export class Viewer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { sourceUrl: "", type: "", header: true };
+    this.state = { sourceUrl: "", type: "", header: true, mime:"" };
   }
   componentDidMount = async () => {
     var [blobSource, mime] = await getFileBlob(this.props.id, this.props.name);
-    var re = /[a-zA-Z0-9_]*(\/)/;
-    var type = re.exec(mime)[0];
-    type = type.split("/")[0];
-    console.log(type)
+
     var tf = true;
-    if (viewableType.indexOf(type) == -1) {
+    if (viewableType.indexOf(mime) == -1) {
       tf = false;
     }
-    this.setState({ sourceUrl: blobSource, type: type, isViewable: tf });
+    this.setState({ sourceUrl: blobSource, isViewable: tf, mime:mime });
   };
 
   download() {
@@ -79,6 +82,7 @@ export class Viewer extends React.Component {
                     <ViewBox
                       type={this.state.type}
                       src={this.state.sourceUrl}
+                      fullMime={this.state.mime}
                     />
                   </>
                 ) : (

@@ -3,7 +3,7 @@ import { DiJavascript1, DiPhp, DiJava } from "react-icons/di";
 import { AiFillFileText, AiFillFileImage, AiFillFilePpt,AiFillPlayCircle } from "react-icons/ai";
 
 export const menus = ["files", "vault", "links"];
-export const viewableType = ["image"];
+export const viewableType = ["image/png","image/jpeg","application/pdf"];
 export const filesWithoutThumb = {
   exe: <IoIosSettings />,
   iso: <IoIosSettings />,

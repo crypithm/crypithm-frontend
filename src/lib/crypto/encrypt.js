@@ -183,8 +183,8 @@ export async function encryptAndUploadFile(
               prevloaded = e.loaded;
             }, 1000);
             nowloaded = e.loaded;
-            console.log(e.loaded , prevVal)
-             updateStatus(
+            console.log(e.loaded, prevVal);
+            updateStatus(
               ((e.loaded - prevVal) / file.size) * 100,
               Math.round(((nowloaded - prevloaded) / megabyte) * 10) / 10,
               ongoingFileId

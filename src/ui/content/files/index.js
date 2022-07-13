@@ -21,12 +21,29 @@ import { FileInfo } from "./fileInfo/index.js";
 import { ContextMenu } from "./contextMenu/index.js";
 import { encryptAndUploadFile } from "../../../lib/crypto/encrypt.js";
 import { randString } from "../../../lib/crypto/random";
-import { getAllFiledata } from "../../../lib/crypto/decrypt";
 import { Foldercreation } from "./folderCreation";
 import { filesWithoutThumb } from "../../../vars";
 
 // selectedIds: updates on drag event
 // selectedIndex: updates on select
+
+class Nofiles extends React.Component {
+  render() {
+    return (
+      <div className="noFiles">
+        {this.props.loader ? (
+          <>
+            <b>Loading</b>
+          </>
+        ) : (
+          <>
+            <b>No Files Here</b>
+          </>
+        )}
+      </div>
+    );
+  }
+}
 export class Files extends React.Component {
   constructor(props) {
     super(props);
@@ -64,6 +81,20 @@ export class Files extends React.Component {
       "mousedown",
       this.mouseDown
     );
+    var keyPressed = false;
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "MetaLeft" || e.code === "ControlLeft") {
+        keyPressed = true;
+      }
+      if (e.code === "KeyZ" && keyPressed === true) {
+        console.log("ctrl-z");
+      }
+    });
+    window.addEventListener("keyup", (e) => {
+      if (e.code === "MetaLeft" || e.code === "ControlLeft") {
+        keyPressed = false;
+      }
+    });
   };
 
   FileInfo = () => {
@@ -135,7 +166,6 @@ export class Files extends React.Component {
     return -1;
   };
 
-
   uploadDone = (id) => {
     let index = this.findElemIndex(id);
     var elem = this.props.data[index];
@@ -143,7 +173,6 @@ export class Files extends React.Component {
     this.props.data.splice(index, 1);
     this.appendToView(elem);
   };
-
 
   appendToView = (elem) => {
     this.props.setData(this.props.data.concat(elem));
@@ -157,7 +186,12 @@ export class Files extends React.Component {
     for (var b = 0; b < files.length; b++) {
       var currentId = randString(11);
       this.changedUploadProgress(0, 0, currentId);
-      await this.pushToQueue(currentId, files[b].name, currentDir, files[b].size);
+      await this.pushToQueue(
+        currentId,
+        files[b].name,
+        currentDir,
+        files[b].size
+      );
       idList[b] = currentId;
     }
     var loopFiles = async (leftover) => {
@@ -413,122 +447,143 @@ export class Files extends React.Component {
                 : "filecont-cont"
             }
           >
-            {this.props.data
-              .filter((elem) => elem.dir == this.props.dir)
-              .map((elem, index) => {
-                if (elem.type == "folder") {
-                  return (
-                    <div
-                      className={
-                        this.state.Aligngrid
-                          ? "fileContainer grid"
-                          : "fileContainer"
-                      }
-                      onMouseUp={() =>
-                        this.moveFilesToDir(this.props.selectedIds, elem.id)
-                      }
-                      onMouseEnter={() => this.folderEnterLeave(true, elem.id)}
-                      onMouseLeave={() => this.folderEnterLeave(false, elem.id)}
-                      style={{
-                        backgroundColor:
-                          this.state.selectedIndex.indexOf(index + 1) != -1
-                            ? "rgba(255,255,255,0.1)"
-                            : "",
-                        border:
-                          this.state.onFolderId == elem.id
-                            ? "solid 1px rgba(255,255,255,0.6)"
-                            : "",
-                      }}
-                      objectid={elem.id}
-                      key={elem.id}
-                      data-index={index + 1}
-                      ref={(ref) => {
-                        this.fileItemsRef[index] = ref;
-                        return true;
-                      }}
-                      onDoubleClick={() => this.moveToDir(elem.id)}
-                    >
+            {this.props.data.length == 0 ? (
+              this.props.isLoading ? (
+                <>
+                  <Nofiles loader={true} />
+                </>
+              ) : (
+                <>
+                  <Nofiles loader={false} />
+                </>
+              )
+            ) : this.props.data.filter((elem) => elem.dir == this.props.dir)
+                .length == 0 ? (
+              <Nofiles loader={false} />
+            ) : (
+              this.props.data
+                .filter((elem) => elem.dir == this.props.dir)
+                .map((elem, index) => {
+                  if (elem.type == "folder") {
+                    return (
                       <div
-                        className="fileThumbnail"
+                        className={
+                          this.state.Aligngrid
+                            ? "fileContainer grid"
+                            : "fileContainer"
+                        }
+                        onMouseUp={() =>
+                          this.moveFilesToDir(this.props.selectedIds, elem.id)
+                        }
+                        onMouseEnter={() =>
+                          this.folderEnterLeave(true, elem.id)
+                        }
+                        onMouseLeave={() =>
+                          this.folderEnterLeave(false, elem.id)
+                        }
                         style={{
-                          fontSize: this.state.Aligngrid ? "40pt" : "20pt",
+                          backgroundColor:
+                            this.state.selectedIndex.indexOf(index + 1) != -1
+                              ? "rgba(255,255,255,0.1)"
+                              : "",
+                          border:
+                            this.state.onFolderId == elem.id
+                              ? "solid 1px rgba(255,255,255,0.6)"
+                              : "",
+                        }}
+                        objectid={elem.id}
+                        key={elem.id}
+                        data-index={index + 1}
+                        ref={(ref) => {
+                          this.fileItemsRef[index] = ref;
+                          return true;
+                        }}
+                        onDoubleClick={() => this.moveToDir(elem.id)}
+                      >
+                        <div
+                          className="fileThumbnail"
+                          style={{
+                            fontSize: this.state.Aligngrid ? "40pt" : "20pt",
+                          }}
+                        >
+                          <FcFolder />
+                        </div>
+                        <p
+                          className="elemName"
+                          onMouseDown={() => this.moveToDir(elem.id)}
+                        >
+                          {elem.name}
+                        </p>
+                        <p className="elemSize">-</p>
+                      </div>
+                    );
+                  } else {
+                    var fileFormat = /\.[^.\\/:*?"<>|\r\n]+$/
+                      .exec(elem.name)[0]
+                      .split(".")[1];
+                    return (
+                      <div
+                        onDoubleClick={() =>
+                          this.props.viewFile(elem.id, elem.name)
+                        }
+                        className={
+                          this.state.Aligngrid
+                            ? "fileContainer grid"
+                            : "fileContainer"
+                        }
+                        style={{
+                          backgroundColor:
+                            this.state.selectedIndex.indexOf(index + 1) != -1
+                              ? "rgba(255,255,255,0.1)"
+                              : "",
+                        }}
+                        objectid={elem.id}
+                        key={elem.id}
+                        data-index={index + 1}
+                        ref={(ref) => {
+                          this.fileItemsRef[index] = ref;
+                          return true;
                         }}
                       >
-                        <FcFolder />
+                        {elem.completed ? (
+                          <>
+                            <div
+                              className="fileThumbnail"
+                              style={{
+                                fontSize: this.state.Aligngrid
+                                  ? "30pt"
+                                  : "15pt",
+                                backgroundColor: "rgba(255,255,255,0.1)",
+                              }}
+                            >
+                              {filesWithoutThumb[fileFormat] ? (
+                                filesWithoutThumb[fileFormat]
+                              ) : (
+                                <img src={elem.thumb} width={20} />
+                              )}
+                            </div>
+                            <p className="elemName">{elem.name}</p>
+                            <p className="elemSize">
+                              {this.addPrefixToSize(elem.size)}
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <progress
+                              className="uploadingProgress"
+                              max="100"
+                              value={this.state.uploadsInProgress[elem.id][0]}
+                            ></progress>
+                            <p className="fileName">{`${elem.name}`}</p>
+                            {`${this.state.uploadsInProgress[elem.id][1]}MB/s`}
+                            <RiArrowUpLine />
+                          </>
+                        )}
                       </div>
-                      <p
-                        className="elemName"
-                        onMouseDown={() => this.moveToDir(elem.id)}
-                      >
-                        {elem.name}
-                      </p>
-                      <p className="elemSize">-</p>
-                    </div>
-                  );
-                } else {
-                  var fileFormat = /\.[^.\\/:*?"<>|\r\n]+$/
-                    .exec(elem.name)[0]
-                    .split(".")[1];
-                  return (
-                    <div
-                      onDoubleClick={() =>
-                        this.props.viewFile(elem.id, elem.name)
-                      }
-                      className={
-                        this.state.Aligngrid
-                          ? "fileContainer grid"
-                          : "fileContainer"
-                      }
-                      style={{
-                        backgroundColor:
-                          this.state.selectedIndex.indexOf(index + 1) != -1
-                            ? "rgba(255,255,255,0.1)"
-                            : "",
-                      }}
-                      objectid={elem.id}
-                      key={elem.id}
-                      data-index={index + 1}
-                      ref={(ref) => {
-                        this.fileItemsRef[index] = ref;
-                        return true;
-                      }}
-                    >
-                      {elem.completed ? (
-                        <>
-                          <div
-                            className="fileThumbnail"
-                            style={{
-                              fontSize: this.state.Aligngrid ? "30pt" : "15pt",
-                              backgroundColor: "rgba(255,255,255,0.1)",
-                            }}
-                          >
-                            {filesWithoutThumb[fileFormat] ? (
-                              filesWithoutThumb[fileFormat]
-                            ) : (
-                              <img src={elem.thumb} width={20} />
-                            )}
-                          </div>
-                          <p className="elemName">{elem.name}</p>
-                          <p className="elemSize">
-                            {this.addPrefixToSize(elem.size)}
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <progress
-                            className="uploadingProgress"
-                            max="100"
-                            value={this.state.uploadsInProgress[elem.id][0]}
-                          ></progress>
-                          <p className="fileName">{`${elem.name}`}</p>
-                          {`${this.state.uploadsInProgress[elem.id][1]}MB/s`}
-                          <RiArrowUpLine />
-                        </>
-                      )}
-                    </div>
-                  );
-                }
-              })}
+                    );
+                  }
+                })
+            )}
           </div>
           <div className="directory">
             <b
@@ -559,10 +614,10 @@ export class Files extends React.Component {
   };
 
   MoveToBtmDir = (id) => {
-      if (localStorage.getItem("dir") != id) {
-        this.setState({ onFolderId: id });
-        this.moveFilesToDir(this.props.selectedIds, id);
-      }
+    if (localStorage.getItem("dir") != id) {
+      this.setState({ onFolderId: id });
+      this.moveFilesToDir(this.props.selectedIds, id);
+    }
   };
   folderEnterLeave = (enter, target) => {
     if (this.props.selectedIds.length > 0) {
@@ -576,10 +631,10 @@ export class Files extends React.Component {
     }
   };
   moveFilesToDir = async (idList, target) => {
-    if(this.state.onFolderId!=""){
-      await this.props.moveFtoD(idList,target)
+    if (this.state.onFolderId != "") {
+      await this.props.moveFtoD(idList, target);
       this.setState({ selectedIndex: [] });
-      this.setState({onFolderId:""})
+      this.setState({ onFolderId: "" });
     }
   };
 

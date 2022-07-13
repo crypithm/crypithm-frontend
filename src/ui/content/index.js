@@ -20,6 +20,7 @@ export class Content extends React.Component {
         data={this.props.data}
         spliceFromData={(strt, fnsh) => this.props.spliceFromData(strt, fnsh)}
         moveFtoD={(idl, targ)=>this.props.moveFtoD(idl, targ)}
+        isLoading={this.props.isLoading}
       />
     );
     return (

@@ -19,6 +19,7 @@ export class Crypithm extends React.Component {
       selectedIds: [],
       data: [],
       folders: [],
+      isDataLoading:true
     };
   }
 
@@ -58,8 +59,9 @@ export class Crypithm extends React.Component {
     if (menus.indexOf(this.state.currentPage) == -1) {
       window.location.href = "/files";
     }
-    var decryptedJsonarray = await getAllFiledata(localStorage.getItem("key"));
-    this.setState({ folders: await getFolders(localStorage.getItem("key")) });
+    var decryptedJsonarray = await getAllFiledata(localStorage.getItem("key"))
+    this.setState({isDataLoading:false})
+    this.setState({folders: decryptedJsonarray.filter(val=>val.type=="folder")})
     this.setState({ data: decryptedJsonarray });
   };
 
@@ -143,6 +145,7 @@ export class Crypithm extends React.Component {
             spliceFromData={(strt, fnsh) => this.spliceFromData(strt, fnsh)}
             moveFtoD={(idl, targ) => this.moveFilesToDir(idl, targ)}
             folders={this.state.folders}
+            isLoading={this.state.isDataLoading}
           />
           <Content
             currentPage={this.state.currentPage}
@@ -159,6 +162,7 @@ export class Crypithm extends React.Component {
             setData={(data) => this.setData(data)}
             spliceFromData={(strt, fnsh) => this.spliceFromData(strt, fnsh)}
             moveFtoD={(idl, targ) => this.moveFilesToDir(idl, targ)}
+            isLoading={this.state.isDataLoading}
           />
         </div>
       </>

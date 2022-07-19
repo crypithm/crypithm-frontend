@@ -21,6 +21,7 @@ export class Content extends React.Component {
         spliceFromData={(strt, fnsh) => this.props.spliceFromData(strt, fnsh)}
         moveFtoD={(idl, targ)=>this.props.moveFtoD(idl, targ)}
         isLoading={this.props.isLoading}
+        modifyData={(a,b,c)=>this.props.modifyData(a,b,c)}
       />
     );
     return (

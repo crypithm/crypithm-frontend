@@ -10,7 +10,8 @@ import {
   RiArrowDownSFill,
   RiArrowUpLine,
   RiArrowDropRightLine,
-  RiEmotionSadLine
+  RiEmotionSadLine,
+  RiShareFill,
 } from "react-icons/ri";
 import { FcFolder } from "react-icons/fc";
 import { BsCloudPlusFill } from "react-icons/bs";
@@ -23,7 +24,7 @@ import { ContextMenu } from "./contextMenu/index.js";
 import { encryptAndUploadFile } from "../../../lib/crypto/encrypt.js";
 import { randString } from "../../../lib/crypto/random";
 import { Foldercreation } from "./folderCreation";
-import { filesWithoutThumb } from "../../../vars";
+import { filesWithoutThumb, unindexed } from "../../../vars";
 
 // selectedIds: updates on drag event
 // selectedIndex: updates on select
@@ -38,7 +39,9 @@ class Nofiles extends React.Component {
           </>
         ) : (
           <>
-          <div className="emojiArea"><RiEmotionSadLine /></div>
+            <div className="emojiArea">
+              <RiEmotionSadLine />
+            </div>
             <h3>Nothing Here</h3>
             <b>You can upload using the -New- button above</b>
           </>
@@ -54,6 +57,8 @@ export class Files extends React.Component {
     this.fileItemsRef = [];
     this.dragBoxRef = React.createRef();
     this.fileInputBox = React.createRef();
+    this.nameChangeInput = React.createRef();
+    this.nameEditingFile = "";
     this.state = {
       onFolderId: "",
       selectedIndex: [],
@@ -276,7 +281,22 @@ export class Files extends React.Component {
   };
 
   changeElemName = () => {
-    var id = this.props.selectedIndex;
+    var selectedId = this.getIdFromIndex(this.state.selectedIndex);
+    var indexFromFull = this.findElemIndex(selectedId);
+    this.props.modifyData(indexFromFull, "isNameEditing", true);
+    this.nameEditingFile = indexFromFull;
+  };
+  applyNameChangeIfKey = (keyCode, id) => {
+    if (keyCode == "Enter") {
+      var willChangeTo = this.nameChangeInput.current.value;
+      var indexFromFull = this.findElemIndex(id);
+      this.props.modifyData(indexFromFull, "isNameEditing", false);
+      this.props.modifyData(indexFromFull, "name", willChangeTo);
+    } else if (keyCode == "Escape") {
+      var indexFromFull = this.findElemIndex(id);
+      this.props.modifyData(indexFromFull, "isNameEditing", false);
+    }
+    this.nameEditingFile = "";
   };
   render = () => {
     return (
@@ -403,14 +423,21 @@ export class Files extends React.Component {
                 >
                   <RiInformationFill />
                 </div>
-                <div className="FileOptIcons">
-                  <RiDeleteBin7Fill />
-                </div>
                 <div
-                  className="FileOptIcons"
+                  className={
+                    this.state.selectedIndex.length !== 1
+                      ? "FileOptIcons hidden"
+                      : "FileOptIcons"
+                  }
                   onClick={() => this.changeElemName()}
                 >
                   <RiPencilFill />
+                </div>
+                <div className="FileOptIcons">
+                  <RiShareFill />
+                </div>
+                <div className="FileOptIcons">
+                  <RiDeleteBin7Fill />
                 </div>
               </div>
             </div>
@@ -521,9 +548,15 @@ export class Files extends React.Component {
                       </div>
                     );
                   } else {
-                    var fileFormat = /\.[^.\\/:*?"<>|\r\n]+$/
-                      .exec(elem.name)[0]
-                      .split(".")[1];
+                    var fileFormat;
+                    try {
+                      fileFormat = /\.[^.\\/:*?"<>|\r\n]+$/
+                        .exec(elem.name)[0]
+                        .split(".")[1];
+                    } catch {
+                      fileFormat = "";
+                    }
+
                     return (
                       <div
                         onDoubleClick={() =>
@@ -559,13 +592,29 @@ export class Files extends React.Component {
                                 backgroundColor: "rgba(255,255,255,0.1)",
                               }}
                             >
-                              {filesWithoutThumb[fileFormat] ? (
-                                filesWithoutThumb[fileFormat]
-                              ) : (
-                                <img src={elem.thumb} width={20} />
-                              )}
+                              {filesWithoutThumb[fileFormat]
+                                ? filesWithoutThumb[fileFormat]
+                                : unindexed}
                             </div>
-                            <p className="elemName">{elem.name}</p>
+                            {elem.isNameEditing ? (
+                              <>
+                                <input
+                                  type="text"
+                                  autoFocus
+                                  defaultValue={elem.name}
+                                  onKeyDown={(e) =>
+                                    this.applyNameChangeIfKey(e.code, elem.id)
+                                  }
+                                  ref={this.nameChangeInput}
+                                  className="nameChangeInput"
+                                  id="inputBoxId"
+                                ></input>
+                              </>
+                            ) : (
+                              <>
+                                <p className="elemName">{elem.name}</p>
+                              </>
+                            )}
                             <p className="elemSize">
                               {this.addPrefixToSize(elem.size)}
                             </p>
@@ -654,6 +703,10 @@ export class Files extends React.Component {
     var tempIdArr = [];
     this.setState({ startPos: [0, 0], currentPos: [0, 0] });
     var targetIndex = e.target.getAttribute("data-index");
+    if (this.nameEditingFile != "" && e.target.id != "inputBoxId") {
+      this.props.modifyData(this.nameEditingFile, "isNameEditing", false);
+      this.nameEditingFile = "";
+    }
     //dragsquare
     if (this.state.selectedIndex.indexOf(parseInt(targetIndex)) != -1) {
       this.state.selectedIndex.map((elem, _) => {

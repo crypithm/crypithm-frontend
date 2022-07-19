@@ -47,6 +47,10 @@ export class Crypithm extends React.Component {
   setData = (data) => {
     this.setState({ data: data });
   };
+  modifyData=(index,attr,value)=>{
+    this.state.data[index][attr]=value
+    this.setState({ data: this.state.data });
+  }
   spliceFromData = (strt, fnsh) => {
     this.state.data.splice(strt, fnsh);
   };
@@ -163,6 +167,7 @@ export class Crypithm extends React.Component {
             spliceFromData={(strt, fnsh) => this.spliceFromData(strt, fnsh)}
             moveFtoD={(idl, targ) => this.moveFilesToDir(idl, targ)}
             isLoading={this.state.isDataLoading}
+            modifyData={(a,b,c)=>this.modifyData(a,b,c)}
           />
         </div>
       </>

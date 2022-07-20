@@ -231,6 +231,7 @@ export class Files extends React.Component {
       <Foldercreation
         root={root}
         appendToView={(elem) => this.appendToView(elem)}
+        refreshFolder={()=>this.props.refreshFolder()}
       />
     );
   };
@@ -241,16 +242,21 @@ export class Files extends React.Component {
         var tempArr = [];
         const v = (id) => {
           var targetObj = this.findElemIndex(id, true);
-          tempArr.unshift({
-            id: targetObj.id,
-            name: targetObj.name,
-          });
-          if (targetObj.dir != "/ 0") {
-            v(targetObj.dir);
-          } else {
-            this.setState({
-              stalkedDirectory: tempArr,
+          if(targetObj==-1){
+            console.error("unidentifiable target index")
+          }else{
+            console.log(targetObj)
+            tempArr.unshift({
+              id: targetObj.id,
+              name: targetObj.name,
             });
+            if (targetObj.dir != "/ 0") {
+              v(targetObj.dir);
+            } else {
+              this.setState({
+                stalkedDirectory: tempArr,
+              });
+            }
           }
         };
         v(this.props.dir);
@@ -538,12 +544,26 @@ export class Files extends React.Component {
                         >
                           <FcFolder />
                         </div>
-                        <p
-                          className="elemName"
-                          onMouseDown={() => this.moveToDir(elem.id)}
-                        >
-                          {elem.name}
-                        </p>
+                        {elem.isNameEditing ? (
+                              <>
+                                <input
+                                  type="text"
+                                  autoFocus
+                                  defaultValue={elem.name}
+                                  onKeyDown={(e) =>
+                                    this.applyNameChangeIfKey(e.code, elem.id)
+                                  }
+                                  ref={this.nameChangeInput}
+                                  className="nameChangeInput"
+                                  id="inputBoxId"
+                                  spellCheck={false}
+                                ></input>
+                              </>
+                            ) : (
+                              <>
+                                <p className="elemName">{elem.name}</p>
+                              </>
+                            )}
                         <p className="elemSize">-</p>
                       </div>
                     );
@@ -608,6 +628,7 @@ export class Files extends React.Component {
                                   ref={this.nameChangeInput}
                                   className="nameChangeInput"
                                   id="inputBoxId"
+                                  spellCheck={false}
                                 ></input>
                               </>
                             ) : (

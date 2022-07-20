@@ -22,6 +22,7 @@ export class Content extends React.Component {
         moveFtoD={(idl, targ)=>this.props.moveFtoD(idl, targ)}
         isLoading={this.props.isLoading}
         modifyData={(a,b,c)=>this.props.modifyData(a,b,c)}
+        refreshFolder={()=>this.props.refreshFolder()}
       />
     );
     return (

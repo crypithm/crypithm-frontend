@@ -63,9 +63,9 @@ export async function getFolders(key) {
         Fullname.slice(32)
       );
       data.push({
-        Name: dec.decode(decryptedData),
-        Parent: folderJson.Folders[i].Index,
-        Id: folderJson.Folders[i].Id,
+        name: dec.decode(decryptedData),
+        dir: folderJson.Folders[i].Index,
+        id: folderJson.Folders[i].Id,
       });
     }
     return data;

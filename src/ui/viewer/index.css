@@ -84,6 +84,66 @@
     color: #fff;
 }
 
+.vidElem {
+    border: solid 1px rgba(255,255,255,.2);
+}
+
+.vidControlbar {
+    bottom: 70px;
+    left: calc((100% / 2) - 150px);
+    width: 300px;
+    background-color: #000;
+    height: 50px;
+    position: fixed;
+    z-index: 1;
+    border-radius: 7px;
+    border: solid 1px rgba(255,255,255,.2);
+    display: flex;
+}
+.playPause{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    color: rgba(255,255,255,.7);
+    cursor: pointer;
+    font-size: 15pt;
+    margin-left: 10px;
+}
+.fullScreen{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    color: rgba(255,255,255,.7);
+    font-size: 15pt;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.vidProgress{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.vidProgress progress{
+    width: 90%;
+    background-color: rgba(255,255,255,.05);
+    height: 3px;
+    transition: height 0.1s linear;
+    cursor: pointer;
+}
+
+.vidProgress progress:hover{
+    width: 90%;
+    background-color: rgba(255,255,255,.05);
+    height: 10px;
+}
+
+
+  .vidProgress progress::-webkit-progress-value {
+    background-color: #fff;
+  }
 .downloadBtn {
     padding: 10px;
     font-size: 10pt;

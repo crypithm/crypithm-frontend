@@ -1,6 +1,5 @@
 import { decode } from "base64-arraybuffer";
 const mimeDB = require("mime-db");
-
 //mime database by: jshttp
 //(c)2022 Oh Eunchong
 
@@ -71,7 +70,7 @@ export async function getFolders(key) {
     return data;
   }
 }
-export async function getFileBlob(id, name, updateStatus) {
+export async function getFileBlob(id, name, updateStatus, isVideo) {
   var form = new FormData();
   form.append("id", id);
   var resp = await fetch(`${baseEndpointURL}/predown`, {
@@ -124,6 +123,9 @@ export async function getFileBlob(id, name, updateStatus) {
         updateStatus
       ).then((decData) => {
         var respAb = new Uint8Array(decData);
+        if(isVideo){
+          console.log('video')
+        }
         totalBlobList[5 * i + v] = new Blob([respAb]);
       })
     );
@@ -160,6 +162,7 @@ function calchunk(filelength) {
   }
   return chunkcount;
 }
+
 
 function sendAndDownloadData(
   token,

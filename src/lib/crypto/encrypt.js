@@ -175,19 +175,17 @@ export async function encryptAndUploadFile(
           xhr.open("POST", `${baseEndpointURL}/upload`);
           xhr.setRequestHeader("StartRange", startFrom);
 
-          var prevVal = 0;
-          var prevloaded = 0,
-            nowloaded = 0;
+          var prevVal = 0,
+            prevloaded = 0;
           xhr.upload.onprogress = (e) => {
             setTimeout(() => {
               prevloaded = e.loaded;
             }, 1000);
-            nowloaded = e.loaded;
-            console.log(e.loaded, prevVal);
             updateStatus(
-              ((e.loaded - prevVal) / file.size) * 100,
-              Math.round(((nowloaded - prevloaded) / megabyte) * 10) / 10,
-              ongoingFileId
+              e.loaded - prevVal,
+              Math.round(((e.loaded - prevloaded) / megabyte) * 10) / 10,
+              ongoingFileId,
+              file.size
             );
             prevVal = e.loaded;
           };

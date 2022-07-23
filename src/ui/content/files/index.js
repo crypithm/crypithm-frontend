@@ -59,6 +59,7 @@ export class Files extends React.Component {
     this.fileInputBox = React.createRef();
     this.nameChangeInput = React.createRef();
     this.nameEditingFile = "";
+    this.previousUpload = 0;
     this.state = {
       onFolderId: "",
       selectedIndex: [],
@@ -80,7 +81,12 @@ export class Files extends React.Component {
     this.state.uploadsInProgress[id] = [0, 0];
     this.setState({ uploadsInProgress: this.state.uploadsInProgress });
   };
-  changedUploadProgress = async (progress, speed, id) => {
+  changedUploadProgress = async (updatedLength, speed, id, fs) => {
+    this.previousUpload += updatedLength;
+    var progress = (this.previousUpload / fs) * 100;
+    if((this.previousUpload / fs)>=1){
+      this.previousUpload=0
+    }
     this.state.uploadsInProgress[id] = [progress, speed];
     this.setState({ uploadsInProgress: this.state.uploadsInProgress });
   };
@@ -231,7 +237,7 @@ export class Files extends React.Component {
       <Foldercreation
         root={root}
         appendToView={(elem) => this.appendToView(elem)}
-        refreshFolder={()=>this.props.refreshFolder()}
+        refreshFolder={() => this.props.refreshFolder()}
       />
     );
   };
@@ -242,10 +248,9 @@ export class Files extends React.Component {
         var tempArr = [];
         const v = (id) => {
           var targetObj = this.findElemIndex(id, true);
-          if(targetObj==-1){
-            console.error("unidentifiable target index")
-          }else{
-            console.log(targetObj)
+          if (targetObj == -1) {
+            console.error("unidentifiable target index");
+          } else {
             tempArr.unshift({
               id: targetObj.id,
               name: targetObj.name,
@@ -408,7 +413,7 @@ export class Files extends React.Component {
               }
             >
               <b className="howManySelected">
-                selected {this.state.selectedIndex.length} file(s)
+                selected {this.state.selectedIndex.length} item(s)
               </b>{" "}
               <b
                 className="unselectButton"
@@ -545,25 +550,25 @@ export class Files extends React.Component {
                           <FcFolder />
                         </div>
                         {elem.isNameEditing ? (
-                              <>
-                                <input
-                                  type="text"
-                                  autoFocus
-                                  defaultValue={elem.name}
-                                  onKeyDown={(e) =>
-                                    this.applyNameChangeIfKey(e.code, elem.id)
-                                  }
-                                  ref={this.nameChangeInput}
-                                  className="nameChangeInput"
-                                  id="inputBoxId"
-                                  spellCheck={false}
-                                ></input>
-                              </>
-                            ) : (
-                              <>
-                                <p className="elemName">{elem.name}</p>
-                              </>
-                            )}
+                          <>
+                            <input
+                              type="text"
+                              autoFocus
+                              defaultValue={elem.name}
+                              onKeyDown={(e) =>
+                                this.applyNameChangeIfKey(e.code, elem.id)
+                              }
+                              ref={this.nameChangeInput}
+                              className="nameChangeInput"
+                              id="inputBoxId"
+                              spellCheck={false}
+                            ></input>
+                          </>
+                        ) : (
+                          <>
+                            <p className="elemName">{elem.name}</p>
+                          </>
+                        )}
                         <p className="elemSize">-</p>
                       </div>
                     );

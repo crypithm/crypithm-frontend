@@ -84,8 +84,8 @@ export class Files extends React.Component {
   changedUploadProgress = async (updatedLength, speed, id, fs) => {
     this.previousUpload += updatedLength;
     var progress = (this.previousUpload / fs) * 100;
-    if((this.previousUpload / fs)>=1){
-      this.previousUpload=0
+    if (this.previousUpload / fs >= 1) {
+      this.previousUpload = 0;
     }
     this.state.uploadsInProgress[id] = [progress, speed];
     this.setState({ uploadsInProgress: this.state.uploadsInProgress });
@@ -342,6 +342,11 @@ export class Files extends React.Component {
           <div
             className="dragSquare"
             style={{
+              display:
+                this.state.currentPos[0] - this.state.startPos[0] != 0 ||
+                this.state.currentPos[1] - this.state.startPos[1] != 0
+                  ? "block"
+                  : "none",
               top:
                 this.state.currentPos[1] - this.state.startPos[1] > 0
                   ? this.state.startPos[1]
@@ -522,6 +527,11 @@ export class Files extends React.Component {
                         onMouseLeave={() =>
                           this.folderEnterLeave(false, elem.id)
                         }
+                        onClick={() => {
+                          if (window.innerWidth <= 800) {
+                            this.moveToDir(elem.id);
+                          }
+                        }}
                         style={{
                           backgroundColor:
                             this.state.selectedIndex.indexOf(index + 1) != -1
@@ -587,6 +597,11 @@ export class Files extends React.Component {
                         onDoubleClick={() =>
                           this.props.viewFile(elem.id, elem.name)
                         }
+                        onClick={() => {
+                          if (window.innerWidth <= 800) {
+                            this.props.viewFile(elem.id, elem.name);
+                          }
+                        }}
                         className={
                           this.state.Aligngrid
                             ? "fileContainer grid"
@@ -726,92 +741,98 @@ export class Files extends React.Component {
   };
 
   mouseDown = (e) => {
-    var tempIdArr = [];
-    this.setState({ startPos: [0, 0], currentPos: [0, 0] });
-    var targetIndex = e.target.getAttribute("data-index");
-    if (this.nameEditingFile != "" && e.target.id != "inputBoxId") {
-      this.props.modifyData(this.nameEditingFile, "isNameEditing", false);
-      this.nameEditingFile = "";
-    }
-    //dragsquare
-    if (this.state.selectedIndex.indexOf(parseInt(targetIndex)) != -1) {
-      this.state.selectedIndex.map((elem, _) => {
-        tempIdArr.unshift(this.getIdFromIndex(elem));
-        targetIndex = parseInt(targetIndex);
-        //click,shift,ctrl
-        if (e.shiftKey) {
-          if (this.state.selectedIndex.length == 0) {
-            this.setState({
-              selectedIndex: this.state.selectedIndex.concat([targetIndex]),
-            });
-          } else {
-            var intlist = [];
-            if (this.state.selectedIndex.at(0) - targetIndex < 0) {
-              for (
-                var i = this.state.selectedIndex.at(0);
-                i <= targetIndex;
-                i++
-              ) {
-                intlist.push(i);
-              }
-            } else {
-              for (
-                var i = this.state.selectedIndex.at(0);
-                i >= targetIndex;
-                i--
-              ) {
-                intlist.push(i);
-              }
+    if (window.innerWidth > 800) {
+      var tempIdArr = [];
+      this.setState({ startPos: [0, 0], currentPos: [0, 0] });
+      var targetIndex = parseInt(e.target.getAttribute("data-index"));
+      if (this.nameEditingFile != "" && e.target.id != "inputBoxId") {
+        this.props.modifyData(this.nameEditingFile, "isNameEditing", false);
+        this.nameEditingFile = "";
+      }
+      //dragsquare
+      if (e.shiftKey) {
+        if (this.state.selectedIndex.length == 0) {
+          this.setState({
+            selectedIndex: [targetIndex],
+          });
+        } else {
+          var intlist = [];
+          if (this.state.selectedIndex.at(0) - targetIndex < 0) {
+            for (
+              var i = this.state.selectedIndex.at(0);
+              i <= targetIndex;
+              i++
+            ) {
+              intlist.push(i);
             }
-            this.setState({ selectedIndex: intlist });
-          }
-        } else if (e.ctrlKey || e.metaKey) {
-          if (this.state.selectedIndex.indexOf(targetIndex) == -1) {
-            this.setState({
-              selectedIndex: this.state.selectedIndex.concat([targetIndex]),
-            });
           } else {
-            var index = this.state.selectedIndex.indexOf(targetIndex);
-            if (index > -1) {
-              this.state.selectedIndex.splice(index, 1);
-              this.setState({ selectedIndex: this.state.selectedIndex });
+            for (
+              var i = this.state.selectedIndex.at(0);
+              i >= targetIndex;
+              i--
+            ) {
+              intlist.push(i);
             }
           }
+          this.setState({ selectedIndex: intlist });
         }
-        this.props.dragDetectionArea.current.addEventListener(
-          "mousemove",
-          this.moveElems
-        );
-        window.addEventListener("mouseup", () => {
-          if (this.props.dragDetectionArea.current) {
-            this.props.dragDetectionArea.current.removeEventListener(
+      } else if (e.ctrlKey || e.metaKey) {
+        if (this.state.selectedIndex.indexOf(targetIndex) == -1) {
+          this.setState({
+            selectedIndex: this.state.selectedIndex.concat(targetIndex),
+          });
+        } else {
+          var index = this.state.selectedIndex.indexOf(targetIndex);
+          this.state.selectedIndex.splice(index, 1);
+          this.setState({ selectedIndex: this.state.selectedIndex });
+        }
+      } else {
+        if (this.state.selectedIndex.indexOf(targetIndex) != -1) {
+          this.state.selectedIndex.map((elem, _) => {
+            tempIdArr.unshift(this.getIdFromIndex(elem));
+            //click,shift,ctrl
+            this.props.dragDetectionArea.current.addEventListener(
               "mousemove",
               this.moveElems
             );
-          }
+            window.addEventListener("mouseup", () => {
+              if (this.props.dragDetectionArea.current) {
+                this.props.dragDetectionArea.current.removeEventListener(
+                  "mousemove",
+                  this.moveElems
+                );
+              }
 
-          this.props.setSelected([]);
-          this.setState({ moveFileBoxPos: [0, 0] });
-        });
-      });
-      this.props.setSelected(tempIdArr);
-    } else {
-      this.setState({ startPos: [e.pageX, e.pageY] });
-      this.mouseMove(e);
-      this.props.dragDetectionArea.current.addEventListener(
-        "mousemove",
-        this.mouseMove
-      );
-      window.addEventListener("mouseup", () => {
-        if (this.props.dragDetectionArea.current) {
-          this.props.dragDetectionArea.current.removeEventListener(
+              this.props.setSelected([]);
+              this.setState({ moveFileBoxPos: [0, 0] });
+            });
+          });
+          this.props.setSelected(tempIdArr);
+        } else {
+          if (!isNaN(targetIndex)) {
+            this.setState({
+              selectedIndex: [parseInt(targetIndex)],
+            });
+          } else {
+            this.setState({ selectedIndex: [] });
+          }
+          this.setState({ startPos: [e.pageX, e.pageY] });
+          this.mouseMove(e);
+          this.props.dragDetectionArea.current.addEventListener(
             "mousemove",
             this.mouseMove
           );
-          this.setState({ startPos: [0, 0], currentPos: [0, 0] });
+          window.addEventListener("mouseup", () => {
+            if (this.props.dragDetectionArea.current) {
+              this.props.dragDetectionArea.current.removeEventListener(
+                "mousemove",
+                this.mouseMove
+              );
+              this.setState({ startPos: [0, 0], currentPos: [0, 0] });
+            }
+          });
         }
-      });
-      this.setState({ selectedIndex: [] });
+      }
     }
   };
 

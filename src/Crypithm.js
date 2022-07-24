@@ -28,7 +28,6 @@ export class Crypithm extends React.Component {
   };
 
   setDirectory = (id) => {
-    console.log(id)
     localStorage.setItem("dir", id);
     this.setState({ currentDir: id });
   };

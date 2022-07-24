@@ -99,6 +99,7 @@
     border-radius: 7px;
     border: solid 1px rgba(255,255,255,.2);
     display: flex;
+    align-items: center;
 }
 .playPause{
     display: flex;
@@ -125,6 +126,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    height: auto;
 }
 .vidProgress progress{
     width: 90%;
@@ -135,8 +137,6 @@
 }
 
 .vidProgress progress:hover{
-    width: 90%;
-    background-color: rgba(255,255,255,.05);
     height: 10px;
 }
 
@@ -206,8 +206,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: pan-y;
 }
 .viewBody img {
     position: absolute;
     z-index: 1;
+}
+@media (max-width: 800px) {
+    .vidProgress progress.moving {
+        height: 10px!important;
+    }
+
+    .vidProgress progress:hover{
+        height: 3px;
+    }
+    
 }

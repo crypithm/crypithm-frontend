@@ -22,12 +22,11 @@ class ViewBox extends React.Component {
       vidDuration: 0,
       playing: false,
       vidPos: 0,
+      isVideoPosChanging:false
     };
     this.imgRef = React.createRef();
     this.vidref = React.createRef();
     this.progressbarRef = React.createRef();
-    this.isVideoPosChanging = false;
-    console.log(this.props.fullMime);
   }
   imgScaleChange = async (zoomin) => {
     if (!zoomin) {
@@ -55,9 +54,6 @@ class ViewBox extends React.Component {
       this.vidref.current.play();
     }
   };
-  modifyprogress = () => {
-    console.log(this.vidref.current.currentTime);
-  };
   videoStateChanged = () => {
     this.setState({
       vidPos:
@@ -65,10 +61,16 @@ class ViewBox extends React.Component {
     });
   };
   changeVidProg = (e) => {
-    if (this.isVideoPosChanging) {
-      this.vidref.current.currentTime =
+    if (this.state.isVideoPosChanging) {
+      var clientPointerXPos=0
+      if(e.type=="touchmove"){
+        clientPointerXPos=e.touches[0].clientX
+      }else if(e.type=="mousemove"){
+        clientPointerXPos=e.clientX
+      }
+        this.vidref.current.currentTime =
         this.vidref.current.duration *
-        ((e.clientX -
+        ((clientPointerXPos -
           this.progressbarRef.current.getBoundingClientRect().left) /
           this.progressbarRef.current.clientWidth);
     }
@@ -139,16 +141,23 @@ class ViewBox extends React.Component {
                   {this.state.playing ? <RiPauseLine /> : <RiPlayLine />}
                 </div>
                 <div className="vidProgress">
-                  <progress
-                    onMouseDown={(e) => {
-                      this.isVideoPosChanging = true;
+                  <progress className={this.state.isVideoPosChanging?"moving":""}
+                    onMouseDown={() => {
+                      this.setState({isVideoPosChanging : true});
+                    }}
+                    onTouchStart={() => {
+                      this.setState({isVideoPosChanging : true});
                     }}
                     onMouseUp={() => {
-                      this.isVideoPosChanging = false;
+                      this.setState({isVideoPosChanging : false});
+                    }}
+                    onTouchEnd={() => {
+                      this.setState({isVideoPosChanging : false});
                     }}
                     onMouseLeave={() => {
-                      this.isVideoPosChanging = false;
+                      this.setState({isVideoPosChanging : false});
                     }}
+                    onTouchMove={this.changeVidProg}
                     onMouseMove={this.changeVidProg}
                     value={this.state.vidPos}
                     max={100}

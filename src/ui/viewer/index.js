@@ -68,11 +68,15 @@ class ViewBox extends React.Component {
       }else if(e.type=="mousemove"){
         clientPointerXPos=e.clientX
       }
+      try{
         this.vidref.current.currentTime =
         this.vidref.current.duration *
         ((clientPointerXPos -
           this.progressbarRef.current.getBoundingClientRect().left) /
           this.progressbarRef.current.clientWidth);
+      }catch{
+        //pass
+      }
     }
   };
   render() {

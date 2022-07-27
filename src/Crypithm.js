@@ -5,6 +5,7 @@ import { menus } from "./vars";
 import { Content } from "./ui/content/index.js";
 import { Viewer } from "./ui/viewer";
 import { getAllFiledata, getFolders } from "./lib/crypto/decrypt";
+import { Helmet } from "react-helmet";
 
 export class Crypithm extends React.Component {
   constructor(props) {
@@ -124,11 +125,15 @@ export class Crypithm extends React.Component {
   render = () => {
     return (
       <>
+      <Helmet>
+        <script type="text/javascript" src="https://unpkg.com/mediainfo.js/dist/mediainfo.min.js"></script>
+      </Helmet>
         {this.state.viewingFileId ? (
           <Viewer
             id={this.state.viewingFileId}
             close={() => this.closeViewer()}
             name={this.state.viewingFileName}
+            is
           ></Viewer>
         ) : (
           <></>

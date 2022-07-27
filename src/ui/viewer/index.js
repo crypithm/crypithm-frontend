@@ -63,9 +63,9 @@ class ViewBox extends React.Component {
   changeVidProg = (e) => {
     if (this.state.isVideoPosChanging) {
       var clientPointerXPos=0
-      if(e.type=="touchmove"){
+      if(e.type==="touchmove"){
         clientPointerXPos=e.touches[0].clientX
-      }else if(e.type=="mousemove"){
+      }else if(e.type==="mousemove"){
         clientPointerXPos=e.clientX
       }
       try{
@@ -120,7 +120,7 @@ class ViewBox extends React.Component {
           </>
         );
       case "application":
-        if (this.props.fullMime.split("/")[1] == "pdf") {
+        if (this.props.fullMime.split("/")[1] === "pdf") {
           return <></>;
         }
       case "video":
@@ -195,7 +195,7 @@ export class Viewer extends React.Component {
   componentDidMount = async () => {
     var mime = getFileMime(this.props.name)
     var blobSource
-    if(mime.split("/")[0]=="video"){
+    if(mime.split("/")[0]==="video"){
       startVidStream(this.props.id, this.updateVideoSource)
     }else{
       blobSource = await getFileBlob(this.props.id,mime);
@@ -203,7 +203,7 @@ export class Viewer extends React.Component {
 
     var prevtoid = "";
     var tf = true;
-    if (viewableType.indexOf(mime) == -1) {
+    if (viewableType.indexOf(mime) === -1) {
       tf = false;
     }
     this.setState({ sourceUrl: blobSource, isViewable: tf, mime: mime });
@@ -235,7 +235,7 @@ export class Viewer extends React.Component {
               <RiArrowDropLeftLine />
             </p>
             <p className="fileName">{this.props.name}</p>
-            {this.state.sourceUrl != "" ? (
+            {this.state.sourceUrl !== "" ? (
               <div className="downloadBtn" onClick={() => this.download()}>
                 <RiDownload2Line />
                 <p>다운로드</p>
@@ -245,7 +245,7 @@ export class Viewer extends React.Component {
             )}
           </div>
           <div className="viewBody">
-            {this.state.sourceUrl != "" ? (
+            {this.state.sourceUrl !== "" ? (
               <>
                 {" "}
                 {this.state.isViewable ? (

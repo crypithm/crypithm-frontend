@@ -131,12 +131,30 @@ export async function startVidStream(id, updateVidSrc) {
     updateVidSrc(u);
     mediaSource.addEventListener('sourceopen', function() {
       if (mediaSource.sourceBuffers.length > 0) return;
-
-      var webmcodec=['video/webm; codecs="opus,vp9"','video/webm; codecs="av01.2.23M.12"']
-      
-      var mp4codec='video/mp4; codecs="avc1.4D0029,mp4a.40.2"'
-      var sourceBuffer = mediaSource.addSourceBuffer(webmcodec[0]
-      );
+      var sourceBuffer
+      sendAndDownloadData(
+        fileDetailJSON.Token,
+        5242912 * 0,
+        5242912 * 1,
+        fileKey,
+        fileDetailJSON.Size
+      ).then(function(fileData){
+        feed(fileData)
+        getMime().then(function(data){
+          sourceBuffer=mediaSource.addSourceBuffer(data);
+          console.log(data)
+          sourceBuffer.appendBuffer(new Uint8Array(fileData));
+            if (totalChunks - 1 === 0) {
+              sourceBuffer.addEventListener('updateend',function(){
+                if (!sourceBuffer.updating && mediaSource.readyState === "open") {
+                  mediaSource.endOfStream();
+                }
+              })
+            }else{
+            startGettingVidBinary(1);
+            }
+        })
+      })
      function startGettingVidBinary(i) {
         sendAndDownloadData(
           fileDetailJSON.Token,
@@ -150,6 +168,7 @@ export async function startVidStream(id, updateVidSrc) {
               sourceBuffer.addEventListener('updateend',function(){
                 if (!sourceBuffer.updating && mediaSource.readyState === "open") {
                   mediaSource.endOfStream();
+                  console.log("EOF")
                 }
               })
             }else{
@@ -158,7 +177,6 @@ export async function startVidStream(id, updateVidSrc) {
         })
 
       }
-      startGettingVidBinary(0);
     });
     mediaSource.addEventListener('sourceended',function(){
       console.log("sourceended")

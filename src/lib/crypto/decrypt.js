@@ -168,7 +168,6 @@ export async function startVidStream(id, updateVidSrc) {
               sourceBuffer.addEventListener('updateend',function(){
                 if (!sourceBuffer.updating && mediaSource.readyState === "open") {
                   mediaSource.endOfStream();
-                  console.log("EOF")
                 }
               })
             }else{

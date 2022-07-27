@@ -1,5 +1,5 @@
 import { decode } from "base64-arraybuffer";
-//import {getMime, feed} from "../utils/codec"
+import {getMime, feed} from "../utils/codec"
 const mimeDB = require("mime-db");
 //mime database by: jshttp
 //(c)2022 Oh Eunchong

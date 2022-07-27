@@ -1,5 +1,5 @@
 //only returns codec compatable with mediasource
-/*
+
 import {MediaInfo} from 'mediainfo.js'
 
 const MP4Box = require('mp4box');
@@ -21,4 +21,3 @@ export async function getMime(){
         await mi.analyzeData(()=>fileData.byteLength, ()=>fileData)
     }
 }
-*/

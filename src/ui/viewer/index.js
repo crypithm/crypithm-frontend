@@ -195,7 +195,7 @@ export class Viewer extends React.Component {
   componentDidMount = async () => {
     var mime = getFileMime(this.props.name)
     var blobSource
-    if(mime.split("/")[0]==="video"){
+    if(mime.split("/")[0]==="video" && viewableType.indexOf(mime)!==-1){
       startVidStream(this.props.id, this.updateVideoSource)
     }else{
       blobSource = await getFileBlob(this.props.id,mime);

@@ -1,4 +1,5 @@
 import { decode } from "base64-arraybuffer";
+//import {getMime, feed} from "../utils/codec"
 const mimeDB = require("mime-db");
 //mime database by: jshttp
 //(c)2022 Oh Eunchong
@@ -70,7 +71,102 @@ export async function getFolders(key) {
     return data;
   }
 }
-export async function getFileBlob(id, name, updateStatus, isVideo) {
+
+export function getFileMime(name) {
+  var Filemime;
+  var re = /\.[^.\\/:*?"<>|\r\n]+$/;
+  var ext = re.exec(name)[0];
+  ext = ext ? ext.split(".")[1] : ext;
+  var Filemime = false;
+  Object.keys(mimeDB).forEach((value, _) => {
+    try {
+      if (mimeDB[value]["extensions"].indexOf(ext) != -1) {
+        Filemime = value;
+      }
+    } catch {}
+  });
+  return Filemime;
+}
+export async function startVidStream(id, updateVidSrc) {
+  var form = new FormData();
+  form.append("id", id);
+  var resp = await fetch(`${baseEndpointURL}/predown`, {
+    headers: {
+      Authorization: localStorage.getItem("tk"),
+    },
+    body: form,
+    method: "POST",
+  });
+  var fileDetailJSON = await resp.json();
+  var nameBinary = fileDetailJSON.Blobkey;
+
+  var enc = new TextEncoder();
+  var normalMountedKey = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(localStorage.getItem("key")),
+    "PBKDF2",
+    false,
+    ["deriveKey", "deriveBits"]
+  );
+
+  var keysalt = decode(nameBinary).slice(16, 32);
+  var usedClientKey = await deriveCryptoKey(normalMountedKey, keysalt);
+  var Fullname = decode(nameBinary);
+  var decryptedData = await decryptBlob(
+    usedClientKey,
+    Fullname.slice(0, 16),
+    Fullname.slice(32)
+  );
+  var fileKey = await crypto.subtle.importKey(
+    "raw",
+    decryptedData,
+    { name: "AES-GCM" },
+    false,
+    ["decrypt"]
+  );
+  async function startVid(){
+    var totalChunks = calchunk(fileDetailJSON.Size);
+    var mediaSource = new MediaSource();
+    var u=URL.createObjectURL(mediaSource)
+    updateVidSrc(u);
+    mediaSource.addEventListener('sourceopen', function() {
+      if (mediaSource.sourceBuffers.length > 0) return;
+
+      var webmcodec=['video/webm; codecs="opus,vp9"','video/webm; codecs="av01.2.23M.12"']
+      
+      var mp4codec='video/mp4; codecs="avc1.4D0029,mp4a.40.2"'
+      var sourceBuffer = mediaSource.addSourceBuffer(webmcodec[0]
+      );
+     function startGettingVidBinary(i) {
+        sendAndDownloadData(
+          fileDetailJSON.Token,
+          5242912 * i,
+          5242912 * (i+1),
+          fileKey,
+          fileDetailJSON.Size
+        ).then(function(data){
+          sourceBuffer.appendBuffer(new Uint8Array(data));
+            if (totalChunks - 1 === i) {
+              sourceBuffer.addEventListener('updateend',function(){
+                if (!sourceBuffer.updating && mediaSource.readyState === "open") {
+                  mediaSource.endOfStream();
+                }
+              })
+            }else{
+            startGettingVidBinary(++i);
+            }
+        })
+
+      }
+      startGettingVidBinary(0);
+    });
+    mediaSource.addEventListener('sourceended',function(){
+      console.log("sourceended")
+    })
+  }
+  startVid()
+}
+export async function getFileBlob(id, Filemime, updateStatus) {
   var form = new FormData();
   form.append("id", id);
   var resp = await fetch(`${baseEndpointURL}/predown`, {
@@ -123,9 +219,6 @@ export async function getFileBlob(id, name, updateStatus, isVideo) {
         updateStatus
       ).then((decData) => {
         var respAb = new Uint8Array(decData);
-        if(isVideo){
-          console.log('video')
-        }
         totalBlobList[5 * i + v] = new Blob([respAb]);
       })
     );
@@ -133,25 +226,10 @@ export async function getFileBlob(id, name, updateStatus, isVideo) {
     await Promise.all(promises);
   }
 
-  var re = /\.[^.\\/:*?"<>|\r\n]+$/;
-  var ext = re.exec(name)[0];
-  ext = ext ? ext.split(".")[1] : ext;
-  var Filemime = false;
-  Object.keys(mimeDB).forEach((value, _) => {
-    try {
-      if (mimeDB[value]["extensions"].indexOf(ext) != -1) {
-        Filemime = value;
-      }
-    } catch {}
-  });
-
   var q = new Blob(totalBlobList, {
     type: Filemime ? Filemime : "application/octet-stream",
   });
-  return [
-    URL.createObjectURL(q),
-    Filemime ? Filemime : "application/octet-stream",
-  ];
+  return URL.createObjectURL(q)
 }
 
 function calchunk(filelength) {
@@ -162,7 +240,6 @@ function calchunk(filelength) {
   }
   return chunkcount;
 }
-
 
 function sendAndDownloadData(
   token,

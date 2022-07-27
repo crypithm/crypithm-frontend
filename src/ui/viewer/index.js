@@ -11,7 +11,7 @@ import {
   RiPlayLine,
   RiPauseLine,
 } from "react-icons/ri";
-import { getFileBlob } from "../../lib/crypto/decrypt";
+import { getFileBlob, getFileMime, startVidStream } from "../../lib/crypto/decrypt";
 
 class ViewBox extends React.Component {
   constructor(props) {
@@ -134,8 +134,8 @@ class ViewBox extends React.Component {
                 height={this.state.imgSize[1]}
                 ref={this.vidref}
                 onTimeUpdate={this.videoStateChanged}
+                src={this.props.src}
               >
-                <source src={this.props.src}></source>
               </video>
               <div
                 className="vidControlbar"
@@ -188,8 +188,19 @@ export class Viewer extends React.Component {
     super(props);
     this.state = { sourceUrl: "", type: "", mime: "", showAddition: true };
   }
+
+  updateVideoSource=(url)=>{
+    this.setState({sourceUrl:url})
+  }
   componentDidMount = async () => {
-    var [blobSource, mime] = await getFileBlob(this.props.id, this.props.name);
+    var mime = getFileMime(this.props.name)
+    var blobSource
+    if(mime.split("/")[0]=="video"){
+      startVidStream(this.props.id, this.updateVideoSource)
+    }else{
+      blobSource = await getFileBlob(this.props.id,mime);
+    }
+
     var prevtoid = "";
     var tf = true;
     if (viewableType.indexOf(mime) == -1) {

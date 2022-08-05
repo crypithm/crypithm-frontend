@@ -25,6 +25,7 @@ import { encryptAndUploadFile } from "../../../lib/crypto/encrypt.js";
 import { randString } from "../../../lib/crypto/random";
 import { Foldercreation } from "./folderCreation";
 import { filesWithoutThumb, unindexed } from "../../../vars";
+import {SharePrompt} from  "./shareFile";
 
 // selectedIds: updates on drag event
 // selectedIndex: updates on select
@@ -297,6 +298,22 @@ export class Files extends React.Component {
     this.props.modifyData(indexFromFull, "isNameEditing", true);
     this.nameEditingFile = indexFromFull;
   };
+  shareFile=()=>{
+    if(this.state.selectedIndex.length>0){
+      var selectedId = this.getIdFromIndex(this.state.selectedIndex);
+      const root = ReactDOM.createRoot(
+        document.querySelector("#shareWillCome")
+      );
+      root.render(
+        <SharePrompt
+          name={this.findElemIndex(selectedId, true).name}
+          id={selectedId}
+          root={root}
+        />
+      );
+  
+    }
+  }
   applyNameChangeIfKey = (keyCode, id) => {
     if (keyCode == "Enter") {
       var willChangeTo = this.nameChangeInput.current.value;
@@ -338,6 +355,7 @@ export class Files extends React.Component {
           </div>
           <div id="ctxMenuWillCome"></div>
           <div id="fileInfoWillCome"></div>
+          <div id="shareWillCome"></div>
           <div id="folderCreationWillCome"></div>
           <div
             className="dragSquare"
@@ -449,7 +467,7 @@ export class Files extends React.Component {
                 >
                   <RiPencilFill />
                 </div>
-                <div className="FileOptIcons">
+                <div className="FileOptIcons" onClick={()=>this.shareFile()}>
                   <RiShareFill />
                 </div>
                 <div className="FileOptIcons">

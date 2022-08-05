@@ -100,7 +100,7 @@
     border-radius: 5px;
   }
   .folderExtended.show{
-    max-height: 200px;
+    max-height: 222px;
     overflow: scroll;
   }
 

@@ -6,7 +6,7 @@ const mimeDB = require("mime-db");
 
 const baseEndpointURL = "https://crypithm.com/api";
 const megabyte = 1048576;
-async function decryptBlob(key, iv, binary) {
+export async function decryptBlob(key, iv, binary) {
   var decdata = await crypto.subtle.decrypt(
     { name: "AES-GCM", iv: iv },
     key,
@@ -309,6 +309,7 @@ export async function getAllFiledata(key) {
     method: "POST",
   });
   var jsn = await resp.json();
+  window.User = jsn.Username
   if (jsn.Message != "Success") {
     console.error("fetcherror");
   } else {

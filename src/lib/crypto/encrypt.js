@@ -36,7 +36,7 @@ export async function importAndDeriveKeyFromRaw(rawKeyBytes, keysalt) {
     importedClientKey,
     { name: "AES-GCM", length: 256 },
     false,
-    ["encrypt"]
+    ["encrypt","decrypt"]
   );
 
   return usedClientKey;

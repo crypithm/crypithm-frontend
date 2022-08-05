@@ -6,6 +6,7 @@
     background-color: rgba(0,0,0,0.4);
     top: 0;
     left: 0;
+    backdrop-filter: blur(3px);
 }
 
 

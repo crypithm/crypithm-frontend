@@ -78,12 +78,11 @@ class RecursiveFolders extends React.Component {
               color: this.props.currentDir == elem.id ? "#fff" : "",
               border: this.state.onWhere == elem.id ? "solid 1px #fff" : "",
             }}
-            onClick={() => this.props.setDirectory(elem.id)}
             onMouseEnter={() => this.mouseEnteredOnFolder(elem.id)}
             onMouseLeave={this.mouseLeftOnFolder}
             onMouseUp={() => this.mouseReleased(elem.id)}
           >
-            <span>
+            <span onClick={() => this.props.setDirectory(elem.id)}>
               <div className="lmenuFolderico">
                 <FcFolder />
               </div>
@@ -129,7 +128,7 @@ class RecursiveFolders extends React.Component {
 export class Leftmenu extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { ActiveMenuIndex: 0, fileBtnExtended: false, };
+    this.state = { ActiveMenuIndex: 0, fileBtnExtended: true, };
   }
 
   componentDidMount = async () => {

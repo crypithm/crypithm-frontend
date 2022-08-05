@@ -14,11 +14,15 @@ export class Vault extends React.Component {
   }
 
   validatePw = async()=>{
-    var [isSuccess, fileKey] = await getKeyFromPw(this.pwRef.current.value)
-    if(!isSuccess) {
+    if(this.pwRef.current.value.length<1){
       this.setState({pwWrong:true})
     }else{
-      console.log("all good")
+      var [isSuccess, fileKey] = await getKeyFromPw(this.pwRef.current.value)
+      if(!isSuccess) {
+        this.setState({pwWrong:true})
+      }else{
+        console.log("all good")
+      }
     }
   }
   pwClick=()=>{
@@ -42,11 +46,12 @@ export class Vault extends React.Component {
         </div>
         </>:
         <>
+        <div className="directory"></div>
         <div className="vault-locked-cont">
           <div className="vault-locker">
-            <div className="vault-logo">
+          <div className="vault-logo">
             <AiFillLock />
-            </div>
+          </div>
             <p className="vault-title">
             Unlock Vault
             </p>
@@ -68,7 +73,7 @@ export class Vault extends React.Component {
       )
     }
 }
-
+//            <div className="vault-login-option"><input type="checkbox"></input><p>Remember me in this session</p></div>
 
 class VaultFiles extends React.Component {
   render(){

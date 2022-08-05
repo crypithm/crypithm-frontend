@@ -1,15 +1,13 @@
 .vault-locked-cont{
-    width: calc(100% - 360px);
-    min-height: calc(100vh - 70px);
+    min-height: calc(100vh - 80px);
     display: flex;
     align-items: center;
     justify-content: center;
-    position: fixed;
 }
 
 .vault-locker {
-    width: 300px;
-    height: 200px;
+    height: 250px;
+    width: 250px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -32,8 +30,9 @@
     height: 35px;
     width: 200px;
     font-size: 12pt;
-    border: none;
+    border: solid 2px transparent;
     caret-color: transparent;
+    transition: border 0.2s ease-in-out;
 }
 
 .vault-pw input[type="password"]:focus {
@@ -42,8 +41,23 @@
 }
 
 .vault-logo{
-    color: #fff;
+    color: rgba(255,255,255,.5);
     font-size: 30pt;
+}
+.vault-login-option{
+    display: flex;
+    flex-direction: row;
+    color: rgba(255,255,255,.3);
+    font-size: 9pt;
+    align-items: center;
+    padding: 0px 10px 0px 10px;
+    margin-bottom: 10px;
+}
+.vault-login-option p{
+    margin-left: 10px;
+}
+.vault-login-option input{
+    margin-right: 10px;
 }
 .vault-pwcheck {
     position: absolute;

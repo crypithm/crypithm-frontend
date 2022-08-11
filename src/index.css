@@ -8,7 +8,7 @@ body, html {
   -webkit-user-select: none;
   -moz-user-select: none;
   width: 100%;
-
+  font-family: 'Ubuntu', sans-serif;
 }
 body::-webkit-scrollbar {
   width: 8px;

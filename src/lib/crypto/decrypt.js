@@ -1,5 +1,5 @@
 import { decode } from "base64-arraybuffer";
-import {getMime, feed} from "../utils/codec"
+import { getMime, feed } from "../utils/codec";
 const mimeDB = require("mime-db");
 //mime database by: jshttp
 //(c)2022 Oh Eunchong
@@ -29,6 +29,12 @@ async function deriveCryptoKey(keyAB, salt) {
     ["decrypt"]
   );
 }
+
+/**
+ *
+ * @param {string} key - localstorage key
+ * @returns {{name:string,dir:string,id:string}} - object containing the requested folders' info
+ */
 
 export async function getFolders(key) {
   var encoder = new TextEncoder();
@@ -72,6 +78,12 @@ export async function getFolders(key) {
   }
 }
 
+/**
+ * 
+ * @param {string} name - file name
+ * @returns {string|false}
+ */
+
 export function getFileMime(name) {
   var Filemime;
   var re = /\.[^.\\/:*?"<>|\r\n]+$/;
@@ -87,6 +99,14 @@ export function getFileMime(name) {
   });
   return Filemime;
 }
+
+/**
+ * 
+ * @param {string} id - Streaming target id 
+ * @param {function} updateVidSrc 
+ * @returns {Promise<void>}
+ */
+
 export async function startVidStream(id, updateVidSrc) {
   var form = new FormData();
   form.append("id", id);
@@ -124,65 +144,72 @@ export async function startVidStream(id, updateVidSrc) {
     false,
     ["decrypt"]
   );
-  async function startVid(){
+  async function startVid() {
     var totalChunks = calchunk(fileDetailJSON.Size);
     var mediaSource = new MediaSource();
-    var u=URL.createObjectURL(mediaSource)
+    var u = URL.createObjectURL(mediaSource);
     updateVidSrc(u);
-    mediaSource.addEventListener('sourceopen', function() {
+    mediaSource.addEventListener("sourceopen", function () {
       if (mediaSource.sourceBuffers.length > 0) return;
-      var sourceBuffer
+      var sourceBuffer;
       sendAndDownloadData(
         fileDetailJSON.Token,
         5242912 * 0,
         5242912 * 1,
         fileKey,
         fileDetailJSON.Size
-      ).then(function(fileData){
-        feed(fileData)
-        getMime().then(function(data){
-          sourceBuffer=mediaSource.addSourceBuffer(data);
-          console.log(data)
+      ).then(function (fileData) {
+        feed(fileData);
+        getMime().then(function (data) {
+          sourceBuffer = mediaSource.addSourceBuffer(data);
+          console.log(data);
           sourceBuffer.appendBuffer(new Uint8Array(fileData));
-            if (totalChunks - 1 === 0) {
-              sourceBuffer.addEventListener('updateend',function(){
-                if (!sourceBuffer.updating && mediaSource.readyState === "open") {
-                  mediaSource.endOfStream();
-                }
-              })
-            }else{
+          if (totalChunks - 1 === 0) {
+            sourceBuffer.addEventListener("updateend", function () {
+              if (!sourceBuffer.updating && mediaSource.readyState === "open") {
+                mediaSource.endOfStream();
+              }
+            });
+          } else {
             startGettingVidBinary(1);
-            }
-        })
-      })
-     function startGettingVidBinary(i) {
+          }
+        });
+      });
+      function startGettingVidBinary(i) {
         sendAndDownloadData(
           fileDetailJSON.Token,
           5242912 * i,
-          5242912 * (i+1),
+          5242912 * (i + 1),
           fileKey,
           fileDetailJSON.Size
-        ).then(function(data){
+        ).then(function (data) {
           sourceBuffer.appendBuffer(new Uint8Array(data));
-            if (totalChunks - 1 === i) {
-              sourceBuffer.addEventListener('updateend',function(){
-                if (!sourceBuffer.updating && mediaSource.readyState === "open") {
-                  mediaSource.endOfStream();
-                }
-              })
-            }else{
+          if (totalChunks - 1 === i) {
+            sourceBuffer.addEventListener("updateend", function () {
+              if (!sourceBuffer.updating && mediaSource.readyState === "open") {
+                mediaSource.endOfStream();
+              }
+            });
+          } else {
             startGettingVidBinary(++i);
-            }
-        })
-
+          }
+        });
       }
     });
-    mediaSource.addEventListener('sourceended',function(){
-      console.log("sourceended")
-    })
+    mediaSource.addEventListener("sourceended", function () {
+      console.log("sourceended");
+    });
   }
-  startVid()
+  startVid();
 }
+
+/**
+ * 
+ * @param {string} id 
+ * @param {string} Filemime 
+ * @param {Function} updateStatus 
+ * @returns {Promise<string>} - blob url of file
+ */
 export async function getFileBlob(id, Filemime, updateStatus) {
   var form = new FormData();
   form.append("id", id);
@@ -224,7 +251,7 @@ export async function getFileBlob(id, Filemime, updateStatus) {
   var hmc = calchunk(fileDetailJSON.Size);
 
   var intArr = [0, 1, 2, 3, 4];
-  var loops = parseInt(hmc / 5) + (hmc % 5 == 0 ? 0 : 1);
+  var loops = Math.floor(hmc / 5) + (hmc % 5 == 0 ? 0 : 1);
   for (var i = 0; i < loops; i++) {
     const promises = intArr.map(async (v) =>
       sendAndDownloadData(
@@ -246,7 +273,7 @@ export async function getFileBlob(id, Filemime, updateStatus) {
   var q = new Blob(totalBlobList, {
     type: Filemime ? Filemime : "application/octet-stream",
   });
-  return URL.createObjectURL(q)
+  return URL.createObjectURL(q);
 }
 
 function calchunk(filelength) {
@@ -309,7 +336,7 @@ export async function getAllFiledata(key) {
     method: "POST",
   });
   var jsn = await resp.json();
-  window.User = jsn.Username
+  window.User = jsn.Username;
   if (jsn.Message != "Success") {
     console.error("fetcherror");
   } else {

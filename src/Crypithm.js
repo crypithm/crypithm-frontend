@@ -6,6 +6,7 @@ import { Content } from "./ui/content/index.js";
 import { Viewer } from "./ui/viewer";
 import { getAllFiledata, getFolders } from "./lib/crypto/decrypt";
 import { Helmet } from "react-helmet";
+import {generatePfp} from "./lib/utils/pfpgen"
 
 export class Crypithm extends React.Component {
   constructor(props) {
@@ -20,7 +21,8 @@ export class Crypithm extends React.Component {
       selectedIds: [],
       data: [],
       folders: [],
-      isDataLoading:true
+      isDataLoading:true,
+      pfpSrc:""
     };
   }
 
@@ -68,6 +70,8 @@ export class Crypithm extends React.Component {
     this.setState({isDataLoading:false})
     this.setState({folders: decryptedJsonarray.filter(val=>val.type=="folder")})
     this.setState({ data: decryptedJsonarray });
+
+    this.setState({pfpSrc:generatePfp(window.User)})
   };
 
   toggleMobileMenu = () => {
@@ -138,7 +142,7 @@ export class Crypithm extends React.Component {
         ) : (
           <></>
         )}
-        <Header mobileMenu={() => this.toggleMobileMenu()} />
+        <Header mobileMenu={() => this.toggleMobileMenu()} pfpsrc={this.state.pfpSrc}/>
 
         <div ref={this.dragDetectionArea}>
           <Leftmenu

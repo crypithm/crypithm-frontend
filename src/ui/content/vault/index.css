@@ -20,7 +20,26 @@
 }
 .vault-pw{
     position: relative;
+    margin: 10px 0px 10px 0px;
 }
+
+.loading {
+    width: 8px;
+    height: 8px;
+    border: solid 2px #fff;
+    border-top: solid 2px transparent;
+    border-radius: 18px;
+    transform: rotate(0deg);
+    animation: loading-anim 1s ease-in-out infinite;
+  }
+  @keyframes loading-anim {
+    0%{
+      transform: rotate(0deg);
+    }
+    100%{
+      transform: rotate(360deg);
+    }
+  }
 
 .vault-pw input[type="password"] {
     background-color: #000;
@@ -28,11 +47,12 @@
     color: rgba(255,255,255,.7);
     border-radius: 5px;
     height: 35px;
-    width: 200px;
-    font-size: 12pt;
+    width: 250px;
     border: solid 2px transparent;
     caret-color: transparent;
     transition: border 0.2s ease-in-out;
+    font-size: 20pt;
+    font-family: 'Ubuntu', sans-serif;
 }
 
 .vault-pw input[type="password"]:focus {
@@ -40,6 +60,20 @@
     border: solid 2px rgba(255,255,255,.3);
 }
 
+.vault-header {
+    height: 60px;
+    border-bottom: solid 1px rgba(255,255,255,.3);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    color: rgba(255,255,255,.5);
+}
+.vault-item{
+    width: 100%;
+    height: 50px;
+    background-color: #000;
+    border-bottom: solid 1px rgba(255,255,255,.3);
+}
 .vault-logo{
     color: rgba(255,255,255,.5);
     font-size: 30pt;

@@ -5,7 +5,17 @@ const megabyte = 1048576;
 const baseEndpointURL = "https://crypithm.com/api";
 
 //(c)2022 Oh Eunchong
-// (AES-256-GCM) binary: blob, key: cryptokey(256bits), iv: iv
+
+/**
+ * encrypts blob with the given params
+ * 
+ * @param {arraybuffer} binary 
+ * @param {cryptokey} key 
+ * @param {boolean} randomiv - generate a random iv?
+ * @param {Uint8Array} iv - (only if randomiv === false) => initialization vector value
+ * @returns {Promise<arraybuffer>}
+ */
+
 export async function encryptBlob(binary, key, randomiv, iv) {
   var willUsedIV;
   if (randomiv) {
@@ -21,7 +31,14 @@ export async function encryptBlob(binary, key, randomiv, iv) {
   return cryptdata;
 }
 
-//rawKeyBytes:string, keysalt: ArrayBuffer => AES-256-GCM CryptoKey Obj (PBKDF2)
+/**
+ * derives cryptokey from raw localstorage key string
+ * 
+ * @param {string} rawKeyBytes - localstorage key
+ * @param {Uint8Array} keysalt - PBKDF2 salt
+ * @returns {cryptokey}
+ */
+
 export async function importAndDeriveKeyFromRaw(rawKeyBytes, keysalt) {
   var enc = new TextEncoder();
   var importedClientKey = await crypto.subtle.importKey(
@@ -43,6 +60,13 @@ export async function importAndDeriveKeyFromRaw(rawKeyBytes, keysalt) {
 }
 
 //data:binary
+/**
+ * creates a hash with the given params
+ * 
+ * @param {{name:string}} algo 
+ * @param {arraybuffer} data 
+ * @returns 
+ */
 export async function hashBinary(algo, data) {
   var digest = await window.crypto.subtle.digest(algo, data);
   return Array.from(new Uint8Array(digest))

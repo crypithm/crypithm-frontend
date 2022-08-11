@@ -187,7 +187,7 @@ export class Leftmenu extends React.Component {
                 <div className="buttonIcon">
                   <AiFillFolder />
                 </div>{" "}
-                <b>All Files</b>
+                <b>Files</b>
               </div>
               <div
                 className="da-btnico"

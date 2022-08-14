@@ -150,8 +150,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 5pt;
-    color: rgba(255,255,255,0.3);
+    font-size: 7pt;
+    color: rgba(255,255,255,0.2);
   }
   .userInfoArea progress {
     background-color: #fff;

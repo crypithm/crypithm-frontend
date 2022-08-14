@@ -2,6 +2,7 @@ import React from "react";
 import "./index.css";
 import { AiOutlineMenu } from "react-icons/ai";
 import { Logo } from "../../icons/Logo";
+import {RiSettings4Fill, RiLogoutBoxRFill} from 'react-icons/ri'
 
 export class Header extends React.Component {
   constructor(props){
@@ -29,7 +30,38 @@ export class Header extends React.Component {
           </div>
         </div>
         <div className={`user-area ${this.state.isuseropen?'show':''}`}>
-          a
+          <div className="profile">
+          <img src={this.props.pfpsrc}></img>
+          <div className="info-area">
+          <p>
+            {window.User}
+          </p>
+          <p className="sub">User</p>
+          </div>
+          </div>
+          <div className="buttons">
+            <div className="button">
+              <p className="icon">
+                <RiSettings4Fill />
+              </p>
+              <p>
+                Settings
+              </p>
+            </div>
+            <div className="button">
+              <p className="icon">
+                <RiLogoutBoxRFill />
+              </p>
+              <p>
+                Sign Out
+              </p>
+            </div>
+          </div>
+          <div className="btm">
+            <p>Privacy</p> • 
+            <p>Terms</p>
+            
+          </div>
         </div>
       </>
     );

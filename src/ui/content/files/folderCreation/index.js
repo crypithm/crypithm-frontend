@@ -5,6 +5,7 @@ import {
   importAndDeriveKeyFromRaw,
 } from "../../../../lib/crypto/encrypt";
 import { encode } from "base64-arraybuffer";
+import { CreateFolder } from "../../../../lib/crypto/encrypt";
 
 export class Foldercreation extends React.Component {
   constructor(props) {
@@ -16,38 +17,15 @@ export class Foldercreation extends React.Component {
   };
 
   create = async () => {
-    var folderNameAb = new TextEncoder().encode(this.inputVal.current.value);
-    const clientKey = localStorage.getItem("key");
-    var clientIV = crypto.getRandomValues(new Uint8Array(16));
-    var keySalt = crypto.getRandomValues(new Uint8Array(16));
-    let folderKey = await importAndDeriveKeyFromRaw(clientKey, keySalt);
-    var encryptedFolderName = new Uint8Array(
-      await encryptBlob(folderNameAb, folderKey, false, clientIV)
-    );
-    var blankSpaceForKey = new Uint8Array(encryptedFolderName.byteLength + 32);
-    blankSpaceForKey.set(keySalt, 0);
-    blankSpaceForKey.set(clientIV, 16);
-    blankSpaceForKey.set(encryptedFolderName, 32);
-    var form = new FormData();
-    var currentDir = localStorage.getItem("dir");
-    form.append("action", "create");
-    form.append("curentdirindex", currentDir);
-    form.append("name", encode(blankSpaceForKey));
-    var resp = await fetch("https://crypithm.com/api/folder", {
-      headers: {
-        Authorization: localStorage.getItem("tk"),
-      },
-      method: "POST",
-      body: form,
-    });
-    var jsn = await resp.json();
-    if (jsn.StatusMessage == "Success") {
+    const dir = localStorage.getItem("dir")
+    let rtn = await CreateFolder(this.inputVal.current.value, dir)
+    if (rtn) {
       var dec = new TextDecoder();
       var obj = {
         type: "folder",
-        name: dec.decode(folderNameAb),
-        id: jsn.Id,
-        dir: currentDir,
+        name: this.inputVal.current.value,
+        id: rtn,
+        dir: dir,
       };
       this.props.appendToView(obj);
       this.props.refreshFolder();

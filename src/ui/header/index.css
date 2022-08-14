@@ -66,17 +66,117 @@
 }
 .user-area{
     position: fixed;
-    height: 100vh;
+    height: calc(100vh - 71px);
     right: -201px;
     width: 200px;
     border-left: solid 1px rgba(255,255,255,.3);
     z-index: 3;
     background-color: #191919;
     transition: right 0.2s ease-in-out;
+    color: rgba(255,255,255,.3);
+    top: 71px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+.user-area .profile{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    margin-top: 24px;
+    border-radius: 0;
+    padding-bottom: 20px;
+    border-bottom: solid 1px rgba(255,255,255,.1);
+}
+
+.user-area .profile img{
+    width: 35px;
+    height: 35px;
+    border-radius: calc(35px / 2);
+    margin-right: 10px;
+}
+
+.user-area .profile .info-area {
+    display: flex;
+    flex-direction: column;
+    height: 30px;
+}
+
+.user-area .profile .info-area p {
+    margin: unset;
+    font-size: 11pt;
+    color: rgba(255,255,255,.5);
+}
+
+.user-area .profile .info-area p.sub {
+    font-size: 9pt;
+    color: rgba(255,255,255,.3);
+}
+
+.user-area .profile .sub{
+    width: 35px;
+    height: 35px;
+    border-radius: calc(35px / 2);
+    margin-right: 10px;
+}
+
+.user-area .buttons {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.user-area .buttons .button{
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 100%;
+    margin: 0;
+}
+
+.user-area .buttons .button:active{
+    background-color: rgba(255,255,255,.05);
+}
+
+.user-area .button p{
+    font-size: 10pt;
+
+}
+
+.user-area .button p.icon{
+    font-size: 15pt;
+    margin-right: 10px;
+    color: rgba(255,255,255,.4);
+
+}
 .user-area.show{
     right: 0px;
+}
+
+.user-area .btm{
+    border-top: solid 1px rgba(255,255,255,.1);
+    margin-bottom: 0px;
+    margin-top: auto;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9pt;
+}
+
+.user-area .btm p{
+    margin: 0px 10px 0px 10px;
+    cursor: pointer;
+    color: rgba(255,255,255,.5);
 }
 @media (max-width: 950px) {
     .header input[type="text"] {

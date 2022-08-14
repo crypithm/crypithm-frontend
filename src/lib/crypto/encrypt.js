@@ -8,9 +8,9 @@ const baseEndpointURL = "https://crypithm.com/api";
 
 /**
  * encrypts blob with the given params
- * 
- * @param {arraybuffer} binary 
- * @param {cryptokey} key 
+ *
+ * @param {arraybuffer} binary
+ * @param {cryptokey} key
  * @param {boolean} randomiv - generate a random iv?
  * @param {Uint8Array} iv - (only if randomiv === false) => initialization vector value
  * @returns {Promise<arraybuffer>}
@@ -33,7 +33,7 @@ export async function encryptBlob(binary, key, randomiv, iv) {
 
 /**
  * derives cryptokey from raw localstorage key string
- * 
+ *
  * @param {string} rawKeyBytes - localstorage key
  * @param {Uint8Array} keysalt - PBKDF2 salt
  * @returns {cryptokey}
@@ -53,7 +53,7 @@ export async function importAndDeriveKeyFromRaw(rawKeyBytes, keysalt) {
     importedClientKey,
     { name: "AES-GCM", length: 256 },
     false,
-    ["encrypt","decrypt"]
+    ["encrypt", "decrypt"]
   );
 
   return usedClientKey;
@@ -62,10 +62,10 @@ export async function importAndDeriveKeyFromRaw(rawKeyBytes, keysalt) {
 //data:binary
 /**
  * creates a hash with the given params
- * 
- * @param {{name:string}} algo 
- * @param {arraybuffer} data 
- * @returns 
+ *
+ * @param {{name:string}} algo
+ * @param {arraybuffer} data
+ * @returns
  */
 export async function hashBinary(algo, data) {
   var digest = await window.crypto.subtle.digest(algo, data);
@@ -224,4 +224,37 @@ export async function encryptAndUploadFile(
       }
     });
   }
+}
+/**
+ *
+ * @param {String} folderName folder name
+ * @param {String} currentDir parent directory id
+ * @returns
+ */
+export async function CreateFolder(folderName, currentDir) {
+  var folderNameAb = new TextEncoder().encode(folderName);
+  const clientKey = localStorage.getItem("key");
+  var clientIV = crypto.getRandomValues(new Uint8Array(16));
+  var keySalt = crypto.getRandomValues(new Uint8Array(16));
+  let folderKey = await importAndDeriveKeyFromRaw(clientKey, keySalt);
+  var encryptedFolderName = new Uint8Array(
+    await encryptBlob(folderNameAb, folderKey, false, clientIV)
+  );
+  var blankSpaceForKey = new Uint8Array(encryptedFolderName.byteLength + 32);
+  blankSpaceForKey.set(keySalt, 0);
+  blankSpaceForKey.set(clientIV, 16);
+  blankSpaceForKey.set(encryptedFolderName, 32);
+  var form = new FormData();
+  form.append("action", "create");
+  form.append("curentdirindex", currentDir);
+  form.append("name", encode(blankSpaceForKey));
+  var resp = await fetch("https://crypithm.com/api/folder", {
+    headers: {
+      Authorization: localStorage.getItem("tk"),
+    },
+    method: "POST",
+    body: form,
+  });
+  var jsn = await resp.json();
+  return jsn.StatusMessage == "Success" ? jsn.Id : false;
 }

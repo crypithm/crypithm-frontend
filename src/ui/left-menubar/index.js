@@ -251,7 +251,7 @@ export class Leftmenu extends React.Component {
             </div>
           </div>
           <div className="btmLeftOver">
-            &copy; Crypithm Cloud., All Rights Reserved
+            &copy; 2022 Crypithm Cloud
           </div>
         </div>
       </>

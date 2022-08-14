@@ -25,7 +25,8 @@ import { encryptAndUploadFile } from "../../../lib/crypto/encrypt.js";
 import { randString } from "../../../lib/crypto/random";
 import { Foldercreation } from "./folderCreation";
 import { filesWithoutThumb, unindexed } from "../../../vars";
-import {SharePrompt} from  "./shareFile";
+import { SharePrompt } from "./shareFile";
+import { CreateFolder } from "../../../lib/crypto/encrypt";
 
 // selectedIds: updates on drag event
 // selectedIndex: updates on select
@@ -59,6 +60,7 @@ export class Files extends React.Component {
     this.dragBoxRef = React.createRef();
     this.fileInputBox = React.createRef();
     this.nameChangeInput = React.createRef();
+    this.folderInputBox = React.createRef();
     this.nameEditingFile = "";
     this.previousUpload = 0;
     this.state = {
@@ -192,15 +194,24 @@ export class Files extends React.Component {
   appendToView = (elem) => {
     this.props.setData(this.props.data.concat(elem));
   };
-  startUpload = async () => {
-    var currentDir = localStorage.getItem("dir");
+  startUpload = async (files, isDirectoryUploading, folderArr) => {
+    let currentDir = localStorage.getItem("dir");
     var clientKey = localStorage.getItem("key");
-    var files = this.fileInputBox.current.files;
+    //    var files = this.fileInputBox.current.files;
     var current = 0;
     var idList = [];
     for (var b = 0; b < files.length; b++) {
       var currentId = randString(11);
       this.changedUploadProgress(0, 0, currentId);
+      if (isDirectoryUploading) {
+        currentDir = folderArr.find(
+          (elem) =>
+            elem.name ==
+            files[b].webkitRelativePath.split("/")[
+              files[b].webkitRelativePath.split("/").length - 2
+            ]
+        ).id;
+      }
       await this.pushToQueue(
         currentId,
         files[b].name,
@@ -212,6 +223,15 @@ export class Files extends React.Component {
     var loopFiles = async (leftover) => {
       var v = leftover > 4 ? 4 : leftover;
       for (var i = 0; i < v; i++) {
+        if (isDirectoryUploading) {
+          currentDir = folderArr.find(
+            (elem) =>
+              elem.name ==
+              files[current].webkitRelativePath.split("/")[
+                files[current].webkitRelativePath.split("/").length - 2
+              ]
+          ).id;
+        }
         await encryptAndUploadFile(
           files[current],
           clientKey,
@@ -228,6 +248,45 @@ export class Files extends React.Component {
     };
     loopFiles(files.length);
     current = 0;
+  };
+
+  filesUpload = async () => {
+    await this.startUpload(this.fileInputBox.current.files, false);
+  };
+
+  folderUpload = async () => {
+    var files = this.folderInputBox.current.files;
+    var folderTarg = [];
+    for (var i = 0; i < files.length; i++) {
+      var fileItem = files[i].webkitRelativePath.split("/");
+      for (var v = 0; v < fileItem.length - 1; v++) {
+        if (
+          folderTarg.find(
+            (elem) => elem.name == fileItem[v] && elem.idx == v
+          ) === undefined
+        ) {
+
+          var parent = v==0?localStorage.getItem("dir"):folderTarg.find((elem) => elem.name == fileItem[v - 1]).id
+          var id = await CreateFolder(
+            fileItem[v],
+            parent
+          );
+          folderTarg.push({ name: fileItem[v], idx: v, id: id });
+          var obj = {
+            type: "folder",
+            name: fileItem[v],
+            id: id,
+            dir: parent
+          };
+          console.log(obj)
+          this.appendToView(obj);
+          await this.props.refreshFolder();
+        }
+      }
+
+      //await CreateFolder(fileItem[0])
+    }
+    await this.startUpload(files, true, folderTarg);
   };
 
   showFileCreation = () => {
@@ -266,6 +325,10 @@ export class Files extends React.Component {
           }
         };
         v(this.props.dir);
+      } else {
+        this.setState({
+          stalkedDirectory: [],
+        });
       }
     }
   }
@@ -298,8 +361,8 @@ export class Files extends React.Component {
     this.props.modifyData(indexFromFull, "isNameEditing", true);
     this.nameEditingFile = indexFromFull;
   };
-  shareFile=()=>{
-    if(this.state.selectedIndex.length>0){
+  shareFile = () => {
+    if (this.state.selectedIndex.length > 0) {
       var selectedId = this.getIdFromIndex(this.state.selectedIndex);
       const root = ReactDOM.createRoot(
         document.querySelector("#shareWillCome")
@@ -311,9 +374,8 @@ export class Files extends React.Component {
           root={root}
         />
       );
-  
     }
-  }
+  };
   applyNameChangeIfKey = (keyCode, id) => {
     if (keyCode == "Enter") {
       var willChangeTo = this.nameChangeInput.current.value;
@@ -411,16 +473,27 @@ export class Files extends React.Component {
                 <RiFolderAddFill />
                 {"Folder"}
               </div>
-              <div className="dropdown-buttonIcon">
+              <input
+                type="file"
+                ref={this.folderInputBox}
+                style={{ display: "none" }}
+                id="folderInput"
+                onChange={() => this.folderUpload()}
+                webkitdirectory=""
+                directory=""
+                mozdirectory=""
+              ></input>
+
+              <label className="dropdown-buttonIcon" htmlFor="folderInput">
                 <RiFolderUploadFill />
                 {"Folder"}
-              </div>
+              </label>
               <input
                 type="file"
                 ref={this.fileInputBox}
                 style={{ display: "none" }}
                 id="fileInput"
-                onChange={() => this.startUpload()}
+                onChange={() => this.filesUpload()}
                 multiple
               ></input>
               <label className="dropdown-buttonIcon" htmlFor="fileInput">
@@ -467,7 +540,7 @@ export class Files extends React.Component {
                 >
                   <RiPencilFill />
                 </div>
-                <div className="FileOptIcons" onClick={()=>this.shareFile()}>
+                <div className="FileOptIcons" onClick={() => this.shareFile()}>
                   <RiShareFill />
                 </div>
                 <div className="FileOptIcons">

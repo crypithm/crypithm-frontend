@@ -387,7 +387,7 @@ export async function getAllFiledata(key) {
             date: "2022 1 19",
             id: jsn.Files[v].Id,
             thumb:
-              "https://i1.sndcdn.com/avatars-zUGIpyyW010rJFrc-rdl0PQ-t240x240.jpg",
+              "",
             completed: true,
             dir: jsn.Files[v].Dir,
           });

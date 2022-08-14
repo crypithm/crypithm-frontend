@@ -38,13 +38,14 @@ export class Crypithm extends React.Component {
     this.setState({ currentPage: window.location.pathname.split("/")[1] });
   };
   pushToUpData = (id, name, dir, size) => {
+    this.state.data.push({
+      id: id,
+      name: name,
+      dir: dir,
+      size: size,
+    })
     this.setState({
-      data: this.state.data.concat({
-        id: id,
-        name: name,
-        dir: dir,
-        size: size,
-      }),
+      data: this.state.data
     });
   };
   setData = (data) => {

@@ -265,20 +265,19 @@ export class Files extends React.Component {
             (elem) => elem.name == fileItem[v] && elem.idx == v
           ) === undefined
         ) {
-
-          var parent = v==0?localStorage.getItem("dir"):folderTarg.find((elem) => elem.name == fileItem[v - 1]).id
-          var id = await CreateFolder(
-            fileItem[v],
-            parent
-          );
+          var parent =
+            v == 0
+              ? localStorage.getItem("dir")
+              : folderTarg.find((elem) => elem.name == fileItem[v - 1]).id;
+          var id = await CreateFolder(fileItem[v], parent);
           folderTarg.push({ name: fileItem[v], idx: v, id: id });
           var obj = {
             type: "folder",
             name: fileItem[v],
             id: id,
-            dir: parent
+            dir: parent,
           };
-          console.log(obj)
+          console.log(obj);
           this.appendToView(obj);
           await this.props.refreshFolder();
         }

@@ -20,7 +20,6 @@ export class Foldercreation extends React.Component {
     const dir = localStorage.getItem("dir")
     let rtn = await CreateFolder(this.inputVal.current.value, dir)
     if (rtn) {
-      var dec = new TextDecoder();
       var obj = {
         type: "folder",
         name: this.inputVal.current.value,

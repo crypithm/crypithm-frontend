@@ -24,14 +24,18 @@
   color: rgba(255,255,255,0.5);
   border: solid 1px #000;
   padding: 0 10px 0 10px;
-  font-size: 10pt;
+  font-size: 9pt;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   border-radius: 5px;
   animation: loadedFbtn 0.4s ease-in;
+}
 
+.lmenuFolderBtn p {
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 @keyframes loadedFbtn {
   0%{
@@ -45,6 +49,8 @@
   display: flex;
   flex-direction: row;
   cursor: pointer;
+  white-space: nowrap;
+  max-width: 85%;
 }
 .lmenuFolderPre{
   display: flex;

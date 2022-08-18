@@ -143,7 +143,7 @@ export class Crypithm extends React.Component {
         ) : (
           <></>
         )}
-        <Header mobileMenu={() => this.toggleMobileMenu()} pfpsrc={this.state.pfpSrc}/>
+        <Header mobileMenu={() => this.toggleMobileMenu()} pfpsrc={this.state.pfpSrc} data={this.state.data}/>
 
         <div ref={this.dragDetectionArea}>
           <Leftmenu

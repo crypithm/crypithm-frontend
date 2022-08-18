@@ -3,6 +3,7 @@ import "./index.css";
 import { AiOutlineMenu } from "react-icons/ai";
 import { Logo } from "../../icons/Logo";
 import {RiSettings4Fill, RiLogoutBoxRFill} from 'react-icons/ri'
+import { SearchBar } from "./search";
 
 export class Header extends React.Component {
   constructor(props){
@@ -24,7 +25,7 @@ export class Header extends React.Component {
           <div className="menuBtn" onClick={() => this.props.mobileMenu()}>
             <AiOutlineMenu />
           </div>
-          <input type="text" placeholder="Search File, Folder"></input>{" "}
+          <SearchBar data={this.props.data}/>
           <div className="profile" onClick={this.clicked}>
             <img src={this.props.pfpsrc}></img>
           </div>

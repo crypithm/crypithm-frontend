@@ -21,15 +21,14 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { FileInfo } from "./fileInfo/index.js";
 import { ContextMenu } from "./contextMenu/index.js";
-import { encryptAndUploadFile } from "../../../lib/crypto/encrypt.js";
+import {
+  encryptAndUploadFile,
+  CreateFolder,
+} from "../../../lib/crypto/encrypt.js";
 import { randString } from "../../../lib/crypto/random";
 import { Foldercreation } from "./folderCreation";
 import { filesWithoutThumb, unindexed } from "../../../vars";
 import { SharePrompt } from "./shareFile";
-import { CreateFolder } from "../../../lib/crypto/encrypt";
-
-// selectedIds: updates on drag event
-// selectedIndex: updates on select
 
 class Nofiles extends React.Component {
   render() {
@@ -58,9 +57,7 @@ export class Files extends React.Component {
     this.clickDetectionArea = React.createRef();
     this.fileItemsRef = [];
     this.dragBoxRef = React.createRef();
-    this.fileInputBox = React.createRef();
     this.nameChangeInput = React.createRef();
-    this.folderInputBox = React.createRef();
     this.nameEditingFile = "";
     this.previousUpload = 0;
     this.state = {
@@ -79,11 +76,30 @@ export class Files extends React.Component {
     };
   }
 
+  /**
+   *
+   * @param {string} id target id - random length 16 string
+   * @param {string} name name - name of file - unencrypted
+   * @param {string} dir target directory
+   * @param {number} size size of file
+   * @return {void}
+   */
+
   pushToQueue = async (id, name, dir, size) => {
     this.props.pushToUpData(id, name, dir, size);
     this.state.uploadsInProgress[id] = [0, 0];
     this.setState({ uploadsInProgress: this.state.uploadsInProgress });
   };
+
+  /**
+   *
+   * @param {number} updatedLength updated length of uploading bytes
+   * @param {*} speed current upload speed in Mb/s
+   * @param {*} id update target id
+   * @param {*} fs target file size
+   * @return {void}
+   */
+
   changedUploadProgress = async (updatedLength, speed, id, fs) => {
     this.previousUpload += updatedLength;
     var progress = (this.previousUpload / fs) * 100;
@@ -120,6 +136,12 @@ export class Files extends React.Component {
     );
     root.render(<FileInfo root={root} />);
   };
+
+  /**
+   *
+   * @param {event} ctxMenuEvent ctx menu event
+   */
+
   ctxMenuCalled = (ctxMenuEvent) => {
     ctxMenuEvent.preventDefault();
     const root = ReactDOM.createRoot(
@@ -133,8 +155,12 @@ export class Files extends React.Component {
       />
     );
   };
+  /**
+   *
+   * @param {number} byindex aligning index(1~3)
+   */
   alignBySomething = (byindex) => {
-    if (byindex == 1) {
+    if (byindex === 1) {
       if (this.state.ascending) {
         this.props.setData(
           this.props.data.sort((a, b) => {
@@ -149,7 +175,7 @@ export class Files extends React.Component {
         );
       }
       this.setState({ ascending: this.state.ascending ? false : true });
-    } else if (byindex == 2) {
+    } else if (byindex === 2) {
       if (this.state.Sizeascending) {
         this.props.setData(
           this.props.data.sort((a, b) => {
@@ -167,12 +193,19 @@ export class Files extends React.Component {
     }
   };
   changedAlign = () => {
-    this.setState({ Aligngrid: this.state.Aligngrid == true ? false : true });
+    this.setState({ Aligngrid: this.state.Aligngrid === true ? false : true });
   };
+
+  /**
+   * find certain element from full data
+   * @param {string} id id of target
+   * @param {boolean} returnFullObj
+   * @returns {(number,object)} object of target if returnFullObj==true else index of target
+   */
 
   findElemIndex = (id, returnFullObj) => {
     for (var i = 0; i < this.props.data.length; i++) {
-      if (this.props.data[i].id == id) {
+      if (this.props.data[i].id === id) {
         if (returnFullObj) {
           return this.props.data[i];
         } else {
@@ -183,6 +216,11 @@ export class Files extends React.Component {
     return -1;
   };
 
+  /**
+   * wrap up upload at interface
+   * @param {string} id target
+   */
+
   uploadDone = (id) => {
     let index = this.findElemIndex(id);
     var elem = this.props.data[index];
@@ -191,13 +229,17 @@ export class Files extends React.Component {
     this.appendToView(elem);
   };
 
+  /**
+   *
+   * @param {object} elem
+   */
+
   appendToView = (elem) => {
     this.props.setData(this.props.data.concat(elem));
   };
   startUpload = async (files, isDirectoryUploading, folderArr) => {
     let currentDir = localStorage.getItem("dir");
     var clientKey = localStorage.getItem("key");
-    //    var files = this.fileInputBox.current.files;
     var current = 0;
     var idList = [];
     for (var b = 0; b < files.length; b++) {
@@ -206,7 +248,7 @@ export class Files extends React.Component {
       if (isDirectoryUploading) {
         currentDir = folderArr.find(
           (elem) =>
-            elem.name ==
+            elem.name ===
             files[b].webkitRelativePath.split("/")[
               files[b].webkitRelativePath.split("/").length - 2
             ]
@@ -226,7 +268,7 @@ export class Files extends React.Component {
         if (isDirectoryUploading) {
           currentDir = folderArr.find(
             (elem) =>
-              elem.name ==
+              elem.name ===
               files[current].webkitRelativePath.split("/")[
                 files[current].webkitRelativePath.split("/").length - 2
               ]
@@ -250,25 +292,25 @@ export class Files extends React.Component {
     current = 0;
   };
 
-  filesUpload = async () => {
-    await this.startUpload(this.fileInputBox.current.files, false);
+  filesUpload = async (e) => {
+    await this.startUpload(e.target.files, false);
   };
 
-  folderUpload = async () => {
-    var files = this.folderInputBox.current.files;
+  folderUpload = async (e) => {
+    var files = e.target.files;
     var folderTarg = [];
     for (var i = 0; i < files.length; i++) {
       var fileItem = files[i].webkitRelativePath.split("/");
       for (var v = 0; v < fileItem.length - 1; v++) {
         if (
           folderTarg.find(
-            (elem) => elem.name == fileItem[v] && elem.idx == v
+            (elem) => elem.name === fileItem[v] && elem.idx === v
           ) === undefined
         ) {
           var parent =
-            v == 0
+            v === 0
               ? localStorage.getItem("dir")
-              : folderTarg.find((elem) => elem.name == fileItem[v - 1]).id;
+              : folderTarg.find((elem) => elem.name === fileItem[v - 1]).id;
           var id = await CreateFolder(fileItem[v], parent);
           folderTarg.push({ name: fileItem[v], idx: v, id: id });
           var obj = {
@@ -303,18 +345,18 @@ export class Files extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.dir !== prevProps.dir) {
-      if (this.props.dir != "/ 0") {
+      if (this.props.dir !== "/ 0") {
         var tempArr = [];
         const v = (id) => {
           var targetObj = this.findElemIndex(id, true);
-          if (targetObj == -1) {
+          if (targetObj === -1) {
             console.error("unidentifiable target index");
           } else {
             tempArr.unshift({
               id: targetObj.id,
               name: targetObj.name,
             });
-            if (targetObj.dir != "/ 0") {
+            if (targetObj.dir !== "/ 0") {
               v(targetObj.dir);
             } else {
               this.setState({
@@ -332,9 +374,11 @@ export class Files extends React.Component {
     }
   }
   moveToDir = (id) => {
-    this.setState({ selectedIndex: [] });
-    this.setState({ stalkedDirectory: [] });
-    this.props.setDirectory(id);
+    if (id !== this.props.dir) {
+      this.setState({ selectedIndex: [] });
+      this.setState({ stalkedDirectory: [] });
+      this.props.setDirectory(id);
+    }
   };
 
   addPrefixToSize = (length) => {
@@ -376,13 +420,13 @@ export class Files extends React.Component {
     }
   };
   applyNameChangeIfKey = (keyCode, id) => {
-    if (keyCode == "Enter") {
+    if (keyCode === "Enter") {
       var willChangeTo = this.nameChangeInput.current.value;
       var indexFromFull = this.findElemIndex(id);
       this.props.modifyData(indexFromFull, "isNameEditing", false);
       this.props.modifyData(indexFromFull, "name", willChangeTo);
-    } else if (keyCode == "Escape") {
-      var indexFromFull = this.findElemIndex(id);
+    } else if (keyCode === "Escape") {
+      indexFromFull = this.findElemIndex(id);
       this.props.modifyData(indexFromFull, "isNameEditing", false);
     }
     this.nameEditingFile = "";
@@ -394,7 +438,7 @@ export class Files extends React.Component {
           <div
             className="dragger"
             style={{
-              display: this.state.moveFileBoxPos[0] == 0 ? "none" : "flex",
+              display: this.state.moveFileBoxPos[0] === 0 ? "none" : "flex",
               top: this.state.moveFileBoxPos[1] + 5 + "px",
               left: this.state.moveFileBoxPos[0] + 5 + "px",
             }}
@@ -405,7 +449,7 @@ export class Files extends React.Component {
                 className="howManyselected"
                 style={{
                   backgroundColor:
-                    this.state.onFolderId == "" ? "#949494" : "#fff",
+                    this.state.onFolderId === "" ? "#949494" : "#fff",
                 }}
               >
                 {this.props.selectedIds.length}
@@ -422,8 +466,8 @@ export class Files extends React.Component {
             className="dragSquare"
             style={{
               display:
-                this.state.currentPos[0] - this.state.startPos[0] != 0 ||
-                this.state.currentPos[1] - this.state.startPos[1] != 0
+                this.state.currentPos[0] - this.state.startPos[0] !== 0 ||
+                this.state.currentPos[1] - this.state.startPos[1] !== 0
                   ? "block"
                   : "none",
               top:
@@ -474,10 +518,9 @@ export class Files extends React.Component {
               </div>
               <input
                 type="file"
-                ref={this.folderInputBox}
                 style={{ display: "none" }}
                 id="folderInput"
-                onChange={() => this.folderUpload()}
+                onChange={this.folderUpload}
                 webkitdirectory=""
                 directory=""
                 mozdirectory=""
@@ -489,10 +532,9 @@ export class Files extends React.Component {
               </label>
               <input
                 type="file"
-                ref={this.fileInputBox}
                 style={{ display: "none" }}
                 id="fileInput"
-                onChange={() => this.filesUpload()}
+                onChange={this.filesUpload}
                 multiple
               ></input>
               <label className="dropdown-buttonIcon" htmlFor="fileInput">
@@ -583,7 +625,7 @@ export class Files extends React.Component {
                 : "filecont-cont"
             }
           >
-            {this.props.data.length == 0 ? (
+            {this.props.data.length === 0 ? (
               this.props.isLoading ? (
                 <>
                   <Nofiles loader={true} />
@@ -593,14 +635,14 @@ export class Files extends React.Component {
                   <Nofiles loader={false} />
                 </>
               )
-            ) : this.props.data.filter((elem) => elem.dir == this.props.dir)
-                .length == 0 ? (
+            ) : this.props.data.filter((elem) => elem.dir === this.props.dir)
+                .length === 0 ? (
               <Nofiles loader={false} />
             ) : (
               this.props.data
-                .filter((elem) => elem.dir == this.props.dir)
+                .filter((elem) => elem.dir === this.props.dir)
                 .map((elem, index) => {
-                  if (elem.type == "folder") {
+                  if (elem.type === "folder") {
                     return (
                       <div
                         className={
@@ -624,11 +666,11 @@ export class Files extends React.Component {
                         }}
                         style={{
                           backgroundColor:
-                            this.state.selectedIndex.indexOf(index + 1) != -1
+                            this.state.selectedIndex.indexOf(index + 1) !== -1
                               ? "rgba(255,255,255,0.1)"
                               : "",
                           border:
-                            this.state.onFolderId == elem.id
+                            this.state.onFolderId === elem.id
                               ? "solid 1px rgba(255,255,255,0.6)"
                               : "",
                         }}
@@ -699,7 +741,7 @@ export class Files extends React.Component {
                         }
                         style={{
                           backgroundColor:
-                            this.state.selectedIndex.indexOf(index + 1) != -1
+                            this.state.selectedIndex.indexOf(index + 1) !== -1
                               ? "rgba(255,255,255,0.1)"
                               : "",
                         }}
@@ -797,14 +839,14 @@ export class Files extends React.Component {
   };
 
   MoveToBtmDir = (id) => {
-    if (localStorage.getItem("dir") != id) {
+    if (localStorage.getItem("dir") !== id) {
       this.setState({ onFolderId: id });
       this.moveFilesToDir(this.props.selectedIds, id);
     }
   };
   folderEnterLeave = (enter, target) => {
     if (this.props.selectedIds.length > 0) {
-      if (this.props.selectedIds.indexOf(target) == -1) {
+      if (this.props.selectedIds.indexOf(target) === -1) {
         if (enter) {
           this.setState({ onFolderId: target });
         } else {
@@ -814,7 +856,7 @@ export class Files extends React.Component {
     }
   };
   moveFilesToDir = async (idList, target) => {
-    if (this.state.onFolderId != "") {
+    if (this.state.onFolderId !== "") {
       await this.props.moveFtoD(idList, target);
       this.setState({ selectedIndex: [] });
       this.setState({ onFolderId: "" });
@@ -835,13 +877,13 @@ export class Files extends React.Component {
       var tempIdArr = [];
       this.setState({ startPos: [0, 0], currentPos: [0, 0] });
       var targetIndex = parseInt(e.target.getAttribute("data-index"));
-      if (this.nameEditingFile != "" && e.target.id != "inputBoxId") {
+      if (this.nameEditingFile !== "" && e.target.id !== "inputBoxId") {
         this.props.modifyData(this.nameEditingFile, "isNameEditing", false);
         this.nameEditingFile = "";
       }
       //dragsquare
       if (e.shiftKey) {
-        if (this.state.selectedIndex.length == 0) {
+        if (this.state.selectedIndex.length === 0) {
           this.setState({
             selectedIndex: [targetIndex],
           });
@@ -856,18 +898,14 @@ export class Files extends React.Component {
               intlist.push(i);
             }
           } else {
-            for (
-              var i = this.state.selectedIndex.at(0);
-              i >= targetIndex;
-              i--
-            ) {
+            for (i = this.state.selectedIndex.at(0); i >= targetIndex; i--) {
               intlist.push(i);
             }
           }
           this.setState({ selectedIndex: intlist });
         }
       } else if (e.ctrlKey || e.metaKey) {
-        if (this.state.selectedIndex.indexOf(targetIndex) == -1) {
+        if (this.state.selectedIndex.indexOf(targetIndex) === -1) {
           this.setState({
             selectedIndex: this.state.selectedIndex.concat(targetIndex),
           });
@@ -877,8 +915,8 @@ export class Files extends React.Component {
           this.setState({ selectedIndex: this.state.selectedIndex });
         }
       } else {
-        if (this.state.selectedIndex.indexOf(targetIndex) != -1) {
-          this.state.selectedIndex.map((elem, _) => {
+        if (this.state.selectedIndex.indexOf(targetIndex) !== -1) {
+          this.state.selectedIndex.forEach((elem, _) => {
             tempIdArr.unshift(this.getIdFromIndex(elem));
             //click,shift,ctrl
             this.props.dragDetectionArea.current.addEventListener(
@@ -933,7 +971,7 @@ export class Files extends React.Component {
   };
   mouseMove = (mouseMoveEvent) => {
     var a = this.dragBoxRef.current.getBoundingClientRect();
-    this.fileItemsRef.map((elem, _) => {
+    this.fileItemsRef.forEach((elem, _) => {
       if (elem != null) {
         var b = elem.getBoundingClientRect();
         if (
@@ -941,13 +979,13 @@ export class Files extends React.Component {
           a.right > b.left &&
           a.top < b.bottom &&
           a.bottom > b.top &&
-          this.state.currentPos[1] != 0 &&
-          this.state.currentPos[0] != 0
+          this.state.currentPos[1] !== 0 &&
+          this.state.currentPos[0] !== 0
         ) {
           if (
             this.state.selectedIndex.indexOf(
               parseInt(elem.getAttribute("data-index"))
-            ) == -1
+            ) === -1
           ) {
             this.setState({
               selectedIndex: this.state.selectedIndex.concat([

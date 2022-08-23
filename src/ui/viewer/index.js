@@ -11,7 +11,12 @@ import {
   RiPlayLine,
   RiPauseLine,
 } from "react-icons/ri";
-import { getFileBlob, getFileMime, startVidStream } from "../../lib/crypto/decrypt";
+import {
+  getFileBlob,
+  getFileMime,
+  startVidStream,
+} from "../../lib/crypto/decrypt";
+
 
 class ViewBox extends React.Component {
   constructor(props) {
@@ -22,7 +27,7 @@ class ViewBox extends React.Component {
       vidDuration: 0,
       playing: false,
       vidPos: 0,
-      isVideoPosChanging:false
+      isVideoPosChanging: false,
     };
     this.imgRef = React.createRef();
     this.vidref = React.createRef();
@@ -62,19 +67,19 @@ class ViewBox extends React.Component {
   };
   changeVidProg = (e) => {
     if (this.state.isVideoPosChanging) {
-      var clientPointerXPos=0
-      if(e.type==="touchmove"){
-        clientPointerXPos=e.touches[0].clientX
-      }else if(e.type==="mousemove"){
-        clientPointerXPos=e.clientX
+      var clientPointerXPos = 0;
+      if (e.type === "touchmove") {
+        clientPointerXPos = e.touches[0].clientX;
+      } else if (e.type === "mousemove") {
+        clientPointerXPos = e.clientX;
       }
-      try{
+      try {
         this.vidref.current.currentTime =
-        this.vidref.current.duration *
-        ((clientPointerXPos -
-          this.progressbarRef.current.getBoundingClientRect().left) /
-          this.progressbarRef.current.clientWidth);
-      }catch{
+          this.vidref.current.duration *
+          ((clientPointerXPos -
+            this.progressbarRef.current.getBoundingClientRect().left) /
+            this.progressbarRef.current.clientWidth);
+      } catch {
         //pass
       }
     }
@@ -135,8 +140,7 @@ class ViewBox extends React.Component {
                 ref={this.vidref}
                 onTimeUpdate={this.videoStateChanged}
                 src={this.props.src}
-              >
-              </video>
+              ></video>
               <div
                 className="vidControlbar"
                 style={{ display: this.props.showControls ? "" : "none" }}
@@ -145,21 +149,22 @@ class ViewBox extends React.Component {
                   {this.state.playing ? <RiPauseLine /> : <RiPlayLine />}
                 </div>
                 <div className="vidProgress">
-                  <progress className={this.state.isVideoPosChanging?"moving":""}
+                  <progress
+                    className={this.state.isVideoPosChanging ? "moving" : ""}
                     onMouseDown={() => {
-                      this.setState({isVideoPosChanging : true});
+                      this.setState({ isVideoPosChanging: true });
                     }}
                     onTouchStart={() => {
-                      this.setState({isVideoPosChanging : true});
+                      this.setState({ isVideoPosChanging: true });
                     }}
                     onMouseUp={() => {
-                      this.setState({isVideoPosChanging : false});
+                      this.setState({ isVideoPosChanging: false });
                     }}
                     onTouchEnd={() => {
-                      this.setState({isVideoPosChanging : false});
+                      this.setState({ isVideoPosChanging: false });
                     }}
                     onMouseLeave={() => {
-                      this.setState({isVideoPosChanging : false});
+                      this.setState({ isVideoPosChanging: false });
                     }}
                     onTouchMove={this.changeVidProg}
                     onMouseMove={this.changeVidProg}
@@ -179,6 +184,7 @@ class ViewBox extends React.Component {
             </div>
           </>
         );
+      
     }
   }
 }
@@ -189,16 +195,18 @@ export class Viewer extends React.Component {
     this.state = { sourceUrl: "", type: "", mime: "", showAddition: true };
   }
 
-  updateVideoSource=(url)=>{
-    this.setState({sourceUrl:url})
-  }
+  updateVideoSource = (url) => {
+    this.setState({ sourceUrl: url });
+  };
   componentDidMount = async () => {
-    var mime = getFileMime(this.props.name)
-    var blobSource
-    if(mime.split("/")[0]==="video" && viewableType.indexOf(mime)!==-1){
-      startVidStream(this.props.id, this.updateVideoSource)
-    }else{
-      blobSource = await getFileBlob(this.props.id,mime);
+    var mime = getFileMime(this.props.name);
+    var blobSource;
+    if(mime){
+      if (mime.split("/")[0] === "video" && viewableType.indexOf(mime) !== -1) {
+        startVidStream(this.props.id, this.updateVideoSource);
+      } else {
+        blobSource = await getFileBlob(this.props.id, mime);
+      }
     }
 
     var prevtoid = "";

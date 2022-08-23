@@ -10,7 +10,7 @@ export async function feed(fileu8) {
 export async function getMime() {
   return new Promise((resolve, reject) => {
     if (fileData.length < 200) {
-      if (fileData.length == 0) {
+      if (fileData.length === 0) {
         throw new Error("No file in queue. use feed() before calling");
       } else {
         throw new Error("Data too small");

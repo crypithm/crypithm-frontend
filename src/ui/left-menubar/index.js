@@ -1,8 +1,7 @@
 import React from "react";
-import { getFolders } from "../../lib/crypto/decrypt";
 import { FcFolder } from "react-icons/fc";
-import { AiFillFolder, AiFillLock, AiOutlinePaperClip } from "react-icons/ai";
-import { RiArrowDownSFill } from "react-icons/ri";
+import { AiFillFolder, AiFillLock, AiOutlinePaperClip, AiOutlineCloud } from "react-icons/ai";
+import { RiArrowDownSFill, RiArrowUpSLine } from "react-icons/ri";
 import { menus } from "../../vars.js";
 import "./index.css";
 
@@ -26,7 +25,7 @@ class RecursiveFolders extends React.Component {
   findFolderFromId = (id) => {
     var foundList = [];
     for (var i = 0; i < this.props.folders.length; i++) {
-      if (this.props.folders[i].dir == id) {
+      if (this.props.folders[i].dir === id) {
         foundList.push(this.props.folders[i]);
       }
     }
@@ -35,7 +34,7 @@ class RecursiveFolders extends React.Component {
 
   mouseEnteredOnFolder = (id) => {
     if (this.props.selectedIds.length > 0) {
-      if (this.props.selectedIds.indexOf(id) == -1) {
+      if (this.props.selectedIds.indexOf(id) === -1) {
         this.setState({ onWhere: id });
       }
     }
@@ -45,7 +44,7 @@ class RecursiveFolders extends React.Component {
 
   findElemIndex = (id, returnFullObj) => {
     for (var i = 0; i < this.props.data.length; i++) {
-      if (this.props.data[i].id == id) {
+      if (this.props.data[i].id === id) {
         if (returnFullObj) {
           return this.props.data[i];
         } else {
@@ -75,8 +74,8 @@ class RecursiveFolders extends React.Component {
           <div
             className="lmenuFolderBtn"
             style={{
-              color: this.props.currentDir == elem.id ? "#fff" : "",
-              border: this.state.onWhere == elem.id ? "solid 1px #fff" : "",
+              color: this.props.currentDir === elem.id ? "#fff" : "",
+              border: this.state.onWhere === elem.id ? "solid 1px #fff" : "",
             }}
             onMouseEnter={() => this.mouseEnteredOnFolder(elem.id)}
             onMouseLeave={this.mouseLeftOnFolder}
@@ -141,11 +140,11 @@ export class Leftmenu extends React.Component {
   };
 
   LeftMenuButtonClicked = (n) => {
-    if (n == 0) {
+    if (n === 0) {
       this.props.setDirectory("/ 0");
     }
     this.setState({ ActiveMenuIndex: n });
-    if (this.props.currentPage != menus[n]) {
+    if (this.props.currentPage !== menus[n]) {
       window.history.pushState({}, "", `/${menus[n]}`);
     }
     this.props.updateFunc();
@@ -246,7 +245,7 @@ export class Leftmenu extends React.Component {
           </div>
           <div className="userInfoArea">
             <div className="progressArea">
-              <b>8GB out of 10GB used</b>
+              <b><b className="cloudIco"><AiOutlineCloud /></b> 8GB/10GB<div className="SUpgrade" ><RiArrowUpSLine /></div></b>
               <progress max="90" value="80"></progress>
             </div>
           </div>

@@ -151,7 +151,7 @@ export async function encryptAndUploadFile(
   } else {
     var giantLoop =
       parseInt(calchunk(file.size) / 5) +
-      (calchunk(file.size) % 5 == 0 ? 0 : 1);
+      (calchunk(file.size) % 5 === 0 ? 0 : 1);
     for (var i = 0; i < giantLoop; i++) {
       const promises = tA.map(async (v) => {
         await loopEncryptChunk(
@@ -159,7 +159,7 @@ export async function encryptAndUploadFile(
           5242912 * (5 * i + v)
         );
       });
-      if (giantLoop - 1 == i) {
+      if (giantLoop - 1 === i) {
         await Promise.all(promises);
       } else {
         await Promise.any(promises);
@@ -167,7 +167,6 @@ export async function encryptAndUploadFile(
     }
   }
   await finishedUpload(ongoingFileId);
-  var fullUploadedBytes = 0;
   async function loopEncryptChunk(offset, startFrom) {
     return new Promise((resolve, _) => {
       if (offset[0] > file.size) {
@@ -215,7 +214,6 @@ export async function encryptAndUploadFile(
           };
 
           xhr.onloadend = function () {
-            fullUploadedBytes += qoffset - offset[0];
             resolve();
           };
           xhr.send(Form);
@@ -256,5 +254,5 @@ export async function CreateFolder(folderName, currentDir) {
     body: form,
   });
   var jsn = await resp.json();
-  return jsn.StatusMessage == "Success" ? jsn.Id : false;
+  return jsn.StatusMessage === "Success" ? jsn.Id : false;
 }

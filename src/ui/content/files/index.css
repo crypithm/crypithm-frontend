@@ -16,8 +16,8 @@
     width: 100%;
     height: 50px;
     background-color: var(--var-dt-bodyColor);
-    border-top: solid 1px rgba(255,255,255,0.3);
-    color: rgba(255,255,255,0.7);
+    border-top: solid 1px rgb(92,92,92);
+    color: rgb(159,159,159);
     font-size: 17pt;
     display: flex;
     align-items: center;
@@ -29,24 +29,28 @@
 .directory span {
     display: flex;
     flex-direction: row;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .directoryBtn {
-    padding: 4px 6px 4px 6px;
+    padding: 6px 10px 6px 10px;
     font-weight: normal;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 10pt;
+    font-size: 9pt;
 }
 
 .directoryBtn:hover {
-    background-color: rgba(255,255,255,0.2);
+    background-color: #000;
+    color: #fff;
 }
 .fileContainer {
     width: calc(100% - 2px);
     border: solid 1px var(--var-dt-bodyColor);
-    border-bottom: solid 1px rgba(255,255,255,0.2);
-    color: rgba(255,255,255,.7);
+    border-bottom: solid 1px rgb(78,78,78);
+    color: rgb(180,180,180);
     height: 50px;
     display: flex;
     align-items: center;
@@ -70,7 +74,7 @@
     z-index: 80;
     padding-left: 10px;
     padding-right: 10px;
-    border: solid 1px rgba(255,255,255,0.1);
+    border: solid 1px rgb(101,101,101);
 }
 
 .dragger p {
@@ -145,8 +149,8 @@
 
 
 .fileContainer.grid>.fileThumbnail {
-    border: solid 1px rgba(255,255,255,0.1);
-    background-color: rgba(255,255,255,0.05);
+    border: solid 1px rgb(76,76,76);
+    background-color: rgb(34,34,34);
     width: 100px;
     height: 100px;
     margin: 0;
@@ -190,7 +194,7 @@
 }
 
 .nameChangeInput{
-color: rgba(255,255,255,0.8);
+color: rgb(204,204,204);
 background-color: #000;
 border: none;
 padding: 7px 10px 7px 10px;
@@ -202,8 +206,7 @@ border-radius: 3px;
 }
 
 .fileContainer:hover {
-    background-color: rgba(255,255,255,0.05)
-
+    background-color: rgb(34,34,34);
 }
 
 .newDropdown {
@@ -236,7 +239,7 @@ border-radius: 3px;
     margin-right: 10px;
 }
 .dropdown-buttonIcon:hover {
-    color: rgba(255,255,255,0.3)
+    color: rgb(190,190,190)
 }
 
 .noFiles{
@@ -246,7 +249,7 @@ border-radius: 3px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color:rgba(255,255,255,.8);
+    color:rgb(208,208,208);
 }
 
 .noFiles h3 {
@@ -277,11 +280,11 @@ border-radius: 3px;
     background-color: #242424;
     padding: 7px 13px 7px 13px;
 
-    color: rgba(255,255,255,.5);
+    color: rgb(158,158,158);
     transition: color 0.1s ease-in-out;
 }
 .Newbtn:hover {
-    color: rgba(255,255,255,.7);
+    color: rgb(190,190,190);
 }
 .Newbtn-icon {
     font-size: 15pt;
@@ -301,13 +304,13 @@ border-radius: 3px;
     background-color: var(--var-dt-bodyColor);
     width: 100%;
     height: 70px;
-    color: rgba(255,255,255,0.6);
+    color: rgb(162,162,162);
     font-size: 10pt;
     position: sticky;
     top: 71px;
     display: flex;
     align-items: center;
-    border-bottom: solid 1px rgba(255,255,255,0.2);
+    border-bottom: solid 1px rgb(69,69,69);
 }
 .FCObtn {
     display: flex;
@@ -317,8 +320,8 @@ border-radius: 3px;
     transition: opacity 0.1s ease-in-out;
 }
 .dragSquare {
-    background-color: rgba(255,255,255,0.05);
-    border: solid 1px rgba(255,255,255,0.3);
+    background-color: rgb(34,34,34);
+    border: solid 1px rgb(101,101,101);
     position: absolute;
     z-index: 2;
     width: 0;
@@ -343,8 +346,8 @@ border-radius: 3px;
 }
 
 .arrangeBar{
-    border-bottom: solid 1px rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.7);
+    border-bottom: solid 1px rgb(69,69,69);
+    color: rgb(186,186,186);
     height: 30px;
     display: flex;
     align-items: center;

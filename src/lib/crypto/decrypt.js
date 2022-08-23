@@ -56,7 +56,7 @@ export async function getFolders(key) {
     body: form,
   });
   var folderJson = await fetchData.json();
-  if (folderJson.Message == "Success") {
+  if (folderJson.Message === "Success") {
     var data = [];
     for (var i = 0; i < folderJson.Folders.length; i++) {
       var dec = new TextDecoder();
@@ -92,7 +92,7 @@ export function getFileMime(name) {
   var Filemime = false;
   Object.keys(mimeDB).forEach((value, _) => {
     try {
-      if (mimeDB[value]["extensions"].indexOf(ext) != -1) {
+      if (mimeDB[value]["extensions"].indexOf(ext) !== -1) {
         Filemime = value;
       }
     } catch {}
@@ -251,7 +251,7 @@ export async function getFileBlob(id, Filemime, updateStatus) {
   var hmc = calchunk(fileDetailJSON.Size);
 
   var intArr = [0, 1, 2, 3, 4];
-  var loops = Math.floor(hmc / 5) + (hmc % 5 == 0 ? 0 : 1);
+  var loops = Math.floor(hmc / 5) + (hmc % 5 === 0 ? 0 : 1);
   for (var i = 0; i < loops; i++) {
     const promises = intArr.map(async (v) =>
       sendAndDownloadData(
@@ -337,7 +337,7 @@ export async function getAllFiledata(key) {
   });
   var jsn = await resp.json();
   window.User = jsn.Username;
-  if (jsn.Message != "Success") {
+  if (jsn.Message !== "Success") {
     console.error("fetcherror");
   } else {
     var foldersArr = [];

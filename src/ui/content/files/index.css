@@ -320,8 +320,8 @@ border-radius: 3px;
     transition: opacity 0.1s ease-in-out;
 }
 .dragSquare {
-    background-color: rgb(34,34,34);
-    border: solid 1px rgb(101,101,101);
+    background-color: rgba(0,0,0,0.2);
+    border: solid 1px rgb(41, 41, 41);
     position: absolute;
     z-index: 2;
     width: 0;

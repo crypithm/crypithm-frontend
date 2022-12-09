@@ -6,8 +6,13 @@ import { Content } from "./ui/content/index.js";
 import { Viewer } from "./ui/viewer";
 import { getAllFiledata, getFolders } from "./lib/crypto/decrypt";
 import { Helmet } from "react-helmet";
-import {generatePfp} from "./lib/utils/pfpgen"
+import { generatePfp } from "./lib/utils/pfpgen";
 
+function throwError(message, type) {}
+
+function rejectUser() {
+  window.location.href = "https://crypithm.com";
+}
 export class Crypithm extends React.Component {
   constructor(props) {
     super(props);
@@ -21,8 +26,8 @@ export class Crypithm extends React.Component {
       selectedIds: [],
       data: [],
       folders: [],
-      isDataLoading:true,
-      pfpSrc:""
+      isDataLoading: true,
+      pfpSrc: "",
     };
   }
 
@@ -43,36 +48,44 @@ export class Crypithm extends React.Component {
       name: name,
       dir: dir,
       size: size,
-    })
+    });
     this.setState({
-      data: this.state.data
+      data: this.state.data,
     });
   };
   setData = (data) => {
     this.setState({ data: data });
   };
-  modifyData=(index,attr,value)=>{
-    this.state.data[index][attr]=value
+  modifyData = (index, attr, value) => {
+    this.state.data[index][attr] = value;
     this.setState({ data: this.state.data });
-  }
+  };
   spliceFromData = (strt, fnsh) => {
     this.state.data.splice(strt, fnsh);
   };
   componentDidMount = async () => {
+    if (
+      localStorage.getItem("tk") === null ||
+      localStorage.getItem("key") === null
+    ) {
+      rejectUser();
+    }
     localStorage.setItem("dir", "/ 0");
     window.onpopstate = () => {
       var currentPage = window.location.pathname.split("/")[1];
       this.setState({ currentPage: currentPage });
     };
-    if (menus.indexOf(this.state.currentPage) == -1) {
+    if (menus.indexOf(this.state.currentPage) === -1) {
       window.location.href = "/files";
     }
-    var decryptedJsonarray = await getAllFiledata(localStorage.getItem("key"))
-    this.setState({isDataLoading:false})
-    this.setState({folders: decryptedJsonarray.filter(val=>val.type=="folder")})
+    var decryptedJsonarray = await getAllFiledata(localStorage.getItem("key"));
+    this.setState({ isDataLoading: false });
+    this.setState({
+      folders: decryptedJsonarray.filter((val) => val.type === "folder"),
+    });
     this.setState({ data: decryptedJsonarray });
 
-    this.setState({pfpSrc:generatePfp(window.User)})
+    this.setState({ pfpSrc: generatePfp(window.User) });
   };
 
   toggleMobileMenu = () => {
@@ -89,7 +102,7 @@ export class Crypithm extends React.Component {
   };
   findElemIndex = (id, returnFullObj) => {
     for (var i = 0; i < this.state.data.length; i++) {
-      if (this.state.data[i].id == id) {
+      if (this.state.data[i].id === id) {
         if (returnFullObj) {
           return this.state.data[i];
         } else {
@@ -100,7 +113,7 @@ export class Crypithm extends React.Component {
     return -1;
   };
   moveFilesToDir = async (idList, target) => {
-    if (idList.indexOf(target) == -1 && idList.length > 0) {
+    if (idList.indexOf(target) === -1 && idList.length > 0) {
       var newForm = new FormData();
       newForm.append("targetObjs", JSON.stringify(idList));
       newForm.append("target", target);
@@ -114,7 +127,7 @@ export class Crypithm extends React.Component {
       });
       var jsn = await resp.json();
       await this.refreshFolders();
-      if (jsn.StatusMessage == "Success") {
+      if (jsn.StatusMessage === "Success") {
         var q = [];
         for (var i = 0; i < idList.length; i++) {
           let index = this.findElemIndex(idList[i]);
@@ -130,9 +143,12 @@ export class Crypithm extends React.Component {
   render = () => {
     return (
       <>
-      <Helmet>
-        <script type="text/javascript" src="https://unpkg.com/mediainfo.js/dist/mediainfo.min.js"></script>
-      </Helmet>
+        <Helmet>
+          <script
+            type="text/javascript"
+            src="https://unpkg.com/mediainfo.js/dist/mediainfo.min.js"
+          ></script>
+        </Helmet>
         {this.state.viewingFileId ? (
           <Viewer
             id={this.state.viewingFileId}
@@ -143,7 +159,12 @@ export class Crypithm extends React.Component {
         ) : (
           <></>
         )}
-        <Header mobileMenu={() => this.toggleMobileMenu()} pfpsrc={this.state.pfpSrc} data={this.state.data}/>
+        <Header
+          mobileMenu={() => this.toggleMobileMenu()}
+          pfpsrc={this.state.pfpSrc}
+          data={this.state.data}
+          setDirectory={(id) => this.setDirectory(id)}
+        />
 
         <div ref={this.dragDetectionArea}>
           <Leftmenu
@@ -178,7 +199,7 @@ export class Crypithm extends React.Component {
             spliceFromData={(strt, fnsh) => this.spliceFromData(strt, fnsh)}
             moveFtoD={(idl, targ) => this.moveFilesToDir(idl, targ)}
             isLoading={this.state.isDataLoading}
-            modifyData={(a,b,c)=>this.modifyData(a,b,c)}
+            modifyData={(a, b, c) => this.modifyData(a, b, c)}
           />
         </div>
       </>

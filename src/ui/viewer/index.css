@@ -15,6 +15,30 @@
         opacity: 1;
     }
 }
+.loadingDownload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+}
+.loadingBar {
+    position: relative;
+    width: 300px;
+    background-color: rgba(255,255,255,.5);
+    height: 5px;
+    border-radius: 2.5px;
+    overflow: hidden;
+
+}
+.fullBar {
+    position: absolute;
+    height: 100%;
+    background-color: #fff;
+    left: 0;
+    transition: width 0.1s ease-in-out;
+
+}
 .viewHeader {
     width: 100%;
     height: 60px;
@@ -31,7 +55,18 @@
 }
 
 .loader{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
 
+.loader p {
+    color: rgba(255,255,255,.5);
+    font-size: 12pt;
+    margin: 20px;
 }
 
 .imgControl {

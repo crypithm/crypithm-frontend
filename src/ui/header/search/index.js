@@ -1,11 +1,17 @@
 import React from "react";
 import "./index.css";
 import { AiOutlineSearch } from "react-icons/ai";
-
+import { FcFolder } from "react-icons/fc";
+import { filesWithoutThumb, unindexed } from "../../../vars";
 export class SearchBar extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { showExtend: false, extendMore: false, searchFrom: "name" };
+    this.state = {
+      showExtend: false,
+      extendMore: false,
+      searchFrom: "name",
+      matchedItem: [],
+    };
   }
   componentDidMount = () => {
     document.addEventListener("click", (e) => {
@@ -17,12 +23,17 @@ export class SearchBar extends React.Component {
     });
   };
   startSearch = (e, prop) => {
+    this.setState({ matchedItem: [] });
     if (e.target.value.length > 1) {
       var s = this.props.data.filter((elem) =>
         new RegExp(e.target.value).test(elem[prop])
       );
       if (prop.length > 0) {
-        console.log(s.map((elem) => elem.name));
+        this.setState({
+          matchedItem: s.map((elem) => {
+            return { name: elem.name, dir: elem.dir, type: elem.type };
+          }),
+        });
       }
     }
   };
@@ -53,7 +64,50 @@ export class SearchBar extends React.Component {
           className={`searchResult ${this.state.showExtend ? "show" : ""}`}
           id="searchExt"
         >
-          <div className="searchTitle"></div>
+          <div className="searchBody">
+            {this.state.matchedItem.length > 0 ? (
+              this.state.matchedItem.map((item, index) => {
+                {
+                  var fileFormat;
+                  try {
+                    fileFormat = /\.[^.\\/:*?"<>|\r\n]+$/
+                      .exec(item.name)[0]
+                      .split(".")[1];
+                  } catch {
+                    fileFormat = "";
+                  }
+                  return (
+                    <div
+                      className="searchedItem"
+                      onClick={() => {
+                        this.props.setDirectory(item.dir);
+                        this.endSearch();
+                      }}
+                      key={index}
+                    >
+                      <p className="icon">
+                        {item.type == "folder" ? (
+                          <>
+                            <FcFolder />
+                          </>
+                        ) : (
+                          <>
+                            {" "}
+                            {filesWithoutThumb[fileFormat]
+                              ? filesWithoutThumb[fileFormat]
+                              : unindexed}
+                          </>
+                        )}
+                      </p>
+                      <p>{item.name}</p>
+                    </div>
+                  );
+                }
+              })
+            ) : (
+              <div className="empty">Nothing Found</div>
+            )}
+          </div>
           <div className="searchFrom">
             <p className="title">Search By:</p>
             <p

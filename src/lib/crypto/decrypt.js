@@ -1,11 +1,10 @@
 import { decode } from "base64-arraybuffer";
-import { getMime, feed } from "../utils/codec";
 const mimeDB = require("mime-db");
-//mime database by: jshttp
-//(c)2022 Oh Eunchong
 
 const baseEndpointURL = "https://crypithm.com/api";
 const megabyte = 1048576;
+let cancelDownload = false;
+
 export async function decryptBlob(key, iv, binary) {
   var decdata = await crypto.subtle.decrypt(
     { name: "AES-GCM", iv: iv },
@@ -79,7 +78,7 @@ export async function getFolders(key) {
 }
 
 /**
- * 
+ *
  * @param {string} name - file name
  * @returns {string|false}
  */
@@ -100,114 +99,15 @@ export function getFileMime(name) {
   return Filemime;
 }
 
-/**
- * 
- * @param {string} id - Streaming target id 
- * @param {function} updateVidSrc 
- * @returns {Promise<void>}
- */
-
-export async function startVidStream(id, updateVidSrc) {
-  var form = new FormData();
-  form.append("id", id);
-  var resp = await fetch(`${baseEndpointURL}/predown`, {
-    headers: {
-      Authorization: localStorage.getItem("tk"),
-    },
-    body: form,
-    method: "POST",
-  });
-  var fileDetailJSON = await resp.json();
-  var nameBinary = fileDetailJSON.Blobkey;
-
-  var enc = new TextEncoder();
-  var normalMountedKey = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(localStorage.getItem("key")),
-    "PBKDF2",
-    false,
-    ["deriveKey", "deriveBits"]
-  );
-
-  var keysalt = decode(nameBinary).slice(16, 32);
-  var usedClientKey = await deriveCryptoKey(normalMountedKey, keysalt);
-  var Fullname = decode(nameBinary);
-  var decryptedData = await decryptBlob(
-    usedClientKey,
-    Fullname.slice(0, 16),
-    Fullname.slice(32)
-  );
-  var fileKey = await crypto.subtle.importKey(
-    "raw",
-    decryptedData,
-    { name: "AES-GCM" },
-    false,
-    ["decrypt"]
-  );
-  async function startVid() {
-    var totalChunks = calchunk(fileDetailJSON.Size);
-    var mediaSource = new MediaSource();
-    var u = URL.createObjectURL(mediaSource);
-    updateVidSrc(u);
-    mediaSource.addEventListener("sourceopen", function () {
-      if (mediaSource.sourceBuffers.length > 0) return;
-      var sourceBuffer;
-      sendAndDownloadData(
-        fileDetailJSON.Token,
-        5242912 * 0,
-        5242912 * 1,
-        fileKey,
-        fileDetailJSON.Size
-      ).then(function (fileData) {
-        feed(fileData);
-        getMime().then(function (data) {
-          sourceBuffer = mediaSource.addSourceBuffer(data);
-          console.log(data);
-          sourceBuffer.appendBuffer(new Uint8Array(fileData));
-          if (totalChunks - 1 === 0) {
-            sourceBuffer.addEventListener("updateend", function () {
-              if (!sourceBuffer.updating && mediaSource.readyState === "open") {
-                mediaSource.endOfStream();
-              }
-            });
-          } else {
-            startGettingVidBinary(1);
-          }
-        });
-      });
-      function startGettingVidBinary(i) {
-        sendAndDownloadData(
-          fileDetailJSON.Token,
-          5242912 * i,
-          5242912 * (i + 1),
-          fileKey,
-          fileDetailJSON.Size
-        ).then(function (data) {
-          sourceBuffer.appendBuffer(new Uint8Array(data));
-          if (totalChunks - 1 === i) {
-            sourceBuffer.addEventListener("updateend", function () {
-              if (!sourceBuffer.updating && mediaSource.readyState === "open") {
-                mediaSource.endOfStream();
-              }
-            });
-          } else {
-            startGettingVidBinary(++i);
-          }
-        });
-      }
-    });
-    mediaSource.addEventListener("sourceended", function () {
-      console.log("sourceended");
-    });
-  }
-  startVid();
+export async function cancelRequests() {
+  cancelDownload = true;
 }
 
 /**
- * 
- * @param {string} id 
- * @param {string} Filemime 
- * @param {Function} updateStatus 
+ *
+ * @param {string} id
+ * @param {string} Filemime
+ * @param {Function} updateStatus
  * @returns {Promise<string>} - blob url of file
  */
 export async function getFileBlob(id, Filemime, updateStatus) {
@@ -250,6 +150,14 @@ export async function getFileBlob(id, Filemime, updateStatus) {
   var totalBlobList = [];
   var hmc = calchunk(fileDetailJSON.Size);
 
+  let dnStates = [];
+  function updateLoadingState(index, size) {
+    dnStates[index] = size;
+    console.log(dnStates);
+    let sum = 0;
+    dnStates.forEach((itm) => (sum += itm));
+    updateStatus((100 * sum) / fileDetailJSON.Size);
+  }
   var intArr = [0, 1, 2, 3, 4];
   var loops = Math.floor(hmc / 5) + (hmc % 5 === 0 ? 0 : 1);
   for (var i = 0; i < loops; i++) {
@@ -260,7 +168,9 @@ export async function getFileBlob(id, Filemime, updateStatus) {
         5242912 * (5 * i + v + 1),
         fileKey,
         fileDetailJSON.Size,
-        updateStatus
+        fileDetailJSON.Rqid,
+        updateLoadingState,
+        5 * i + v
       ).then((decData) => {
         var respAb = new Uint8Array(decData);
         totalBlobList[5 * i + v] = new Blob([respAb]);
@@ -291,20 +201,24 @@ function sendAndDownloadData(
   endrange,
   fileKey,
   fileSize,
-  updateStatus
+  subdomain,
+  updateState,
+  index
 ) {
   return new Promise((resolve, _) => {
     if (startrange > fileSize) {
       resolve();
     } else {
       var xhr = new XMLHttpRequest();
-      xhr.open("POST", `${baseEndpointURL}/download`);
+      xhr.open("POST", `https://${subdomain}.crypithm.com/download`);
       xhr.responseType = "arraybuffer";
       var form = new FormData();
       form.append("token", token);
       xhr.setRequestHeader("StartRange", startrange);
       xhr.setRequestHeader("EndRange", endrange);
-      xhr.onprogress = (e) => {};
+      xhr.onprogress = (e) => {
+        updateState(index, e.loaded);
+      };
       xhr.onloadend = async () => {
         var data = await decryptBlob(
           fileKey,
@@ -386,8 +300,7 @@ export async function getAllFiledata(key) {
             size: parseInt(jsn.Files[v].Size),
             date: "2022 1 19",
             id: jsn.Files[v].Id,
-            thumb:
-              "",
+            thumb: "",
             completed: true,
             dir: jsn.Files[v].Dir,
           });

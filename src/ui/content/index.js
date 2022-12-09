@@ -4,6 +4,7 @@ import { Vault } from "./vault/index.js";
 import { Files } from "./files/index.js";
 import { menus } from "../../vars.js";
 import "./index.css";
+
 export class Content extends React.Component {
   render = () => {
     var index = menus.indexOf(this.props.currentPage);
@@ -15,14 +16,16 @@ export class Content extends React.Component {
         dragDetectionArea={this.props.dragDetectionArea}
         selectedIds={this.props.selectedIds}
         setSelected={(idl) => this.props.setSelected(idl)}
-        pushToUpData={(id, name, dir, size) => this.props.pushToUpData(id, name, dir, size)}
+        pushToUpData={(id, name, dir, size) =>
+          this.props.pushToUpData(id, name, dir, size)
+        }
         setData={(data) => this.props.setData(data)}
         data={this.props.data}
         spliceFromData={(strt, fnsh) => this.props.spliceFromData(strt, fnsh)}
-        moveFtoD={(idl, targ)=>this.props.moveFtoD(idl, targ)}
+        moveFtoD={(idl, targ) => this.props.moveFtoD(idl, targ)}
         isLoading={this.props.isLoading}
-        modifyData={(a,b,c)=>this.props.modifyData(a,b,c)}
-        refreshFolder={()=>this.props.refreshFolder()}
+        modifyData={(a, b, c) => this.props.modifyData(a, b, c)}
+        refreshFolder={() => this.props.refreshFolder()}
       />
     );
     return (

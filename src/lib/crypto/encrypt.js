@@ -1,13 +1,10 @@
 import { encode } from "base64-arraybuffer";
-import { FileThumbnail } from "../utils/thumbnail";
 
 const megabyte = 1048576;
 const baseEndpointURL = "https://crypithm.com/api";
 
-//(c)2022 Oh Eunchong
-
 /**
- * encrypts blob with the given params
+ * blob obj 암호화
  *
  * @param {arraybuffer} binary
  * @param {cryptokey} key
@@ -32,7 +29,7 @@ export async function encryptBlob(binary, key, randomiv, iv) {
 }
 
 /**
- * derives cryptokey from raw localstorage key string
+ * raw localstorage key에서 cryptokey 생성 (pbkdf2)
  *
  * @param {string} rawKeyBytes - localstorage key
  * @param {Uint8Array} keysalt - PBKDF2 salt
@@ -61,7 +58,7 @@ export async function importAndDeriveKeyFromRaw(rawKeyBytes, keysalt) {
 
 //data:binary
 /**
- * creates a hash with the given params
+ * 해시 생성
  *
  * @param {{name:string}} algo
  * @param {arraybuffer} data
@@ -195,7 +192,7 @@ export async function encryptAndUploadFile(
           Form.append("token", jsn.StatusMessage);
           Form.append("partialFileDta", new Blob([finishedBytes]));
           var xhr = new XMLHttpRequest();
-          xhr.open("POST", `${baseEndpointURL}/upload`);
+          xhr.open("POST", `https://${jsn.Rqid}.crypithm.com/upload`);
           xhr.setRequestHeader("StartRange", startFrom);
 
           var prevVal = 0,

@@ -1,7 +1,7 @@
 import React from "react";
 import { FcFolder } from "react-icons/fc";
-import { AiFillFolder, AiFillLock, AiOutlinePaperClip, AiOutlineCloud } from "react-icons/ai";
-import { RiArrowDownSFill, RiArrowUpSLine } from "react-icons/ri";
+import { AiFillFolder, AiFillLock } from "react-icons/ai";
+import { RiArrowDownSFill } from "react-icons/ri";
 import { menus } from "../../vars.js";
 import "./index.css";
 
@@ -57,7 +57,7 @@ class RecursiveFolders extends React.Component {
 
   mouseReleased = async (onId) => {
     if (this.mouseOn && this.props.selectedIds.length > 0) {
-      await this.props.moveFtoD(this.props.selectedIds,onId)
+      await this.props.moveFtoD(this.props.selectedIds, onId);
       this.setState({ onWhere: "" });
     }
   };
@@ -113,7 +113,7 @@ class RecursiveFolders extends React.Component {
                   this.props.spliceFromData(strt, fnsh)
                 }
                 refreshFolders={() => this.props.refreshFolders()}
-                moveFtoD={(a,b)=>this.props.moveFtoD(a,b)}
+                moveFtoD={(a, b) => this.props.moveFtoD(a, b)}
               />
             </div>
           ) : (
@@ -127,7 +127,7 @@ class RecursiveFolders extends React.Component {
 export class Leftmenu extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { ActiveMenuIndex: 0, fileBtnExtended: true, };
+    this.state = { ActiveMenuIndex: 0, fileBtnExtended: true };
   }
 
   componentDidMount = async () => {
@@ -215,7 +215,7 @@ export class Leftmenu extends React.Component {
                   this.props.spliceFromData(strt, fnsh)
                 }
                 refreshFolders={() => this.refreshFolders()}
-                moveFtoD={(a,b)=>this.props.moveFtoD(a,b)}
+                moveFtoD={(a, b) => this.props.moveFtoD(a, b)}
               />
             </div>
             <div
@@ -234,24 +234,10 @@ export class Leftmenu extends React.Component {
               className="button"
               style={this.state.ActiveMenuIndex === 2 ? ActivatedMenuStyle : {}}
               onClick={() => this.LeftMenuButtonClicked(2)}
-            >
-              <div className="icoBtn">
-                <div className="buttonIcon">
-                  <AiOutlinePaperClip />
-                </div>{" "}
-                <b>Links</b>
-              </div>
-            </div>
+            ></div>
           </div>
-          <div className="userInfoArea">
-            <div className="progressArea">
-              <b><b className="cloudIco"><AiOutlineCloud /></b> 8GB/10GB<div className="SUpgrade" ><RiArrowUpSLine /></div></b>
-              <progress max="90" value="80"></progress>
-            </div>
-          </div>
-          <div className="btmLeftOver">
-            &copy; 2022 Crypithm Cloud
-          </div>
+          <div className="userInfoArea"></div>
+          <div className="btmLeftOver">Made by gs22048 오은총</div>
         </div>
       </>
     );

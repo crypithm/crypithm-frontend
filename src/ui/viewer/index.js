@@ -11,12 +11,7 @@ import {
   RiPlayLine,
   RiPauseLine,
 } from "react-icons/ri";
-import {
-  getFileBlob,
-  getFileMime,
-  startVidStream,
-} from "../../lib/crypto/decrypt";
-
+import { getFileBlob, getFileMime } from "../../lib/crypto/decrypt";
 
 class ViewBox extends React.Component {
   constructor(props) {
@@ -124,10 +119,6 @@ class ViewBox extends React.Component {
             </div>
           </>
         );
-      case "application":
-        if (this.props.fullMime.split("/")[1] === "pdf") {
-          return <></>;
-        }
       case "video":
         return (
           <>
@@ -184,7 +175,6 @@ class ViewBox extends React.Component {
             </div>
           </>
         );
-      
     }
   }
 }
@@ -192,21 +182,33 @@ class ViewBox extends React.Component {
 export class Viewer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { sourceUrl: "", type: "", mime: "", showAddition: true };
+    this.state = {
+      sourceUrl: "",
+      type: "",
+      mime: "",
+      showAddition: true,
+      pctge: 0,
+    };
   }
+
+  updateLoading = (pctge) => {
+    this.setState({ pctge: pctge });
+  };
 
   updateVideoSource = (url) => {
     this.setState({ sourceUrl: url });
   };
+  componentWillUnmount = () => {
+    console.log("unmount");
+  };
   componentDidMount = async () => {
     var mime = getFileMime(this.props.name);
+    if (!mime) {
+      mime = "application/octet-stream";
+    }
     var blobSource;
-    if(mime){
-      if (mime.split("/")[0] === "video" && viewableType.indexOf(mime) !== -1) {
-        startVidStream(this.props.id, this.updateVideoSource);
-      } else {
-        blobSource = await getFileBlob(this.props.id, mime);
-      }
+    if (mime) {
+      blobSource = await getFileBlob(this.props.id, mime, this.updateLoading);
     }
 
     var prevtoid = "";
@@ -278,7 +280,16 @@ export class Viewer extends React.Component {
                 )}
               </>
             ) : (
-              <div className="loader"></div>
+              <div className="loader">
+                <p>다운로드중</p>
+                <div className="loadingBar">
+                  <div
+                    className="fullBar"
+                    style={{ width: `${this.state.pctge}%` }}
+                  />
+                </div>
+                <p className="progressData">{Math.round(this.state.pctge)}%</p>
+              </div>
             )}
           </div>
         </div>

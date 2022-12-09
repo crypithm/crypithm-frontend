@@ -2,18 +2,17 @@ import React from "react";
 import "./index.css";
 import { AiOutlineMenu } from "react-icons/ai";
 import { Logo } from "../../icons/Logo";
-import {RiSettings4Fill, RiLogoutBoxRFill} from 'react-icons/ri'
 import { SearchBar } from "./search";
 
 export class Header extends React.Component {
-  constructor(props){
-    super(props)
-    this.state={isuseropen:false}
+  constructor(props) {
+    super(props);
+    this.state = { isuseropen: false };
   }
 
-  clicked=()=>{
-    this.setState({isuseropen: this.state.isuseropen?false:true})
-  }
+  clicked = () => {
+    this.setState({ isuseropen: this.state.isuseropen ? false : true });
+  };
   render() {
     return (
       <>
@@ -25,44 +24,23 @@ export class Header extends React.Component {
           <div className="menuBtn" onClick={() => this.props.mobileMenu()}>
             <AiOutlineMenu />
           </div>
-          <SearchBar data={this.props.data}/>
+          <SearchBar
+            data={this.props.data}
+            setDirectory={(id) => this.props.setDirectory(id)}
+          />
           <div className="profile" onClick={this.clicked}>
             <img src={this.props.pfpsrc}></img>
           </div>
         </div>
-        <div className={`user-area ${this.state.isuseropen?'show':''}`}>
+        <div className={`user-area ${this.state.isuseropen ? "show" : ""}`}>
           <div className="profile">
-          <img src={this.props.pfpsrc}></img>
-          <div className="info-area">
-          <p>
-            {window.User}
-          </p>
-          <p className="sub">User</p>
-          </div>
-          </div>
-          <div className="buttons">
-            <div className="button">
-              <p className="icon">
-                <RiSettings4Fill />
-              </p>
-              <p>
-                Settings
-              </p>
-            </div>
-            <div className="button">
-              <p className="icon">
-                <RiLogoutBoxRFill />
-              </p>
-              <p>
-                Sign Out
-              </p>
+            <img src={this.props.pfpsrc}></img>
+            <div className="info-area">
+              <p>{window.User}</p>
+              <p className="sub">User</p>
             </div>
           </div>
-          <div className="btm">
-            <p>Privacy</p> • 
-            <p>Terms</p>
-            
-          </div>
+          <div className="btm"></div>
         </div>
       </>
     );

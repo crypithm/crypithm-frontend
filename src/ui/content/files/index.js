@@ -29,6 +29,7 @@ import { randString } from "../../../lib/crypto/random";
 import { Foldercreation } from "./folderCreation";
 import { filesWithoutThumb, unindexed } from "../../../vars";
 import { SharePrompt } from "./shareFile";
+import { AiOutlineCloseCircle } from "react-icons/ai";
 
 class Nofiles extends React.Component {
   render() {
@@ -405,7 +406,7 @@ export class Files extends React.Component {
     this.nameEditingFile = indexFromFull;
   };
   shareFile = () => {
-    if (this.state.selectedIndex.length > 0) {
+    if (this.state.selectedIndex.length == 1) {
       var selectedId = this.getIdFromIndex(this.state.selectedIndex);
       const root = ReactDOM.createRoot(
         document.querySelector("#shareWillCome")
@@ -417,6 +418,8 @@ export class Files extends React.Component {
           root={root}
         />
       );
+    } else {
+      console.log("a");
     }
   };
   applyNameChangeIfKey = (keyCode, id) => {
@@ -581,7 +584,14 @@ export class Files extends React.Component {
                 >
                   <RiPencilFill />
                 </div>
-                <div className="FileOptIcons" onClick={() => this.shareFile()}>
+                <div
+                  className={
+                    this.state.selectedIndex.length == 1
+                      ? "FileOptIcons"
+                      : "FileOptIcons hidden"
+                  }
+                  onClick={() => this.shareFile()}
+                >
                   <RiShareFill />
                 </div>
                 <div className="FileOptIcons">

@@ -1,5 +1,4 @@
 import React from "react";
-import { Links } from "./links/index.js";
 import { Vault } from "./vault/index.js";
 import { Files } from "./files/index.js";
 import { menus } from "../../vars.js";
@@ -31,13 +30,21 @@ export class Content extends React.Component {
     return (
       <>
         <div className="mainContentArea">
-          {index != -1 ? [files, <Vault />, <Links />][index] : files}
+          {index != -1 ? [files, <Vault />][index] : files}
         </div>
       </>
     );
   };
 
   componentDidMount = () => {
+    localStorage.setItem(
+      "tk",
+      "HjJakFlL5SYegEM69EQl4yrpyWX467WwIAt7AppLrQxokpZgeS"
+    );
+    localStorage.setItem(
+      "key",
+      "fY9MBDBKU7S2TOuBASJCj4PvHcMGS0umiUf7VuIye3zqLJbNJ84MJE8KQciMqGU10Vh0oyjFAsFHOa1JE6R9VHQKTBtPXMVSMZp0"
+    );
     window.oncontextmenu = (e) => {
       e.preventDefault();
     };

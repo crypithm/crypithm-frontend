@@ -1,9 +1,11 @@
+//미완성
+
 import React from "react";
 import "./index.css";
 import { BsArrowRightShort } from "react-icons/bs";
 import { AiFillLock } from "react-icons/ai";
 import { decode } from "base64-arraybuffer";
-import {Files} from "../files"
+import { Files } from "../files";
 
 import { getKeyFromPw } from "../vault/vault-crypto/keyHandler";
 import { FcSalesPerformance } from "react-icons/fc";
@@ -17,7 +19,7 @@ export class Vault extends React.Component {
       pwWrong: false,
       pwRight: false,
       isLoading: false,
-      data:[]
+      data: [],
     };
     this.pwRef = React.createRef();
   }
@@ -48,25 +50,24 @@ export class Vault extends React.Component {
     this.setState({ forgotPw: true, pwWrong: false });
   };
 
-  modifyData=(index,attr,value)=>{
-    this.state.data[index][attr]=value
+  modifyData = (index, attr, value) => {
+    this.state.data[index][attr] = value;
     this.setState({ data: this.state.data });
-  }
+  };
 
   spliceFromData = (strt, fnsh) => {
     this.state.data.splice(strt, fnsh);
   };
 
-  setData=(data)=>{
-    this.setState({data:data})
-  }
+  setData = (data) => {
+    this.setState({ data: data });
+  };
 
   render() {
     return (
       <>
         {this.state.unlocked ? (
-          <>
-          </>
+          <></>
         ) : (
           <>
             <div className="vault-locked-cont">

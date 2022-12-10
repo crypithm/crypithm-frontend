@@ -1,6 +1,6 @@
 import React from "react";
 import { FcFolder } from "react-icons/fc";
-import { AiFillFolder, AiFillLock } from "react-icons/ai";
+import { AiFillFolder } from "react-icons/ai";
 import { RiArrowDownSFill } from "react-icons/ri";
 import { menus } from "../../vars.js";
 import "./index.css";
@@ -218,23 +218,6 @@ export class Leftmenu extends React.Component {
                 moveFtoD={(a, b) => this.props.moveFtoD(a, b)}
               />
             </div>
-            <div
-              className="button"
-              style={this.state.ActiveMenuIndex === 1 ? ActivatedMenuStyle : {}}
-              onClick={() => this.LeftMenuButtonClicked(1)}
-            >
-              <div className="icoBtn">
-                <div className="buttonIcon">
-                  <AiFillLock />
-                </div>{" "}
-                <b>Vault</b>
-              </div>
-            </div>
-            <div
-              className="button"
-              style={this.state.ActiveMenuIndex === 2 ? ActivatedMenuStyle : {}}
-              onClick={() => this.LeftMenuButtonClicked(2)}
-            ></div>
           </div>
           <div className="userInfoArea"></div>
           <div className="btmLeftOver">Made by gs22048 오은총</div>

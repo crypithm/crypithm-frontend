@@ -29,7 +29,6 @@ import { randString } from "../../../lib/crypto/random";
 import { Foldercreation } from "./folderCreation";
 import { filesWithoutThumb, unindexed } from "../../../vars";
 import { SharePrompt } from "./shareFile";
-import { AiOutlineCloseCircle } from "react-icons/ai";
 
 class Nofiles extends React.Component {
   render() {
@@ -65,7 +64,6 @@ export class Files extends React.Component {
       onFolderId: "",
       selectedIndex: [],
       moveFileBoxPos: [0, 0],
-      onFolder: "",
       startPos: [0, 0],
       currentPos: [0, 0],
       newDropdown: true,
@@ -132,10 +130,19 @@ export class Files extends React.Component {
   };
 
   FileInfo = () => {
+    var selectedId = this.getIdFromIndex(this.state.selectedIndex);
+    let data = this.props.data.filter((item) => item.id == selectedId);
     const root = ReactDOM.createRoot(
       document.querySelector("#fileInfoWillCome")
     );
-    root.render(<FileInfo root={root} />);
+    let datas = {
+      name: data[0].name,
+      date: "",
+      size: `${data[0].size} bytes`,
+      dirId: data[0].dir,
+      type: data[0].type,
+    };
+    root.render(<FileInfo root={root} datas={datas} />);
   };
 
   /**
@@ -143,19 +150,6 @@ export class Files extends React.Component {
    * @param {event} ctxMenuEvent ctx menu event
    */
 
-  ctxMenuCalled = (ctxMenuEvent) => {
-    ctxMenuEvent.preventDefault();
-    const root = ReactDOM.createRoot(
-      document.querySelector("#ctxMenuWillCome")
-    );
-    root.render(
-      <ContextMenu
-        x={ctxMenuEvent.clientX}
-        y={ctxMenuEvent.clientY}
-        root={root}
-      />
-    );
-  };
   /**
    *
    * @param {number} byindex aligning index(1~3)
@@ -298,10 +292,18 @@ export class Files extends React.Component {
   };
 
   folderUpload = async (e) => {
+    let uploadable = [];
     var files = e.target.files;
     var folderTarg = [];
     for (var i = 0; i < files.length; i++) {
-      var fileItem = files[i].webkitRelativePath.split("/");
+      var fileItem = (
+        !/(^|\/)\.[^\/\.]/g.test(files[i].webkitRelativePath)
+          ? files[i].webkitRelativePath
+          : ""
+      ).split("/");
+      if (fileItem[0] != "") {
+        uploadable.push(files[i]);
+      }
       for (var v = 0; v < fileItem.length - 1; v++) {
         if (
           folderTarg.find(
@@ -320,15 +322,12 @@ export class Files extends React.Component {
             id: id,
             dir: parent,
           };
-          console.log(obj);
           this.appendToView(obj);
           await this.props.refreshFolder();
         }
       }
-
-      //await CreateFolder(fileItem[0])
     }
-    await this.startUpload(files, true, folderTarg);
+    await this.startUpload(uploadable, true, folderTarg);
   };
 
   showFileCreation = () => {
@@ -405,21 +404,36 @@ export class Files extends React.Component {
     this.props.modifyData(indexFromFull, "isNameEditing", true);
     this.nameEditingFile = indexFromFull;
   };
+  deletefrmdta = () => {
+    this.state.selectedIndex.map((elem) => {
+      var selectedId = this.getIdFromIndex(elem);
+      var indexFromFull = this.findElemIndex(selectedId);
+      this.props.spliceFromData(indexFromFull, 1);
+    });
+    this.setState({ selectedIndex: [] });
+    this.props.refreshFolder();
+  };
   shareFile = () => {
     if (this.state.selectedIndex.length == 1) {
       var selectedId = this.getIdFromIndex(this.state.selectedIndex);
-      const root = ReactDOM.createRoot(
-        document.querySelector("#shareWillCome")
-      );
-      root.render(
-        <SharePrompt
-          name={this.findElemIndex(selectedId, true).name}
-          id={selectedId}
-          root={root}
-        />
-      );
-    } else {
-      console.log("a");
+      var indexFromFull = this.findElemIndex(selectedId);
+      if (this.props.data[indexFromFull].type !== "folder") {
+        const root = ReactDOM.createRoot(
+          document.querySelector("#shareWillCome")
+        );
+        root.render(
+          <SharePrompt
+            name={this.findElemIndex(selectedId, true).name}
+            id={selectedId}
+            root={root}
+          />
+        );
+      } else {
+        this.setState({ onFolderId: selectedId });
+        setTimeout(() => {
+          this.setState({ onFolderId: "" });
+        }, 500);
+      }
     }
   };
   applyNameChangeIfKey = (keyCode, id) => {
@@ -437,7 +451,7 @@ export class Files extends React.Component {
   render = () => {
     return (
       <>
-        <div onContextMenu={(e) => this.ctxMenuCalled(e)}>
+        <div>
           <div
             className="dragger"
             style={{
@@ -461,7 +475,6 @@ export class Files extends React.Component {
               <></>
             )}
           </div>
-          <div id="ctxMenuWillCome"></div>
           <div id="fileInfoWillCome"></div>
           <div id="shareWillCome"></div>
           <div id="folderCreationWillCome"></div>
@@ -594,7 +607,7 @@ export class Files extends React.Component {
                 >
                   <RiShareFill />
                 </div>
-                <div className="FileOptIcons">
+                <div className="FileOptIcons" onClick={this.deletefrmdta}>
                   <RiDeleteBin7Fill />
                 </div>
               </div>

@@ -3,7 +3,6 @@ const mimeDB = require("mime-db");
 
 const baseEndpointURL = "https://crypithm.com/api";
 const megabyte = 1048576;
-let cancelDownload = false;
 
 export async function decryptBlob(key, iv, binary) {
   var decdata = await crypto.subtle.decrypt(
@@ -97,10 +96,6 @@ export function getFileMime(name) {
     } catch {}
   });
   return Filemime;
-}
-
-export async function cancelRequests() {
-  cancelDownload = true;
 }
 
 /**

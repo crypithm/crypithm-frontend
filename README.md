@@ -4,8 +4,9 @@ Crypithm, a secure file storage with zero knowlege and
 end-to-end encryption.
 
 
-## To-do-list
+## Features
 
-1. make vault
-2. make folder sharing
-3. make link management
+- end-to-end encryption, client controlled keys
+- fast download/upload
+
+A detailed whitepaper will be released soon
